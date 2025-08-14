@@ -1,0 +1,23 @@
+{
+  "bot": {
+    "telegram_token": "YOUR_BOT_TOKEN_HERE",
+    "telegram_chat_id": "YOUR_CHAT_ID_HERE",
+    "interval": 58,
+    "threshold": 0.05,
+    "min_market_cap": 0,
+    "min_age_days": 10
+  },
+  "analysis": {
+    "top_holders_count": 100,
+    "ranking_size": 30,
+    "detail_buttons_count": 30,
+    "cluster_min_common_tokens": 2,
+    "cluster_min_addresses": 2,
+    "cluster_max_addresses": 50
+  },
+  "proxy": {
+    "http_proxy": "http://127.0.0.1:10808",
+    "https_proxy": "http://127.0.0.1:10808",
+    "enabled": true
+  }
+}
