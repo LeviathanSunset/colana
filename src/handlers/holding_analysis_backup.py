@@ -13,7 +13,56 @@ from ..core.config import get_config
 # 导入OKX相关功能
 try:
     from ..services.okx_crawler import (
-        OKXCrawlerForBot,
+            def handle_ca1_cluster(self, call: CallbackQuery) -> None:
+        """处理地址集群分析回调"""
+        try:
+            # 解析回调数据: ca1_cluster_{cache_key} 或 ca1_cluster_page_{cache_key}_{page}
+            if call.data.startswith("ca1_cluster_page_"):
+                # 分页回调
+                parts = call.data[len("ca1_cluster_page_"):].split("_")
+                if len(parts) >= 2:
+                    cache_key = "_".join(parts[:-1])
+                    page = int(parts[-1])
+                    print(f"集群分页回调: cache_key={cache_key}, page={page}")
+                    self._handle_cluster_page_callback(call, cache_key, page)
+                else:
+                    self.bot.answer_callback_query(call.id, "❌ 分页回调数据格式错误")
+            else:
+                # 普通集群分析回调
+                cache_key = call.data[len("ca1_cluster_"):]
+                print(f"集群分析回调: cache_key={cache_key}")
+                self._handle_cluster_callback(call, cache_key)
+        except Exception as e:
+            print(f"集群分析回调处理错误: {str(e)}")
+            self.bot.answer_callback_query(call.id, f"❌ 处理集群分析失败: {str(e)}")
+
+    def _handle_cluster_page_callback(self, call: CallbackQuery, cache_key: str, page: int):
+        """处理集群分页回调"""
+        try:
+            # 从缓存中获取分析结果
+            if cache_key not in self.analysis_cache:
+                self.bot.answer_callback_query(call.id, "❌ 数据缓存已失效，请重新运行 /ca1 命令")
+                return
+
+            cached_data = self.analysis_cache[cache_key]
+            result = cached_data["result"]
+            token_address = cached_data["token_address"]
+
+            # 检查缓存是否过期
+            if time.time() - cached_data["timestamp"] > 24 * 3600:
+                self._show_expired_data_option(call, token_address)
+                return
+
+            # 检查是否已有集群分析结果缓存
+            cluster_cache_key = f"{cache_key}_clusters"
+            if cluster_cache_key in self.analysis_cache:
+                # 使用缓存的集群分析结果
+                cluster_result = self.analysis_cache[cluster_cache_key]["cluster_result"]
+                self._show_cluster_page(call, cache_key, cluster_result, page)
+            else:
+                # 需要重新运行集群分析
+                self.bot.answer_callback_query(call.id, "🔄 重新分析集群数据...")
+                self._handle_cluster_callback(call, cache_key)rForBot,
         format_tokens_table,
         format_token_holders_detail,
         analyze_address_clusters,
@@ -348,112 +397,12 @@ class HoldingAnalysisHandler:
     def handle_ca1_cluster(self, call: CallbackQuery) -> None:
         """处理地址集群分析回调"""
         try:
-            # 解析回调数据: ca1_cluster_{cache_key} 或 ca1_cluster_page_{cache_key}_{page}
-            if call.data.startswith("ca1_cluster_page_"):
-                # 分页回调
-                parts = call.data[len("ca1_cluster_page_"):].split("_")
-                if len(parts) >= 2:
-                    cache_key = "_".join(parts[:-1])
-                    page = int(parts[-1])
-                    print(f"集群分页回调: cache_key={cache_key}, page={page}")
-                    self._handle_cluster_page_callback(call, cache_key, page)
-                else:
-                    self.bot.answer_callback_query(call.id, "❌ 分页回调数据格式错误")
-            else:
-                # 普通集群分析回调
-                cache_key = call.data[len("ca1_cluster_"):]
-                print(f"集群分析回调: cache_key={cache_key}")
-                self._handle_cluster_callback(call, cache_key)
+            cache_key = call.data[len("ca1_cluster_") :]
+            print(f"集群分析回调: cache_key={cache_key}")
+            self._handle_cluster_callback(call, cache_key)
         except Exception as e:
             print(f"集群分析回调处理错误: {str(e)}")
             self.bot.answer_callback_query(call.id, f"❌ 处理集群分析失败: {str(e)}")
-
-    def _handle_cluster_page_callback(self, call: CallbackQuery, cache_key: str, page: int):
-        """处理集群分页回调"""
-        try:
-            # 从缓存中获取分析结果
-            if cache_key not in self.analysis_cache:
-                self.bot.answer_callback_query(call.id, "❌ 数据缓存已失效，请重新运行 /ca1 命令")
-                return
-
-            cached_data = self.analysis_cache[cache_key]
-            result = cached_data["result"]
-            token_address = cached_data["token_address"]
-
-            # 检查缓存是否过期
-            if time.time() - cached_data["timestamp"] > 24 * 3600:
-                self._show_expired_data_option(call, token_address)
-                return
-
-            # 检查是否已有集群分析结果缓存
-            cluster_cache_key = f"{cache_key}_clusters"
-            if cluster_cache_key in self.analysis_cache:
-                # 使用缓存的集群分析结果
-                cluster_result = self.analysis_cache[cluster_cache_key]["cluster_result"]
-                self._show_cluster_page(call, cache_key, cluster_result, page)
-            else:
-                # 需要重新运行集群分析
-                self.bot.answer_callback_query(call.id, "🔄 重新分析集群数据...")
-                self._handle_cluster_callback(call, cache_key)
-
-        except Exception as e:
-            print(f"集群分页回调错误: cache_key={cache_key}, page={page}, error={str(e)}")
-            self.bot.answer_callback_query(call.id, f"❌ 切换页面失败: {str(e)}")
-
-    def _show_cluster_page(self, call: CallbackQuery, cache_key: str, cluster_result: dict, page: int):
-        """显示指定页的集群分析结果"""
-        try:
-            # 格式化集群分析结果（支持分页）
-            clusters_per_page = self.config.analysis.clusters_per_page
-            cluster_msg, current_page, total_pages = format_cluster_analysis(
-                cluster_result, 
-                page=page, 
-                clusters_per_page=clusters_per_page
-            )
-
-            # 创建分页按钮
-            markup = InlineKeyboardMarkup(row_width=3)
-            
-            # 添加分页导航按钮
-            nav_buttons = []
-            if current_page > 1:
-                nav_buttons.append(
-                    InlineKeyboardButton("⬅️ 上一页", callback_data=f"ca1_cluster_page_{cache_key}_{current_page-1}")
-                )
-            
-            nav_buttons.append(
-                InlineKeyboardButton(f"{current_page}/{total_pages}", callback_data="noop")
-            )
-            
-            if current_page < total_pages:
-                nav_buttons.append(
-                    InlineKeyboardButton("下一页 ➡️", callback_data=f"ca1_cluster_page_{cache_key}_{current_page+1}")
-                )
-            
-            if nav_buttons:
-                markup.row(*nav_buttons)
-            
-            # 添加功能按钮
-            markup.add(
-                InlineKeyboardButton("⬅️ 返回代币排行", callback_data=f"ca1_sort_count_{cache_key}"),
-                InlineKeyboardButton("🔄 重新运行", callback_data=f"ca1_cluster_{cache_key}"),
-            )
-
-            # 更新消息
-            self.bot.edit_message_text(
-                cluster_msg,
-                call.message.chat.id,
-                call.message.message_id,
-                parse_mode="HTML",
-                reply_markup=markup,
-                disable_web_page_preview=True,
-            )
-            
-            self.bot.answer_callback_query(call.id, f"已切换到第{current_page}页")
-
-        except Exception as e:
-            print(f"显示集群页面错误: cache_key={cache_key}, page={page}, error={str(e)}")
-            self.bot.answer_callback_query(call.id, f"❌ 显示页面失败: {str(e)}")
 
     def _handle_cluster_callback(self, call: CallbackQuery, cache_key: str):
         """处理集群分析逻辑"""
@@ -573,6 +522,61 @@ class HoldingAnalysisHandler:
                 parse_mode="HTML",
                 reply_markup=markup,
             )
+
+    def _show_cluster_page(self, call: CallbackQuery, cache_key: str, cluster_result: dict, page: int):
+        """显示指定页的集群分析结果"""
+        try:
+            # 格式化集群分析结果（支持分页）
+            clusters_per_page = self.config.analysis.clusters_per_page
+            cluster_msg, current_page, total_pages = format_cluster_analysis(
+                cluster_result, 
+                page=page, 
+                clusters_per_page=clusters_per_page
+            )
+
+            # 创建分页按钮
+            markup = InlineKeyboardMarkup(row_width=3)
+            
+            # 添加分页导航按钮
+            nav_buttons = []
+            if current_page > 1:
+                nav_buttons.append(
+                    InlineKeyboardButton("⬅️ 上一页", callback_data=f"ca1_cluster_page_{cache_key}_{current_page-1}")
+                )
+            
+            nav_buttons.append(
+                InlineKeyboardButton(f"{current_page}/{total_pages}", callback_data="noop")
+            )
+            
+            if current_page < total_pages:
+                nav_buttons.append(
+                    InlineKeyboardButton("下一页 ➡️", callback_data=f"ca1_cluster_page_{cache_key}_{current_page+1}")
+                )
+            
+            if nav_buttons:
+                markup.row(*nav_buttons)
+            
+            # 添加功能按钮
+            markup.add(
+                InlineKeyboardButton("⬅️ 返回代币排行", callback_data=f"ca1_sort_count_{cache_key}"),
+                InlineKeyboardButton("🔄 重新运行", callback_data=f"ca1_cluster_{cache_key}"),
+            )
+
+            # 更新消息
+            self.bot.edit_message_text(
+                cluster_msg,
+                call.message.chat.id,
+                call.message.message_id,
+                parse_mode="HTML",
+                reply_markup=markup,
+                disable_web_page_preview=True,
+            )
+            
+            self.bot.answer_callback_query(call.id, f"已切换到第{current_page}页")
+
+        except Exception as e:
+            print(f"显示集群页面错误: cache_key={cache_key}, page={page}, error={str(e)}")
+            self.bot.answer_callback_query(call.id, f"❌ 显示页面失败: {str(e)}")
 
     def handle_token_detail(self, call: CallbackQuery) -> None:
         """处理代币详情查看回调"""

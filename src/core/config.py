@@ -31,6 +31,7 @@ class AnalysisConfig:
     cluster_min_common_tokens: int = 2
     cluster_min_addresses: int = 2
     cluster_max_addresses: int = 50
+    clusters_per_page: int = 3
 
 
 @dataclass
@@ -50,6 +51,7 @@ class ConfigManager:
         self._bot_config = None
         self._analysis_config = None
         self._proxy_config = None
+        self._ca1_allowed_groups = []
         self.load_config()
 
     def load_config(self):
@@ -83,6 +85,7 @@ class ConfigManager:
             cluster_min_common_tokens=int(os.getenv("CLUSTER_MIN_COMMON_TOKENS", 2)),
             cluster_min_addresses=int(os.getenv("CLUSTER_MIN_ADDRESSES", 2)),
             cluster_max_addresses=int(os.getenv("CLUSTER_MAX_ADDRESSES", 50)),
+            clusters_per_page=int(os.getenv("CLUSTERS_PER_PAGE", 3)),
         )
 
         self._proxy_config = ProxyConfig(
@@ -104,6 +107,20 @@ class ConfigManager:
                     for key, value in bot_data.items():
                         if hasattr(self._bot_config, key):
                             setattr(self._bot_config, key, value)
+            
+            # 更新analysis配置
+            if "analysis" in config_data:
+                analysis_data = config_data["analysis"]
+                if hasattr(self._analysis_config, "__dict__"):
+                    for key, value in analysis_data.items():
+                        if hasattr(self._analysis_config, key):
+                            setattr(self._analysis_config, key, value)
+            
+            # 加载ca1允许的群组列表
+            if "ca1_allowed_groups" in config_data:
+                self._ca1_allowed_groups = config_data["ca1_allowed_groups"]
+            else:
+                self._ca1_allowed_groups = []
 
         except Exception as e:
             print(f"配置文件加载失败: {e}")
@@ -128,6 +145,7 @@ class ConfigManager:
         config_data = {
             "bot": self._bot_config.__dict__,
             "analysis": self._analysis_config.__dict__,
+            "ca1_allowed_groups": self._ca1_allowed_groups,
             "proxy": self._proxy_config.__dict__,
         }
 
@@ -148,6 +166,11 @@ class ConfigManager:
     @property
     def proxy(self) -> ProxyConfig:
         return self._proxy_config
+
+    @property
+    def ca1_allowed_groups(self) -> list:
+        """获取允许使用 /ca1 命令的群组列表"""
+        return self._ca1_allowed_groups
 
     def update_config(self, section: str, **kwargs):
         """更新配置"""

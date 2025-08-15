@@ -772,7 +772,7 @@ def format_tokens_table(
 
         # 为代币添加详情按钮
         if i <= detail_buttons_count and cache_key and markup:
-            button_text = f"{i}. {symbol} 大户"
+            button_text = f"{i}. {symbol}"
             # 在回调数据中包含排序信息
             callback_data = f"token_detail_{cache_key}_{i-1}_{sort_by}"  # 添加排序信息
             try:
@@ -891,13 +891,15 @@ def format_token_holders_detail(token_info: Dict, token_stats: Dict) -> str:
     return msg
 
 
-def format_cluster_analysis(cluster_result: Dict, max_clusters: int = 5) -> str:
+def format_cluster_analysis(cluster_result: Dict, max_clusters: int = 5, page: int = 1, clusters_per_page: int = 3) -> str:
     """
     格式化集群分析结果为Telegram消息
 
     Args:
         cluster_result: 集群分析结果
-        max_clusters: 最多显示的集群数量
+        max_clusters: 最多显示的集群数量（已废弃，为了兼容性保留）
+        page: 当前页码（从1开始）
+        clusters_per_page: 每页显示的集群数量
 
     Returns:
         str: 格式化的消息文本
@@ -909,12 +911,20 @@ def format_cluster_analysis(cluster_result: Dict, max_clusters: int = 5) -> str:
         return "❌ 未发现符合条件的地址集群"
 
     total_clusters = summary.get("total_clusters", 0)
-
-    msg = f"🎯 <b>地址集群分析</b> (发现{total_clusters}个)\n"
+    total_pages = (len(clusters) + clusters_per_page - 1) // clusters_per_page  # 向上取整
+    
+    # 确保页码在有效范围内
+    page = max(1, min(page, total_pages))
+    
+    # 计算当前页显示的集群范围
+    start_idx = (page - 1) * clusters_per_page
+    end_idx = min(start_idx + clusters_per_page, len(clusters))
+    
+    msg = f"🎯 <b>地址集群分析</b> (第{page}/{total_pages}页, 共{total_clusters}个)\n"
     msg += "─" * 35 + "\n\n"
 
-    # 显示前几个最有价值的集群
-    displayed_clusters = clusters[:max_clusters]
+    # 显示当前页的集群
+    displayed_clusters = clusters[start_idx:end_idx]
 
     for cluster in displayed_clusters:
         cluster_id = cluster["cluster_id"]
@@ -973,11 +983,8 @@ def format_cluster_analysis(cluster_result: Dict, max_clusters: int = 5) -> str:
 
         msg += "\n" + "─" * 30 + "\n\n"
 
-    if len(clusters) > max_clusters:
-        msg += f"💡 <i>还有 {len(clusters) - max_clusters} 个集群未显示</i>\n"
-
     msg += f"\n🎯 <b>集群说明</b>\n"
     msg += f"• 按 代币数量×地址数量 综合评分排序\n"
     msg += f"• 百分比：集群在该代币中的持仓占大户总持仓的比例\n"
 
-    return msg
+    return msg, page, total_pages

@@ -1,0 +1,4524 @@
+{
+  "token_address": "9RjwNo6hBPkxayWHCqQD1VjaH8igSizEseNZNbddpump",
+  "analysis_time": "2025-08-14T13:30:13.320064",
+  "total_holders_analyzed": 99,
+  "target_token_actual_holders": 92,
+  "token_statistics": {
+    "total_unique_tokens": 193,
+    "total_portfolio_value": 23878025127.303608,
+    "top_tokens_by_value": [
+      {
+        "symbol": "VANCE ",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "97qqXPiTzpUxW1sHSPwhbtKapHQEwgs91RxfVmVVVZoi",
+        "price_usd": 0.0,
+        "total_value": 23810716998.53405,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 1,
+            "holder_address": "5Q544fKrFoe6tsEbD7S8EmxGTJYAKtTVhAW5Q5pge4j1",
+            "balance": 99999999.0,
+            "value_usd": 23810716998.53405
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "AIX",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "AiXxRGmRc5oDiFXbEeRX9obPpr3Zir7rks1ef2NjddiF",
+        "price_usd": 0.0,
+        "total_value": 17260405.22573336,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 59,
+            "holder_address": "ASTyfSima4LLAdDgoFGkgqoKowG1LZFDr9fAQrg7iaJZ",
+            "balance": 2107225.29220662,
+            "value_usd": 17260405.22573336
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "USDT",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB",
+        "price_usd": 0.0,
+        "total_value": 10481500.646355983,
+        "holder_count": 4,
+        "holders_details": [
+          {
+            "holder_rank": 34,
+            "holder_address": "D5jx4wmxuPz18hqmgpCMLGVq3uSksCafCp5xjVe1nw8p",
+            "balance": 5918016.285779,
+            "value_usd": 5920501.852619027
+          },
+          {
+            "holder_rank": 58,
+            "holder_address": "41uCv6a1JPwZT4pDAN4AGvPosHVx2ndkNFEFgKLzd5wx",
+            "balance": 133289.849976,
+            "value_usd": 133345.83171298992
+          },
+          {
+            "holder_rank": 59,
+            "holder_address": "ASTyfSima4LLAdDgoFGkgqoKowG1LZFDr9fAQrg7iaJZ",
+            "balance": 4425781.839073,
+            "value_usd": 4427640.667445411
+          },
+          {
+            "holder_rank": 83,
+            "holder_address": "458erScYN24wtNhP2voUtkab2qemunersoSbgd7e74CY",
+            "balance": 12.289417,
+            "value_usd": 12.29457855514
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "Fartcoin ",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "9BB6NFEcjBCtnNLFko2FqVQBq8HHM13kCyYcdQbgpump",
+        "price_usd": 0.0,
+        "total_value": 7856595.2638065275,
+        "holder_count": 3,
+        "holders_details": [
+          {
+            "holder_rank": 34,
+            "holder_address": "D5jx4wmxuPz18hqmgpCMLGVq3uSksCafCp5xjVe1nw8p",
+            "balance": 94912.877561,
+            "value_usd": 98317.20875948906
+          },
+          {
+            "holder_rank": 58,
+            "holder_address": "41uCv6a1JPwZT4pDAN4AGvPosHVx2ndkNFEFgKLzd5wx",
+            "balance": 47580.698322,
+            "value_usd": 49267.016442746135
+          },
+          {
+            "holder_rank": 59,
+            "holder_address": "ASTyfSima4LLAdDgoFGkgqoKowG1LZFDr9fAQrg7iaJZ",
+            "balance": 7443515.489655,
+            "value_usd": 7709011.038604292
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "RAY",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "4k3Dyjzvzp8eMZWUXbBCjEvwSkkk59S5iCNLY3QrkX6R",
+        "price_usd": 0.0,
+        "total_value": 5705356.033345745,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 59,
+            "holder_address": "ASTyfSima4LLAdDgoFGkgqoKowG1LZFDr9fAQrg7iaJZ",
+            "balance": 1524843.925953,
+            "value_usd": 5705356.033345745
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "PUMP",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "pumpCmXqMfrsAkQ5r49WcJnRayYRqmXz6ae8H7H9Dfn",
+        "price_usd": 0.0,
+        "total_value": 5148063.103488861,
+        "holder_count": 6,
+        "holders_details": [
+          {
+            "holder_rank": 34,
+            "holder_address": "D5jx4wmxuPz18hqmgpCMLGVq3uSksCafCp5xjVe1nw8p",
+            "balance": 19541468.373251,
+            "value_usd": 71763.13565588916
+          },
+          {
+            "holder_rank": 58,
+            "holder_address": "41uCv6a1JPwZT4pDAN4AGvPosHVx2ndkNFEFgKLzd5wx",
+            "balance": 8313136.80372,
+            "value_usd": 30565.729463181622
+          },
+          {
+            "holder_rank": 59,
+            "holder_address": "ASTyfSima4LLAdDgoFGkgqoKowG1LZFDr9fAQrg7iaJZ",
+            "balance": 1323990317.452445,
+            "value_usd": 4868045.698106912
+          },
+          {
+            "holder_rank": 60,
+            "holder_address": "632xX5AAwJ7Z5phYdc5p6k3LTFk4JtRXGN196iqwHAoj",
+            "balance": 18698.880886,
+            "value_usd": 68.80687341362756
+          },
+          {
+            "holder_rank": 62,
+            "holder_address": "8s9j5qUtuE9PGA5s7QeAXEh5oc2UGr71pmJXgyiZMHkt",
+            "balance": 46353129.809714,
+            "value_usd": 170509.88341766925
+          },
+          {
+            "holder_rank": 98,
+            "holder_address": "Bka38LDfNRCJqvc3Bgy7i6RpVdgCFPGM22pGYPPaGTVf",
+            "balance": 1935088.783699,
+            "value_usd": 7109.849971794585
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "ai16z",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "HeLp6NuQkmYB4pYWo2zYs22mESHXPQYzXbB8n4V98jwC",
+        "price_usd": 0.0,
+        "total_value": 3612655.445504189,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 59,
+            "holder_address": "ASTyfSima4LLAdDgoFGkgqoKowG1LZFDr9fAQrg7iaJZ",
+            "balance": 28349456.977839414,
+            "value_usd": 3612655.445504189
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "USELESS",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "Dz9mQ9NzkBcCsuGPFJ3r1bS4wgqKMHBPiVuniW8Mbonk",
+        "price_usd": 0.0,
+        "total_value": 3588835.9861484235,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 59,
+            "holder_address": "ASTyfSima4LLAdDgoFGkgqoKowG1LZFDr9fAQrg7iaJZ",
+            "balance": 13682586.846339,
+            "value_usd": 3588835.9861484235
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "$WIF",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "EKpQGSJtjMFqKZ9KQanSqYXRcF8fBopzLHYxdM65zcjm",
+        "price_usd": 0.0,
+        "total_value": 3412801.6250795736,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 59,
+            "holder_address": "ASTyfSima4LLAdDgoFGkgqoKowG1LZFDr9fAQrg7iaJZ",
+            "balance": 3609079.871379,
+            "value_usd": 3412801.6250795736
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "SAROS",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "SarosY6Vscao718M4A778z4CGtvcwcGef5M9MEH1LGL",
+        "price_usd": 0.0,
+        "total_value": 2396982.8722943105,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 59,
+            "holder_address": "ASTyfSima4LLAdDgoFGkgqoKowG1LZFDr9fAQrg7iaJZ",
+            "balance": 6177106.30161,
+            "value_usd": 2396982.8722943105
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "Stupid",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "9RjwNo6hBPkxayWHCqQD1VjaH8igSizEseNZNbddpump",
+        "price_usd": 0.0,
+        "total_value": 1991392.168683475,
+        "holder_count": 92,
+        "holders_details": [
+          {
+            "holder_rank": 2,
+            "holder_address": "9rd2ehJwSBqqK1rNZZmJ8euuNh4ryR5KmFzuc3yRCFVz",
+            "balance": 19434199.059022,
+            "value_usd": 73759.77535068509
+          },
+          {
+            "holder_rank": 3,
+            "holder_address": "GGD3fvpTbLdHQQ8YqBXUxafFGnTDEKf8svL6k9pokgkq",
+            "balance": 16769682.355894,
+            "value_usd": 63646.976112394295
+          },
+          {
+            "holder_rank": 4,
+            "holder_address": "34qSTYsfmQcqjq9LvrLGavarD4f8T7wJaNDqzo91KgBb",
+            "balance": 14890639.081186,
+            "value_usd": 56515.33104712797
+          },
+          {
+            "holder_rank": 5,
+            "holder_address": "3tGPfUTXBkhD4HcJ57wxxRA7n6KQZR88anFQhn8mjfZy",
+            "balance": 13964669.971274,
+            "value_usd": 53000.945230591
+          },
+          {
+            "holder_rank": 6,
+            "holder_address": "C7ZZSpPQfSw95AbEAdZdWFYL2K2Ek55gyqAbsBEWuE1B",
+            "balance": 13000000.0,
+            "value_usd": 49339.6757256
+          },
+          {
+            "holder_rank": 7,
+            "holder_address": "C8xKCjdzgqVPegGdNKL5wfyvdJ1Jx1EjXgyoU2sfcYqr",
+            "balance": 12302548.914748,
+            "value_usd": 46692.59800399988
+          },
+          {
+            "holder_rank": 9,
+            "holder_address": "AgezeV8FWoKYStx9dzobPvcUsH9RDDPCumtkR8KUKcsd",
+            "balance": 12000148.075807,
+            "value_usd": 45544.87805534617
+          },
+          {
+            "holder_rank": 10,
+            "holder_address": "EFS7EkPWzgyJxJ2GXyNekXhYWKE421naxkGCVFrwaaar",
+            "balance": 12000113.462085,
+            "value_usd": 45544.74668382162
+          },
+          {
+            "holder_rank": 11,
+            "holder_address": "J1NAx4rocSWA1GWXD4z2LWswE3xEVQHFg2bY1gLKEcRx",
+            "balance": 11650689.500073,
+            "value_usd": 44218.557070250354
+          },
+          {
+            "holder_rank": 12,
+            "holder_address": "EjtZWQtMyBN5HH9eEQJhZXjF4E3Xnn3agFobyKUPEh9s",
+            "balance": 11407156.247629,
+            "value_usd": 43294.260785328224
+          },
+          {
+            "holder_rank": 13,
+            "holder_address": "B8Hrx68jAhV7jWbgzbyfbRhGLphFHkBZJjE2JxMKhdGG",
+            "balance": 10577578.253003,
+            "value_usd": 40145.71392040973
+          },
+          {
+            "holder_rank": 14,
+            "holder_address": "3rVfGfGxomNCA2qfK4QVuQV4DzypZFkHfSPaphWpgAqd",
+            "balance": 10063399.92461,
+            "value_usd": 38194.222229021914
+          },
+          {
+            "holder_rank": 15,
+            "holder_address": "DSDfJrtq9KZgyeh2kSXVUxxrdyFobwMJdP46jKpBiUNT",
+            "balance": 10009571.366853,
+            "value_usd": 37989.92349175214
+          },
+          {
+            "holder_rank": 16,
+            "holder_address": "EtU73MSYSw2RbGu3QGA8HxNeZudnRDeSBuHFCKd8gawv",
+            "balance": 10000000.0,
+            "value_usd": 37953.596712
+          },
+          {
+            "holder_rank": 17,
+            "holder_address": "8sTVL7QoRY2wtcmyPD9XDNhNZkkgvnwYJNJYCVmgPYh1",
+            "balance": 10000000.0,
+            "value_usd": 37953.596712
+          },
+          {
+            "holder_rank": 18,
+            "holder_address": "C37gGxxyWLXETgE4aNqsXhSZTuS6dRTXxEki7G9cgaax",
+            "balance": 9942523.068074,
+            "value_usd": 37735.451082543754
+          },
+          {
+            "holder_rank": 19,
+            "holder_address": "3v8RbCPVTxRuGrt3BfYoDtXycZnW212MbW2dy1vv4VJE",
+            "balance": 9788188.273623,
+            "value_usd": 37149.695027821486
+          },
+          {
+            "holder_rank": 20,
+            "holder_address": "E6jtGZzNgpiNA6LjhCp4aM64W2aW2RUbcwowZtVKjjEf",
+            "balance": 9681380.668908,
+            "value_usd": 36744.3217523087
+          },
+          {
+            "holder_rank": 21,
+            "holder_address": "6sJXfeGWBiFATzwsTghcsPbd3XTcBPvsxXLT5Q2GGBCB",
+            "balance": 9527777.454335,
+            "value_usd": 36161.34230635166
+          },
+          {
+            "holder_rank": 22,
+            "holder_address": "EFW5CwoiBqxVFdAYrnPMj1GEgoFoHaWaGb4tXtSXsLDV",
+            "balance": 9507847.287537,
+            "value_usd": 36085.70015504624
+          },
+          {
+            "holder_rank": 23,
+            "holder_address": "3FcviM7AAeKjGC78jARYXT3dLPJy7wA76rzmfoctA1gy",
+            "balance": 9440615.312963,
+            "value_usd": 35830.53063013294
+          },
+          {
+            "holder_rank": 24,
+            "holder_address": "CPvkoujsnnVc46rhfhayugEZ5ynJbeKVdXwVHjisbXJB",
+            "balance": 9232767.868078,
+            "value_usd": 35041.674820054446
+          },
+          {
+            "holder_rank": 25,
+            "holder_address": "5sAfisQZfhPvwiuuy5x8JhKxZGiDDeMHnScELAK28Dtj",
+            "balance": 9001000.000001,
+            "value_usd": 34162.03240047499
+          },
+          {
+            "holder_rank": 26,
+            "holder_address": "97GNwhcedV4b4nnfQ6bDgmFGTdGsGLQuXe3MV8qpDrLw",
+            "balance": 9000000.000001,
+            "value_usd": 34158.2370408038
+          },
+          {
+            "holder_rank": 27,
+            "holder_address": "BQnTyxEjQyXx2twsC4EeTHrioNhMyJw3PUJdsqzGdWB2",
+            "balance": 8510029.408845,
+            "value_usd": 32298.62241905629
+          },
+          {
+            "holder_rank": 28,
+            "holder_address": "FsKn2CGTc8Qcb2tsMDQDN6v4NxNrj2asKFDCDeBQoS7m",
+            "balance": 8197589.98707,
+            "value_usd": 31112.802437958406
+          },
+          {
+            "holder_rank": 29,
+            "holder_address": "B4gF7BQjawi2x46SAS57xXJsteRoQxf2cd3Vx8LeFaCd",
+            "balance": 8049147.668742,
+            "value_usd": 30549.410449476884
+          },
+          {
+            "holder_rank": 30,
+            "holder_address": "3YiackdmooZqgx43RrHyKQnqhm8tqhm2TNsVi2qtmagD",
+            "balance": 8000000.0,
+            "value_usd": 30362.8773696
+          },
+          {
+            "holder_rank": 31,
+            "holder_address": "9YKQk73NVuMY2SQFrZjeSuQ4RbvUQuDRZPXczhhpT5Ds",
+            "balance": 7839725.961575,
+            "value_usd": 29754.579747821397
+          },
+          {
+            "holder_rank": 32,
+            "holder_address": "FVrq4FbdWQrTBgyDUFbZbrdt5FFtWiDkhRTFM6HEGRh6",
+            "balance": 7769936.190152,
+            "value_usd": 29489.702463900274
+          },
+          {
+            "holder_rank": 33,
+            "holder_address": "7onSZMa5WdRmppGPAqigFjysefsqCpVfJh7aPMR2EH7e",
+            "balance": 7344837.397297,
+            "value_usd": 27876.299649222605
+          },
+          {
+            "holder_rank": 35,
+            "holder_address": "6n8TR5M5kTpVyCRfHVd85DQLyEYb9vig6KRZPccS9qXJ",
+            "balance": 7237559.7434,
+            "value_usd": 27469.14236800098
+          },
+          {
+            "holder_rank": 36,
+            "holder_address": "2VDK1KP7FWdhtzQ3UGJ4VA3YAhwL4ghU7J1EWFiTEyBh",
+            "balance": 6389552.015942,
+            "value_usd": 24250.648038340925
+          },
+          {
+            "holder_rank": 37,
+            "holder_address": "GqvDabiaJwkjTwFPYsVcn9SymEoqVoGYQYUo3Covq5CY",
+            "balance": 6062521.600922,
+            "value_usd": 23009.44998991822
+          },
+          {
+            "holder_rank": 38,
+            "holder_address": "CCzbWwebpgbA1vbZezcDbbXWWYzH3f7hmwa16oQrS3Bs",
+            "balance": 6027317.834398,
+            "value_usd": 22875.83903417869
+          },
+          {
+            "holder_rank": 39,
+            "holder_address": "Ai19fbhw2ADxzQ9xij26nEvK4NGmb4PPHU3Vsa7Yp1cu",
+            "balance": 6001694.867177,
+            "value_usd": 22778.590657731627
+          },
+          {
+            "holder_rank": 40,
+            "holder_address": "J9oCqq3nbGoNPAX4TX7US54vhPkz7ggyaktaDi85nbLs",
+            "balance": 5562629.741945,
+            "value_usd": 21112.180588395717
+          },
+          {
+            "holder_rank": 41,
+            "holder_address": "54a2nSQEgX3JD2itpXuz3iZk1ivPwb2BJTK6rueyV9qZ",
+            "balance": 5549655.724269,
+            "value_usd": 21062.93952493479
+          },
+          {
+            "holder_rank": 42,
+            "holder_address": "B6jqEpTP2o378WAJ8LmTMzm39EBZujfp91oFjCF2hHWW",
+            "balance": 5512557.474885,
+            "value_usd": 20922.138325350636
+          },
+          {
+            "holder_rank": 43,
+            "holder_address": "AQi3KQh54j8nhxxcRqjphd5MbjZkbZiTbiYcWSFWsbqY",
+            "balance": 5139342.633323,
+            "value_usd": 19505.653766992924
+          },
+          {
+            "holder_rank": 44,
+            "holder_address": "HU9aawK3Qf8dzwagTvqYSP2DnSBXfAQUw2MZXZzmRMLC",
+            "balance": 5003107.888112,
+            "value_usd": 18988.593909202886
+          },
+          {
+            "holder_rank": 45,
+            "holder_address": "FNqYztxBM8ugDTEufY6ot8KvJFoYziQCbLQqF1adTmjt",
+            "balance": 5001544.352279,
+            "value_usd": 18982.65972835784
+          },
+          {
+            "holder_rank": 46,
+            "holder_address": "xuW63oFFg1n94oBaZEKvLK3zyq1GqEAaEeejbHVL1DR",
+            "balance": 5000195.168839,
+            "value_usd": 18977.539091940616
+          },
+          {
+            "holder_rank": 47,
+            "holder_address": "2kVaTYHe4fQao9U5Ap6Wq1qPAtWvwBSoRECSBSgsYkXW",
+            "balance": 5000041.322171,
+            "value_usd": 18976.95518850134
+          },
+          {
+            "holder_rank": 48,
+            "holder_address": "HsitEkE84vwLbfeBvFhs9meQAa2wYtePDYW2cndeeJPr",
+            "balance": 5000000.0,
+            "value_usd": 18976.798356
+          },
+          {
+            "holder_rank": 50,
+            "holder_address": "5d4TCx3mvXeRx7wVqNgA7X2CnkUrg3qPLUzgwcpY8aby",
+            "balance": 4603248.242947,
+            "value_usd": 17507.60483904617
+          },
+          {
+            "holder_rank": 51,
+            "holder_address": "511bYc7dNx5LnH9VfPoYT56kfQLApr7uKWea2QG5r2Z9",
+            "balance": 4579880.286548,
+            "value_usd": 17418.729131081345
+          },
+          {
+            "holder_rank": 52,
+            "holder_address": "Dabd8AcuDXWpDQfUZCCa6C8oY7axD2zZcLmaoVmjrj5n",
+            "balance": 4478440.978044,
+            "value_usd": 17032.92344894043
+          },
+          {
+            "holder_rank": 53,
+            "holder_address": "7zhQANrCG4a9PfGEGjwhAJsw172SnLL1zwcufAwLKXkV",
+            "balance": 4271148.551564,
+            "value_usd": 16244.524975210616
+          },
+          {
+            "holder_rank": 54,
+            "holder_address": "3rxNo1RsmRH8AZskiWPRrZDjHFGXqs3PctrnDkyCQEVv",
+            "balance": 4127682.301973,
+            "value_usd": 15698.87758167114
+          },
+          {
+            "holder_rank": 55,
+            "holder_address": "9pSZw8E4EBMC4hc9pU8qC3ss4H6XKRabWqWqK8K3E6DF",
+            "balance": 4003988.595444,
+            "value_usd": 15228.431405255445
+          },
+          {
+            "holder_rank": 56,
+            "holder_address": "EquR7UoxWfKv83cVzZGodvZ4CEUVB9HySY2EmggoG3P4",
+            "balance": 3768587.625653,
+            "value_usd": 14333.12727644952
+          },
+          {
+            "holder_rank": 57,
+            "holder_address": "AyhQRprqfvb8s4RLbnvf6NdfefZGTHXqYCT2d7kMVAgp",
+            "balance": 3645407.716704,
+            "value_usd": 13864.6352342719
+          },
+          {
+            "holder_rank": 60,
+            "holder_address": "632xX5AAwJ7Z5phYdc5p6k3LTFk4JtRXGN196iqwHAoj",
+            "balance": 3305788.0417,
+            "value_usd": 12572.954501075394
+          },
+          {
+            "holder_rank": 61,
+            "holder_address": "CFtdkMRX62Knn51SiibXQsGPRHpgg3X3AKuXT7A4GMSG",
+            "balance": 3288896.621197,
+            "value_usd": 12508.7111016911
+          },
+          {
+            "holder_rank": 63,
+            "holder_address": "4N8r2omejBQELRfdkvraRKy97XCyJsU3gdRr1gRwK8nY",
+            "balance": 3090000.206006,
+            "value_usd": 11752.245306825
+          },
+          {
+            "holder_rank": 64,
+            "holder_address": "3KK5DsjuVZPvaTVZ9PS5sEPCWXZcWcb2C1aLBfdcijLw",
+            "balance": 3051469.690066,
+            "value_usd": 11605.701602962044
+          },
+          {
+            "holder_rank": 65,
+            "holder_address": "Fscrd95LbaUoVMHtaMjwVFzbfGiL3vUmR4EmKK9ts4bB",
+            "balance": 2946780.104009,
+            "value_usd": 11207.534090215464
+          },
+          {
+            "holder_rank": 66,
+            "holder_address": "DWtdG5Hi23om7QuUinnheLjJmUzc8d64RvbQvimUGt95",
+            "balance": 2800000.0,
+            "value_usd": 10649.283063201874
+          },
+          {
+            "holder_rank": 67,
+            "holder_address": "DeAivEUFE7BeLPu99bmDxAtomgFxDyuXmS6mLJEgMrz6",
+            "balance": 2596000.0,
+            "value_usd": 9873.406725740024
+          },
+          {
+            "holder_rank": 68,
+            "holder_address": "DuLMFpDBXVpSEJUL3H86Hp5kMLttuHzFbgdH6jgLBdUZ",
+            "balance": 2509838.183079,
+            "value_usd": 9545.7061623002
+          },
+          {
+            "holder_rank": 70,
+            "holder_address": "4BeK2UZekpbcSGgt4i7d91e61vw61KT3Cxf2S7uaQRyj",
+            "balance": 2406798.051038,
+            "value_usd": 9153.812043380805
+          },
+          {
+            "holder_rank": 71,
+            "holder_address": "DUFwznTAZ6G6ZfEPWqcyauxKdhdDa4YkrvmmC5w3rBfh",
+            "balance": 2287410.954516,
+            "value_usd": 8699.745263039169
+          },
+          {
+            "holder_rank": 72,
+            "holder_address": "BdwdJCUvF1AS5KNuJJvTCf2iE8AYZHG8XvgP8LixaPZB",
+            "balance": 2277205.689837,
+            "value_usd": 8660.931422931466
+          },
+          {
+            "holder_rank": 73,
+            "holder_address": "4176mDBGAaKmatA4ACZVA72AGNWYKqp6tZWEKei4RjX9",
+            "balance": 2236324.672361,
+            "value_usd": 8505.448020426598
+          },
+          {
+            "holder_rank": 74,
+            "holder_address": "2zuo2M1HCS9gs2vzuCDK6gR7VuSw6e3am6SeBrj54s1c",
+            "balance": 2210604.886632,
+            "value_usd": 8407.62756380052
+          },
+          {
+            "holder_rank": 75,
+            "holder_address": "A7JLaVrqaxrgedrGBYrC439zbapuR3TigxRsYx7Evz2T",
+            "balance": 2206612.712909,
+            "value_usd": 8392.44406808134
+          },
+          {
+            "holder_rank": 76,
+            "holder_address": "HCZgcnoYBSorLid2gogmqCGrkyb2UuTatCyDHNNo5K6F",
+            "balance": 2204875.715016,
+            "value_usd": 8385.837717280361
+          },
+          {
+            "holder_rank": 77,
+            "holder_address": "EpNDMVvKtYM4Jn47xKV6mCvSefY1DmmuvyxZH29WcoWu",
+            "balance": 2039664.854226,
+            "value_usd": 7757.488709541807
+          },
+          {
+            "holder_rank": 78,
+            "holder_address": "F5NvuP1htcKph9vjktbPVDkc85dwvzNFHvUs3nS6gxHd",
+            "balance": 2033943.015371,
+            "value_usd": 7735.726751824335
+          },
+          {
+            "holder_rank": 79,
+            "holder_address": "AFs7qiiid5rh22RLxS9miXxFVCUxRUq8qE9QJMDuwH1J",
+            "balance": 2032273.835112,
+            "value_usd": 7729.3783328737645
+          },
+          {
+            "holder_rank": 80,
+            "holder_address": "2QKia2kY3a9ymz1z2AMaLwk1EHW91UwTmvieNYcJioN5",
+            "balance": 2013858.409834,
+            "value_usd": 7659.3386626899555
+          },
+          {
+            "holder_rank": 81,
+            "holder_address": "BvFEfQjCCBgV29KRX1oo1bng5RxjXZjgp9rTjhYrWAy8",
+            "balance": 2001081.919896,
+            "value_usd": 7610.745642009986
+          },
+          {
+            "holder_rank": 82,
+            "holder_address": "ALU8tUp4tmYoBY37os6wPhBwrQst5d6UaLCFiMsno24c",
+            "balance": 2000000.201421,
+            "value_usd": 7585.369686575633
+          },
+          {
+            "holder_rank": 83,
+            "holder_address": "458erScYN24wtNhP2voUtkab2qemunersoSbgd7e74CY",
+            "balance": 1947092.741955,
+            "value_usd": 7384.70838717077
+          },
+          {
+            "holder_rank": 84,
+            "holder_address": "HdQhk7d4mypWv779T8wARMPqi3RLaYtpP6kt2PjEF7C2",
+            "balance": 1921667.267973,
+            "value_usd": 7288.277587077424
+          },
+          {
+            "holder_rank": 85,
+            "holder_address": "4ckP3uN4N76qakK8sZxchGh1kFy5TB7V1A47mPMjF1gL",
+            "balance": 1914009.607236,
+            "value_usd": 7259.234496190108
+          },
+          {
+            "holder_rank": 86,
+            "holder_address": "CRocYEsrdwTJmfbbBVc43iAKaRmLzxpieJtNysXs5TYr",
+            "balance": 1897105.305977,
+            "value_usd": 7195.121815475548
+          },
+          {
+            "holder_rank": 87,
+            "holder_address": "FzjbMkvgRqnzCpP5uKSN9bCezEPKa4fi8rgRFPTHNo4y",
+            "balance": 1895189.374277,
+            "value_usd": 7187.855291087998
+          },
+          {
+            "holder_rank": 88,
+            "holder_address": "9D1qtQ2RDo8MKfyYKKXdPy2esMUyry8oX5Kyi23nuems",
+            "balance": 1882391.618438,
+            "value_usd": 7139.317441377596
+          },
+          {
+            "holder_rank": 89,
+            "holder_address": "5cGDtzoNNvm3CYq97YaNCUSqCC3R4N6CUFvYDnTLmjzY",
+            "balance": 1868653.384143,
+            "value_usd": 7087.212653640911
+          },
+          {
+            "holder_rank": 90,
+            "holder_address": "tYeqethXvq6TURQdMaRcq33dCdnB8xaCqK2WHkKcfoZ",
+            "balance": 1844780.640208,
+            "value_usd": 6996.670868669455
+          },
+          {
+            "holder_rank": 91,
+            "holder_address": "4JnpVQBMoX3AAEDvSSTxUPYedvGNsL4FtZHLhSKXwDmU",
+            "balance": 1819771.276308,
+            "value_usd": 6901.818242818311
+          },
+          {
+            "holder_rank": 92,
+            "holder_address": "5N2DB6b7zZEqUMNhyxcys9afARn7L3tH2QUP12i1fPwa",
+            "balance": 1788062.613013,
+            "value_usd": 6781.557288249988
+          },
+          {
+            "holder_rank": 93,
+            "holder_address": "HnKWADuvemQb1o5JWnHjhykPKkUSDWqr7UaMMo6HCu5j",
+            "balance": 1778915.328935,
+            "value_usd": 6746.864526064035
+          },
+          {
+            "holder_rank": 94,
+            "holder_address": "GM3A4B2CnkgPbw8h6LQCt6xZCBKTheN4cbFGM4EHPkEb",
+            "balance": 1756253.626473,
+            "value_usd": 6660.915839269244
+          },
+          {
+            "holder_rank": 95,
+            "holder_address": "3vpi8QbrDVcSpTtVEoajRPNqzAdBadD4CBrH93uHm9FY",
+            "balance": 1701851.628983,
+            "value_usd": 6454.586228723898
+          },
+          {
+            "holder_rank": 96,
+            "holder_address": "EWkGyhD7XEgzJsutnTmN6qCobBBhMuDukaGXUmMhjM7f",
+            "balance": 1669557.029971,
+            "value_usd": 6332.103004866375
+          },
+          {
+            "holder_rank": 97,
+            "holder_address": "CKMn2HbwcrU5iGkYpRiVB4Soo4jz7LdHBex4DdbYx1XT",
+            "balance": 1654975.954632,
+            "value_usd": 6276.801586998745
+          },
+          {
+            "holder_rank": 98,
+            "holder_address": "Bka38LDfNRCJqvc3Bgy7i6RpVdgCFPGM22pGYPPaGTVf",
+            "balance": 1619174.452129,
+            "value_usd": 6141.0177847635405
+          },
+          {
+            "holder_rank": 99,
+            "holder_address": "G7MHDeoCSMafEqwqQkmmitQc7eAJgVVmP8du1Fr9NU5X",
+            "balance": 1600000.0,
+            "value_usd": 6068.295138119469
+          },
+          {
+            "holder_rank": 100,
+            "holder_address": "9WQesj6nDwkwbYD1CyyhF9Dy3d3rSFcoy4rJSKLZYb9N",
+            "balance": 1572583.952762,
+            "value_usd": 5964.314721768963
+          }
+        ],
+        "is_target_token": true
+      },
+      {
+        "symbol": "USDC",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+        "price_usd": 0.0,
+        "total_value": 1461363.4841273732,
+        "holder_count": 13,
+        "holders_details": [
+          {
+            "holder_rank": 14,
+            "holder_address": "3rVfGfGxomNCA2qfK4QVuQV4DzypZFkHfSPaphWpgAqd",
+            "balance": 15026.428425,
+            "value_usd": 15024.9257821575
+          },
+          {
+            "holder_rank": 15,
+            "holder_address": "DSDfJrtq9KZgyeh2kSXVUxxrdyFobwMJdP46jKpBiUNT",
+            "balance": 1e-06,
+            "value_usd": 9.999e-07
+          },
+          {
+            "holder_rank": 32,
+            "holder_address": "FVrq4FbdWQrTBgyDUFbZbrdt5FFtWiDkhRTFM6HEGRh6",
+            "balance": 0.752169,
+            "value_usd": 0.7520185662
+          },
+          {
+            "holder_rank": 34,
+            "holder_address": "D5jx4wmxuPz18hqmgpCMLGVq3uSksCafCp5xjVe1nw8p",
+            "balance": 1210235.578749,
+            "value_usd": 1209993.5316332502
+          },
+          {
+            "holder_rank": 40,
+            "holder_address": "J9oCqq3nbGoNPAX4TX7US54vhPkz7ggyaktaDi85nbLs",
+            "balance": 50122.116846,
+            "value_usd": 50112.0924226308
+          },
+          {
+            "holder_rank": 51,
+            "holder_address": "511bYc7dNx5LnH9VfPoYT56kfQLApr7uKWea2QG5r2Z9",
+            "balance": 0.912282,
+            "value_usd": 0.9120995436
+          },
+          {
+            "holder_rank": 52,
+            "holder_address": "Dabd8AcuDXWpDQfUZCCa6C8oY7axD2zZcLmaoVmjrj5n",
+            "balance": 9.205089,
+            "value_usd": 9.2032479822
+          },
+          {
+            "holder_rank": 58,
+            "holder_address": "41uCv6a1JPwZT4pDAN4AGvPosHVx2ndkNFEFgKLzd5wx",
+            "balance": 166164.298926,
+            "value_usd": 166131.0660662148
+          },
+          {
+            "holder_rank": 68,
+            "holder_address": "DuLMFpDBXVpSEJUL3H86Hp5kMLttuHzFbgdH6jgLBdUZ",
+            "balance": 10640.0,
+            "value_usd": 10637.872
+          },
+          {
+            "holder_rank": 71,
+            "holder_address": "DUFwznTAZ6G6ZfEPWqcyauxKdhdDa4YkrvmmC5w3rBfh",
+            "balance": 9001.501229,
+            "value_usd": 8999.7009287542
+          },
+          {
+            "holder_rank": 81,
+            "holder_address": "BvFEfQjCCBgV29KRX1oo1bng5RxjXZjgp9rTjhYrWAy8",
+            "balance": 200.92292,
+            "value_usd": 200.882735416
+          },
+          {
+            "holder_rank": 86,
+            "holder_address": "CRocYEsrdwTJmfbbBVc43iAKaRmLzxpieJtNysXs5TYr",
+            "balance": 7.595711,
+            "value_usd": 7.5941918578
+          },
+          {
+            "holder_rank": 92,
+            "holder_address": "5N2DB6b7zZEqUMNhyxcys9afARn7L3tH2QUP12i1fPwa",
+            "balance": 245.0,
+            "value_usd": 244.951
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "UFD",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "eL5fUxj2J4CiQsmW85k5FG9DvuQjjUoBHoQBi2Kpump",
+        "price_usd": 0.0,
+        "total_value": 1145170.7259707684,
+        "holder_count": 5,
+        "holders_details": [
+          {
+            "holder_rank": 4,
+            "holder_address": "34qSTYsfmQcqjq9LvrLGavarD4f8T7wJaNDqzo91KgBb",
+            "balance": 19458021.858053,
+            "value_usd": 774109.7383495612
+          },
+          {
+            "holder_rank": 22,
+            "holder_address": "EFW5CwoiBqxVFdAYrnPMj1GEgoFoHaWaGb4tXtSXsLDV",
+            "balance": 524055.423022,
+            "value_usd": 20848.800014495497
+          },
+          {
+            "holder_rank": 36,
+            "holder_address": "2VDK1KP7FWdhtzQ3UGJ4VA3YAhwL4ghU7J1EWFiTEyBh",
+            "balance": 8737043.654039,
+            "value_usd": 347590.8613072955
+          },
+          {
+            "holder_rank": 54,
+            "holder_address": "3rxNo1RsmRH8AZskiWPRrZDjHFGXqs3PctrnDkyCQEVv",
+            "balance": 42104.359576,
+            "value_usd": 1675.0620907162734
+          },
+          {
+            "holder_rank": 98,
+            "holder_address": "Bka38LDfNRCJqvc3Bgy7i6RpVdgCFPGM22pGYPPaGTVf",
+            "balance": 23785.296508,
+            "value_usd": 946.2642086998349
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "Pnut",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "2qEHjDLDLbuBgRYvsxhc5D6uDWAivNFZGan56P1tpump",
+        "price_usd": 0.0,
+        "total_value": 763387.7650483121,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 4,
+            "holder_address": "34qSTYsfmQcqjq9LvrLGavarD4f8T7wJaNDqzo91KgBb",
+            "balance": 3250946.985311,
+            "value_usd": 763387.7650483121
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "MOODENG",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "ED5nyyWEzpPPiWimP8vYm7sD7TD3LAt3Q3gRTWHzPJBY",
+        "price_usd": 0.0,
+        "total_value": 219588.92711146607,
+        "holder_count": 4,
+        "holders_details": [
+          {
+            "holder_rank": 58,
+            "holder_address": "41uCv6a1JPwZT4pDAN4AGvPosHVx2ndkNFEFgKLzd5wx",
+            "balance": 734429.189652,
+            "value_usd": 118682.68271748177
+          },
+          {
+            "holder_rank": 76,
+            "holder_address": "HCZgcnoYBSorLid2gogmqCGrkyb2UuTatCyDHNNo5K6F",
+            "balance": 607000.000001,
+            "value_usd": 98090.31207455894
+          },
+          {
+            "holder_rank": 78,
+            "holder_address": "F5NvuP1htcKph9vjktbPVDkc85dwvzNFHvUs3nS6gxHd",
+            "balance": 11573.712312,
+            "value_usd": 1870.294979478377
+          },
+          {
+            "holder_rank": 98,
+            "holder_address": "Bka38LDfNRCJqvc3Bgy7i6RpVdgCFPGM22pGYPPaGTVf",
+            "balance": 5851.769183,
+            "value_usd": 945.6373399469707
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "Bonk",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263",
+        "price_usd": 0.0,
+        "total_value": 159106.99988997483,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 34,
+            "holder_address": "D5jx4wmxuPz18hqmgpCMLGVq3uSksCafCp5xjVe1nw8p",
+            "balance": 6537207901.1572,
+            "value_usd": 159106.99988997483
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "SPARK",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "5zCETicUCJqJ5Z3wbfFPZqtSpHPYqnggs1wX7ZRpump",
+        "price_usd": 0.0,
+        "total_value": 116023.4015487054,
+        "holder_count": 2,
+        "holders_details": [
+          {
+            "holder_rank": 75,
+            "holder_address": "A7JLaVrqaxrgedrGBYrC439zbapuR3TigxRsYx7Evz2T",
+            "balance": 2769984.794176,
+            "value_usd": 97220.60359551042
+          },
+          {
+            "holder_rank": 88,
+            "holder_address": "9D1qtQ2RDo8MKfyYKKXdPy2esMUyry8oX5Kyi23nuems",
+            "balance": 533951.033734,
+            "value_usd": 18802.797953194986
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "MSTRx",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "XsP7xzNPvEHS1m6qfanPUGjNmdnmsLKEoNAnHjdxxyZ",
+        "price_usd": 0.0,
+        "total_value": 113832.22135686128,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 62,
+            "holder_address": "8s9j5qUtuE9PGA5s7QeAXEh5oc2UGr71pmJXgyiZMHkt",
+            "balance": 299.91576006,
+            "value_usd": 113832.22135686128
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "RENDER",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "rndrizKT3MK1iimdxRdWabcF7Zg7AR5T4nud4EkHBof",
+        "price_usd": 0.0,
+        "total_value": 100676.25050214428,
+        "holder_count": 2,
+        "holders_details": [
+          {
+            "holder_rank": 22,
+            "holder_address": "EFW5CwoiBqxVFdAYrnPMj1GEgoFoHaWaGb4tXtSXsLDV",
+            "balance": 2058.75474167,
+            "value_usd": 7952.436273551324
+          },
+          {
+            "holder_rank": 34,
+            "holder_address": "D5jx4wmxuPz18hqmgpCMLGVq3uSksCafCp5xjVe1nw8p",
+            "balance": 24004.66795864,
+            "value_usd": 92723.81422859295
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "GIGA",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "63LfDmNb3MQ8mw9MtZ2To9bEA2M71kZUUGq5tiJxcqj9",
+        "price_usd": 0.0,
+        "total_value": 93011.14517688632,
+        "holder_count": 2,
+        "holders_details": [
+          {
+            "holder_rank": 3,
+            "holder_address": "GGD3fvpTbLdHQQ8YqBXUxafFGnTDEKf8svL6k9pokgkq",
+            "balance": 6523892.9272,
+            "value_usd": 92917.8320523966
+          },
+          {
+            "holder_rank": 60,
+            "holder_address": "632xX5AAwJ7Z5phYdc5p6k3LTFk4JtRXGN196iqwHAoj",
+            "balance": 6518.87828,
+            "value_usd": 93.31312448972628
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "BONGO",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "HUdqc5MR5h3FssESabPnQ1GTgTcPvnNudAuLj5J6a9sU",
+        "price_usd": 0.0,
+        "total_value": 88406.2485389406,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 95,
+            "holder_address": "3vpi8QbrDVcSpTtVEoajRPNqzAdBadD4CBrH93uHm9FY",
+            "balance": 10760979.887660852,
+            "value_usd": 88406.2485389406
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "GARI",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "CKaKtYvz6dKPyMvYq9Rh3UBrnNqYZAyd7iF4hJtjUvks",
+        "price_usd": 0.0,
+        "total_value": 86872.07050766902,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 34,
+            "holder_address": "D5jx4wmxuPz18hqmgpCMLGVq3uSksCafCp5xjVe1nw8p",
+            "balance": 6974867.731194243,
+            "value_usd": 86872.07050766902
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "BUCK",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "FLqmVrv6cp7icjobpRMQJMEyjF3kF84QmC4HXpySpump",
+        "price_usd": 0.0,
+        "total_value": 84528.49030132258,
+        "holder_count": 2,
+        "holders_details": [
+          {
+            "holder_rank": 34,
+            "holder_address": "D5jx4wmxuPz18hqmgpCMLGVq3uSksCafCp5xjVe1nw8p",
+            "balance": 26658117.424546,
+            "value_usd": 73499.9605151245
+          },
+          {
+            "holder_rank": 91,
+            "holder_address": "4JnpVQBMoX3AAEDvSSTxUPYedvGNsL4FtZHLhSKXwDmU",
+            "balance": 4000000.000001,
+            "value_usd": 11028.529786198078
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "KMNO",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "KMNo3nJsBXfcpJTVhZcXLW7RmTwTt4GVFE7suUBo9sS",
+        "price_usd": 0.0,
+        "total_value": 80043.04079080153,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 34,
+            "holder_address": "D5jx4wmxuPz18hqmgpCMLGVq3uSksCafCp5xjVe1nw8p",
+            "balance": 1244884.317939,
+            "value_usd": 80043.04079080153
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "CRCLx",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "XsueG8BtpquVJX9LVLLEGuViXUungE6WmK5YZ3p3bd1",
+        "price_usd": 0.0,
+        "total_value": 65437.851670169104,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 62,
+            "holder_address": "8s9j5qUtuE9PGA5s7QeAXEh5oc2UGr71pmJXgyiZMHkt",
+            "balance": 436.00063486,
+            "value_usd": 65437.851670169104
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "BTC-S",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "HjKkxYmvekKYo1WhWJivx5SeZxKP2vJ9CCZp9ZmvCCKq",
+        "price_usd": 0.0,
+        "total_value": 62596.26235673635,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 62,
+            "holder_address": "8s9j5qUtuE9PGA5s7QeAXEh5oc2UGr71pmJXgyiZMHkt",
+            "balance": 51018.660738071,
+            "value_usd": 62596.26235673635
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "XSPA",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "8Hg96R1AGDe5vKABwniVPT2LHdhZHmCTFijZAXXZpump",
+        "price_usd": 0.0,
+        "total_value": 62238.01717175873,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 62,
+            "holder_address": "8s9j5qUtuE9PGA5s7QeAXEh5oc2UGr71pmJXgyiZMHkt",
+            "balance": 5433791.322142,
+            "value_usd": 62238.01717175873
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "YURU",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "mm7g78aMJZv8QB4Q15qbsM3UQJZWof85vwC2NSxRh2Q",
+        "price_usd": 0.0,
+        "total_value": 61120.999942678216,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 62,
+            "holder_address": "8s9j5qUtuE9PGA5s7QeAXEh5oc2UGr71pmJXgyiZMHkt",
+            "balance": 55254.834027975,
+            "value_usd": 61120.999942678216
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "JOS",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "JosjEXh69RckgSs2AWsN1xN8zmiSHxBuJjHLURJnHhg",
+        "price_usd": 0.0,
+        "total_value": 53018.31179794311,
+        "holder_count": 3,
+        "holders_details": [
+          {
+            "holder_rank": 40,
+            "holder_address": "J9oCqq3nbGoNPAX4TX7US54vhPkz7ggyaktaDi85nbLs",
+            "balance": 9250934.659816,
+            "value_usd": 23731.45158549006
+          },
+          {
+            "holder_rank": 68,
+            "holder_address": "DuLMFpDBXVpSEJUL3H86Hp5kMLttuHzFbgdH6jgLBdUZ",
+            "balance": 6959063.316878,
+            "value_usd": 17828.177892215594
+          },
+          {
+            "holder_rank": 76,
+            "holder_address": "HCZgcnoYBSorLid2gogmqCGrkyb2UuTatCyDHNNo5K6F",
+            "balance": 4472790.0,
+            "value_usd": 11458.68232023746
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "Cupsey",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "5PsnNwPmMtsGZgG6ZqMoDJJi28BR5xpAotXHHiQhpump",
+        "price_usd": 0.0,
+        "total_value": 52269.106072298084,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 48,
+            "holder_address": "HsitEkE84vwLbfeBvFhs9meQAa2wYtePDYW2cndeeJPr",
+            "balance": 11000000.0,
+            "value_usd": 52269.106072298084
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "USA",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "69kdRLyP5DTRkpHraaSZAQbWmAwzF9guKjZfzMXzcbAs",
+        "price_usd": 0.0,
+        "total_value": 49829.47952612754,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 47,
+            "holder_address": "2kVaTYHe4fQao9U5Ap6Wq1qPAtWvwBSoRECSBSgsYkXW",
+            "balance": 54091921528.09149,
+            "value_usd": 49829.47952612754
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "BUNKER",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "8NCievmJCg2d9Vc2TWgz2HkE6ANeSX7kwvdq5AL7pump",
+        "price_usd": 0.0,
+        "total_value": 49209.33291895318,
+        "holder_count": 2,
+        "holders_details": [
+          {
+            "holder_rank": 14,
+            "holder_address": "3rVfGfGxomNCA2qfK4QVuQV4DzypZFkHfSPaphWpgAqd",
+            "balance": 14009333.835055,
+            "value_usd": 23764.419292831706
+          },
+          {
+            "holder_rank": 17,
+            "holder_address": "8sTVL7QoRY2wtcmyPD9XDNhNZkkgvnwYJNJYCVmgPYh1",
+            "balance": 15000000.0,
+            "value_usd": 25444.913626121473
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "TRUMP",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "6p6xgHyF7AeE6TZkSmFsko444wqoP15icUSqi2jfGiPN",
+        "price_usd": 0.0,
+        "total_value": 42899.593963518564,
+        "holder_count": 3,
+        "holders_details": [
+          {
+            "holder_rank": 41,
+            "holder_address": "54a2nSQEgX3JD2itpXuz3iZk1ivPwb2BJTK6rueyV9qZ",
+            "balance": 1.056688,
+            "value_usd": 9.58128486175432
+          },
+          {
+            "holder_rank": 54,
+            "holder_address": "3rxNo1RsmRH8AZskiWPRrZDjHFGXqs3PctrnDkyCQEVv",
+            "balance": 121.252711,
+            "value_usd": 1100.7814862180953
+          },
+          {
+            "holder_rank": 58,
+            "holder_address": "41uCv6a1JPwZT4pDAN4AGvPosHVx2ndkNFEFgKLzd5wx",
+            "balance": 4608.584203,
+            "value_usd": 41789.23119243872
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "TROLL",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "5UUH9RTDiSpq6HKS6bp4NdU9PNJpXRXuiw6ShBTBhgH2",
+        "price_usd": 0.0,
+        "total_value": 42046.351859298746,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 84,
+            "holder_address": "HdQhk7d4mypWv779T8wARMPqi3RLaYtpP6kt2PjEF7C2",
+            "balance": 254161.462831,
+            "value_usd": 42046.351859298746
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "jobcoin",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "AyrQpt5xsVYiN4BqgZdd2tZJAWswT9yLUZmP1jKqpump",
+        "price_usd": 0.0,
+        "total_value": 40112.343098693644,
+        "holder_count": 2,
+        "holders_details": [
+          {
+            "holder_rank": 7,
+            "holder_address": "C8xKCjdzgqVPegGdNKL5wfyvdJ1Jx1EjXgyoU2sfcYqr",
+            "balance": 5071024.307825,
+            "value_usd": 14996.888975969297
+          },
+          {
+            "holder_rank": 78,
+            "holder_address": "F5NvuP1htcKph9vjktbPVDkc85dwvzNFHvUs3nS6gxHd",
+            "balance": 8515439.661276,
+            "value_usd": 25115.454122724346
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "SPX",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "J3NKxxXZcnNiMjKw9hYb2K4LUxgwB6t1FtPtQVsv3KFr",
+        "price_usd": 0.0,
+        "total_value": 39754.97464601924,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 22,
+            "holder_address": "EFW5CwoiBqxVFdAYrnPMj1GEgoFoHaWaGb4tXtSXsLDV",
+            "balance": 25259.22987346,
+            "value_usd": 39754.97464601924
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "DJI6930",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "DQnkBM4eYYMnVE8Qy2K3BB7uts1fh2EwBVktEz6jpump",
+        "price_usd": 0.0,
+        "total_value": 38392.077358703435,
+        "holder_count": 2,
+        "holders_details": [
+          {
+            "holder_rank": 68,
+            "holder_address": "DuLMFpDBXVpSEJUL3H86Hp5kMLttuHzFbgdH6jgLBdUZ",
+            "balance": 1673607.484842,
+            "value_usd": 37561.52475451453
+          },
+          {
+            "holder_rank": 98,
+            "holder_address": "Bka38LDfNRCJqvc3Bgy7i6RpVdgCFPGM22pGYPPaGTVf",
+            "balance": 36886.069802,
+            "value_usd": 830.5526041889013
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "POPCAT",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "7GCihgDB8fe6KNjn2MYtkzZcRjQy3t9GHdC8uHYmW2hr",
+        "price_usd": 0.0,
+        "total_value": 38268.8401288797,
+        "holder_count": 2,
+        "holders_details": [
+          {
+            "holder_rank": 58,
+            "holder_address": "41uCv6a1JPwZT4pDAN4AGvPosHVx2ndkNFEFgKLzd5wx",
+            "balance": 105819.861956649,
+            "value_usd": 32570.129174453723
+          },
+          {
+            "holder_rank": 95,
+            "holder_address": "3vpi8QbrDVcSpTtVEoajRPNqzAdBadD4CBrH93uHm9FY",
+            "balance": 18500.603474994,
+            "value_usd": 5698.710954425979
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "RS",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "HQPMEbkZmwxCscm6wQmDXc5Ywyft7aRsbKdooh6Ldr8a",
+        "price_usd": 0.0,
+        "total_value": 34303.94120737368,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 62,
+            "holder_address": "8s9j5qUtuE9PGA5s7QeAXEh5oc2UGr71pmJXgyiZMHkt",
+            "balance": 25192744910.5606,
+            "value_usd": 34303.94120737368
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "LAUNCHCOIN",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "Ey59PH7Z4BFU4HjyKnyMdWt5GGN76KazTAwQihoUXRnk",
+        "price_usd": 0.0,
+        "total_value": 33397.54789051237,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 62,
+            "holder_address": "8s9j5qUtuE9PGA5s7QeAXEh5oc2UGr71pmJXgyiZMHkt",
+            "balance": 582305.619599858,
+            "value_usd": 33397.54789051237
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "KAI",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "2MuDS29b6rQb9MydKLMvggST5Yqez3B6gYWitvvjc6ir",
+        "price_usd": 0.0,
+        "total_value": 31947.517177971542,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 40,
+            "holder_address": "J9oCqq3nbGoNPAX4TX7US54vhPkz7ggyaktaDi85nbLs",
+            "balance": 5113052.866214573,
+            "value_usd": 31947.517177971542
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "LC",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "43YakhC3TcSuTgSXnxFgw8uKL8VkuLuFa4M6Bninpump",
+        "price_usd": 0.0,
+        "total_value": 30800.89326234331,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 62,
+            "holder_address": "8s9j5qUtuE9PGA5s7QeAXEh5oc2UGr71pmJXgyiZMHkt",
+            "balance": 10911609.220866,
+            "value_usd": 30800.89326234331
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "AKA",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "4TwC4AiF1uUSHES2eBftGqemp6TqjEnKghqiH6dFpump",
+        "price_usd": 0.0,
+        "total_value": 29632.751661404964,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 58,
+            "holder_address": "41uCv6a1JPwZT4pDAN4AGvPosHVx2ndkNFEFgKLzd5wx",
+            "balance": 14801876.896108,
+            "value_usd": 29632.751661404964
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "MOBY",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "Cy1GS2FqefgaMbi45UunrUzin1rfEmTUYnomddzBpump",
+        "price_usd": 0.0,
+        "total_value": 22799.263302607582,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 58,
+            "holder_address": "41uCv6a1JPwZT4pDAN4AGvPosHVx2ndkNFEFgKLzd5wx",
+            "balance": 743756.90615,
+            "value_usd": 22799.263302607582
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "GOHOME",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "2Wu1g2ft7qZHfTpfzP3wLdfPeV1is4EwQ3CXBfRYAciD",
+        "price_usd": 0.0,
+        "total_value": 21691.426239568293,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 49,
+            "holder_address": "25mYnjJ2MXHZH6NvTTdA63JvjgRVcuiaj6MRiEQNs1Dq",
+            "balance": 100.205353,
+            "value_usd": 21691.426239568293
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "NOS",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "nosXBVoaCTtYdLvKY6Csb4AC8JCdQKKAaWYtx2ZMoo7",
+        "price_usd": 0.0,
+        "total_value": 21449.099872833398,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 40,
+            "holder_address": "J9oCqq3nbGoNPAX4TX7US54vhPkz7ggyaktaDi85nbLs",
+            "balance": 40184.177102,
+            "value_usd": 21449.099872833398
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "ANONCOIN",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "D25bi7oHQjqkVrzbfuM6k2gzVNHTSpBLhtakDCzCCDUB",
+        "price_usd": 0.0,
+        "total_value": 21429.032371261976,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 48,
+            "holder_address": "HsitEkE84vwLbfeBvFhs9meQAa2wYtePDYW2cndeeJPr",
+            "balance": 3221305.238859788,
+            "value_usd": 21429.032371261976
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "GO",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "77LQG7ZT5FzkqikyTzmfQMe12qPrAYkYgbjB6ygo83dt",
+        "price_usd": 0.0,
+        "total_value": 19392.902180987534,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 62,
+            "holder_address": "8s9j5qUtuE9PGA5s7QeAXEh5oc2UGr71pmJXgyiZMHkt",
+            "balance": 13176897.886231644,
+            "value_usd": 19392.902180987534
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "旺柴",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "83kGGSggYGP2ZEEyvX54SkZR1kFn84RgGCDyptbDbonk",
+        "price_usd": 0.0,
+        "total_value": 17734.575867059863,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 96,
+            "holder_address": "EWkGyhD7XEgzJsutnTmN6qCobBBhMuDukaGXUmMhjM7f",
+            "balance": 2127192.414867,
+            "value_usd": 17734.575867059863
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "WINTER",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "4j2gUEmfbSAacvSSd6yXo8yEzXCAUVeoXrqLVV3apump",
+        "price_usd": 0.0,
+        "total_value": 14854.45430175457,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 48,
+            "holder_address": "HsitEkE84vwLbfeBvFhs9meQAa2wYtePDYW2cndeeJPr",
+            "balance": 14072979.161787,
+            "value_usd": 14854.45430175457
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "NATIX",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "FRySi8LPkuByB7VPSCCggxpewFUeeJiwEGRKKuhwpKcX",
+        "price_usd": 0.0,
+        "total_value": 14533.925323319749,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 47,
+            "holder_address": "2kVaTYHe4fQao9U5Ap6Wq1qPAtWvwBSoRECSBSgsYkXW",
+            "balance": 18427053.900037,
+            "value_usd": 14533.925323319749
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "HAROLD",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "3vgopg7xm3EWkXfxmWPUpcf7g939hecfqg18sLuXDzVt",
+        "price_usd": 0.0,
+        "total_value": 12574.497347478446,
+        "holder_count": 2,
+        "holders_details": [
+          {
+            "holder_rank": 14,
+            "holder_address": "3rVfGfGxomNCA2qfK4QVuQV4DzypZFkHfSPaphWpgAqd",
+            "balance": 4194527.42781,
+            "value_usd": 10153.777171826236
+          },
+          {
+            "holder_rank": 17,
+            "holder_address": "8sTVL7QoRY2wtcmyPD9XDNhNZkkgvnwYJNJYCVmgPYh1",
+            "balance": 1000000.0,
+            "value_usd": 2420.72017565221
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "FRIC",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "EsP4kJfKUDLfX274WoBSiiEy74Sh4tZKUCDjfULHpump",
+        "price_usd": 0.0,
+        "total_value": 11103.34166957784,
+        "holder_count": 2,
+        "holders_details": [
+          {
+            "holder_rank": 48,
+            "holder_address": "HsitEkE84vwLbfeBvFhs9meQAa2wYtePDYW2cndeeJPr",
+            "balance": 2029842.46781,
+            "value_usd": 10634.785030423658
+          },
+          {
+            "holder_rank": 95,
+            "holder_address": "3vpi8QbrDVcSpTtVEoajRPNqzAdBadD4CBrH93uHm9FY",
+            "balance": 89432.570758,
+            "value_usd": 468.5566391541813
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "BoatKid",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "FJjKH9Xp2SvNDNUSN7X9T4uMNafFEYzbZpnwEZXKpump",
+        "price_usd": 0.0,
+        "total_value": 9498.070987350373,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 76,
+            "holder_address": "HCZgcnoYBSorLid2gogmqCGrkyb2UuTatCyDHNNo5K6F",
+            "balance": 1500000.000001,
+            "value_usd": 9498.070987350373
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "GUANO",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "APmLv2VarkC5yEjjutYkeK3byr9L2KwCgrVMWHWsgaG7",
+        "price_usd": 0.0,
+        "total_value": 9353.340006625203,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 48,
+            "holder_address": "HsitEkE84vwLbfeBvFhs9meQAa2wYtePDYW2cndeeJPr",
+            "balance": 22995825.128209427,
+            "value_usd": 9353.340006625203
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "WOJAK",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "7oLWGMuGbBm9uwDmffSdxLE98YChFAH1UdY5XpKYLff8",
+        "price_usd": 0.0,
+        "total_value": 9306.235359967342,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 78,
+            "holder_address": "F5NvuP1htcKph9vjktbPVDkc85dwvzNFHvUs3nS6gxHd",
+            "balance": 5871192.065232,
+            "value_usd": 9306.235359967342
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "UPONLY",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "5SKLS8gvhJgAtmtmRr7SQg7NjoehutwK3vAzYPAYpump",
+        "price_usd": 0.0,
+        "total_value": 9275.261101610116,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 48,
+            "holder_address": "HsitEkE84vwLbfeBvFhs9meQAa2wYtePDYW2cndeeJPr",
+            "balance": 19845069.628428,
+            "value_usd": 9275.261101610116
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "ber",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "HeWdnJqjmmFbs6ACUHuPTR8diasBjNRiyKumFvyypump",
+        "price_usd": 0.0,
+        "total_value": 9215.7439638046,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 95,
+            "holder_address": "3vpi8QbrDVcSpTtVEoajRPNqzAdBadD4CBrH93uHm9FY",
+            "balance": 20814999.690028,
+            "value_usd": 9215.7439638046
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "CLIPPY",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "7eMJmn1bYWSQEwxAX7CyngBzGNGu1cT582asKxxRpump",
+        "price_usd": 0.0,
+        "total_value": 9191.704491806342,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 96,
+            "holder_address": "EWkGyhD7XEgzJsutnTmN6qCobBBhMuDukaGXUmMhjM7f",
+            "balance": 510524.619177,
+            "value_usd": 9191.704491806342
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "KOLIN",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "4q3Z58YxrZEAVMLtMwnm7eHtodSD3LSpSNt3pDnqpump",
+        "price_usd": 0.0,
+        "total_value": 9088.572052710606,
+        "holder_count": 2,
+        "holders_details": [
+          {
+            "holder_rank": 47,
+            "holder_address": "2kVaTYHe4fQao9U5Ap6Wq1qPAtWvwBSoRECSBSgsYkXW",
+            "balance": 1000000.0,
+            "value_usd": 1652.467645947383
+          },
+          {
+            "holder_rank": 48,
+            "holder_address": "HsitEkE84vwLbfeBvFhs9meQAa2wYtePDYW2cndeeJPr",
+            "balance": 4500000.0,
+            "value_usd": 7436.104406763224
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "LUX",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "BmXfbamFqrBzrqihr9hbSmEsfQUXMVaqshAjgvZupump",
+        "price_usd": 0.0,
+        "total_value": 9031.245568719572,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 48,
+            "holder_address": "HsitEkE84vwLbfeBvFhs9meQAa2wYtePDYW2cndeeJPr",
+            "balance": 2736841.107575,
+            "value_usd": 9031.245568719572
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "FCK925",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "EbFogghDYCPxg8NDzWJXyJMykNVjfLLgm1o3h7H7pump",
+        "price_usd": 0.0,
+        "total_value": 7824.025511194323,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 68,
+            "holder_address": "DuLMFpDBXVpSEJUL3H86Hp5kMLttuHzFbgdH6jgLBdUZ",
+            "balance": 3947016.171158,
+            "value_usd": 7824.025511194323
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "Smart",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "5g6s6LtJnwzKLMefinXM5s6PhWKBiCeJVmGEpRiApump",
+        "price_usd": 0.0,
+        "total_value": 7775.050411510841,
+        "holder_count": 4,
+        "holders_details": [
+          {
+            "holder_rank": 55,
+            "holder_address": "9pSZw8E4EBMC4hc9pU8qC3ss4H6XKRabWqWqK8K3E6DF",
+            "balance": 47783416.482179,
+            "value_usd": 1267.3711771696744
+          },
+          {
+            "holder_rank": 60,
+            "holder_address": "632xX5AAwJ7Z5phYdc5p6k3LTFk4JtRXGN196iqwHAoj",
+            "balance": 20018392.257214,
+            "value_usd": 530.9526866822449
+          },
+          {
+            "holder_rank": 77,
+            "holder_address": "EpNDMVvKtYM4Jn47xKV6mCvSefY1DmmuvyxZH29WcoWu",
+            "balance": 55725878.582858,
+            "value_usd": 1478.0310312200277
+          },
+          {
+            "holder_rank": 85,
+            "holder_address": "4ckP3uN4N76qakK8sZxchGh1kFy5TB7V1A47mPMjF1gL",
+            "balance": 169613326.672437,
+            "value_usd": 4498.695516438894
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "NYLA",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "3HeUeL8ru8DFfRRQGnE11vGrDdNUzqVwBW8hyYHBbonk",
+        "price_usd": 0.0,
+        "total_value": 7361.574260090167,
+        "holder_count": 2,
+        "holders_details": [
+          {
+            "holder_rank": 75,
+            "holder_address": "A7JLaVrqaxrgedrGBYrC439zbapuR3TigxRsYx7Evz2T",
+            "balance": 675819.48185,
+            "value_usd": 4251.364943619751
+          },
+          {
+            "holder_rank": 88,
+            "holder_address": "9D1qtQ2RDo8MKfyYKKXdPy2esMUyry8oX5Kyi23nuems",
+            "balance": 494415.341091,
+            "value_usd": 3110.2093164704156
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "TRASH",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "5ypxFmuJUTsSkAeKRuRs4xSxkb4vWbjMLT3GY7ckpump",
+        "price_usd": 0.0,
+        "total_value": 7087.460610814173,
+        "holder_count": 4,
+        "holders_details": [
+          {
+            "holder_rank": 51,
+            "holder_address": "511bYc7dNx5LnH9VfPoYT56kfQLApr7uKWea2QG5r2Z9",
+            "balance": 83350.04159,
+            "value_usd": 161.93373965365487
+          },
+          {
+            "holder_rank": 68,
+            "holder_address": "DuLMFpDBXVpSEJUL3H86Hp5kMLttuHzFbgdH6jgLBdUZ",
+            "balance": 1001477.093678,
+            "value_usd": 1957.0073979110023
+          },
+          {
+            "holder_rank": 76,
+            "holder_address": "HCZgcnoYBSorLid2gogmqCGrkyb2UuTatCyDHNNo5K6F",
+            "balance": 2007238.549908,
+            "value_usd": 3922.3869585629454
+          },
+          {
+            "holder_rank": 92,
+            "holder_address": "5N2DB6b7zZEqUMNhyxcys9afARn7L3tH2QUP12i1fPwa",
+            "balance": 527105.444018,
+            "value_usd": 1046.1325146865702
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "SCF",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "GiG7Hr61RVm4CSUxJmgiCoySFQtdiwxtqf64MsRppump",
+        "price_usd": 0.0,
+        "total_value": 6837.311836364862,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 22,
+            "holder_address": "EFW5CwoiBqxVFdAYrnPMj1GEgoFoHaWaGb4tXtSXsLDV",
+            "balance": 1142284.360977,
+            "value_usd": 6837.311836364862
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "BREW",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "2hXQn7nJbh2XFTxvtyKb5mKfnScuoiC1Sm8rnWydpump",
+        "price_usd": 0.0,
+        "total_value": 6833.470835023587,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 40,
+            "holder_address": "J9oCqq3nbGoNPAX4TX7US54vhPkz7ggyaktaDi85nbLs",
+            "balance": 2000000.875967,
+            "value_usd": 6833.470835023587
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "real",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "Cy4DSbZW4CE6cG6HDqQFhXxpHTdm41SY9hBB1JG6pump",
+        "price_usd": 0.0,
+        "total_value": 6319.247588888173,
+        "holder_count": 3,
+        "holders_details": [
+          {
+            "holder_rank": 51,
+            "holder_address": "511bYc7dNx5LnH9VfPoYT56kfQLApr7uKWea2QG5r2Z9",
+            "balance": 119798.443401,
+            "value_usd": 42.02988376536226
+          },
+          {
+            "holder_rank": 55,
+            "holder_address": "9pSZw8E4EBMC4hc9pU8qC3ss4H6XKRabWqWqK8K3E6DF",
+            "balance": 9083096.131346,
+            "value_usd": 3186.698122213642
+          },
+          {
+            "holder_rank": 77,
+            "holder_address": "EpNDMVvKtYM4Jn47xKV6mCvSefY1DmmuvyxZH29WcoWu",
+            "balance": 8808956.91741,
+            "value_usd": 3090.519582909168
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "KNOT",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "7RDvypx3p9EWq4nZZKux1ZQAc7DUWXpHTVKxCCnupump",
+        "price_usd": 0.0,
+        "total_value": 6158.281666052643,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 48,
+            "holder_address": "HsitEkE84vwLbfeBvFhs9meQAa2wYtePDYW2cndeeJPr",
+            "balance": 12002127.063915,
+            "value_usd": 6158.281666052643
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "Goku",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "6W8FHYE6jnw1dktabRRiZpQRQFPSFhTeLczdvBNPzVeo",
+        "price_usd": 0.0,
+        "total_value": 6010.08668354994,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 83,
+            "holder_address": "458erScYN24wtNhP2voUtkab2qemunersoSbgd7e74CY",
+            "balance": 1212731.984663,
+            "value_usd": 6010.08668354994
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "pwease",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "CniPCE4b3s8gSUPhUiyMjXnytrEqUrMfSsnbBjLCpump",
+        "price_usd": 0.0,
+        "total_value": 5463.843824839639,
+        "holder_count": 2,
+        "holders_details": [
+          {
+            "holder_rank": 95,
+            "holder_address": "3vpi8QbrDVcSpTtVEoajRPNqzAdBadD4CBrH93uHm9FY",
+            "balance": 242000.1069,
+            "value_usd": 825.9111668174518
+          },
+          {
+            "holder_rank": 98,
+            "holder_address": "Bka38LDfNRCJqvc3Bgy7i6RpVdgCFPGM22pGYPPaGTVf",
+            "balance": 1358959.9513,
+            "value_usd": 4637.932658022187
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "BROKE",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "Ga4oZoNRLkZkruJpS8NLwa8DJCwKP9hbTBSNDQZ9V43v",
+        "price_usd": 0.0,
+        "total_value": 5149.382551317423,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 79,
+            "holder_address": "AFs7qiiid5rh22RLxS9miXxFVCUxRUq8qE9QJMDuwH1J",
+            "balance": 696828481.05752,
+            "value_usd": 5149.382551317423
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "Chud",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "6yjNqPzTSanBWSa6dxVEgTjePXBrZ2FoHLDQwYwEsyM6",
+        "price_usd": 0.0,
+        "total_value": 5068.096450312656,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 96,
+            "holder_address": "EWkGyhD7XEgzJsutnTmN6qCobBBhMuDukaGXUmMhjM7f",
+            "balance": 1115536.110486,
+            "value_usd": 5068.096450312656
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "BOSS",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "GUy9Tu8YtvvHoL3DcXLJxXvEN8PqEus6mWQUEchcbonk",
+        "price_usd": 0.0,
+        "total_value": 5034.937957270366,
+        "holder_count": 2,
+        "holders_details": [
+          {
+            "holder_rank": 75,
+            "holder_address": "A7JLaVrqaxrgedrGBYrC439zbapuR3TigxRsYx7Evz2T",
+            "balance": 787185.0297,
+            "value_usd": 3900.6437615073187
+          },
+          {
+            "holder_rank": 99,
+            "holder_address": "G7MHDeoCSMafEqwqQkmmitQc7eAJgVVmP8du1Fr9NU5X",
+            "balance": 229198.756792,
+            "value_usd": 1134.2941957630464
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "Loopy",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "9anaj2GrwWWQvkNKzzEzoz5xvTEYP69EPJRagowobonk",
+        "price_usd": 0.0,
+        "total_value": 4794.892335182068,
+        "holder_count": 2,
+        "holders_details": [
+          {
+            "holder_rank": 75,
+            "holder_address": "A7JLaVrqaxrgedrGBYrC439zbapuR3TigxRsYx7Evz2T",
+            "balance": 3926397.688025,
+            "value_usd": 2520.775372544678
+          },
+          {
+            "holder_rank": 88,
+            "holder_address": "9D1qtQ2RDo8MKfyYKKXdPy2esMUyry8oX5Kyi23nuems",
+            "balance": 3542198.833601,
+            "value_usd": 2274.11696263739
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "EDWIN",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "GPrg1CgbBvAJS2SCuf9gF7NmQYsWudfyfWy5SUzypump",
+        "price_usd": 0.0,
+        "total_value": 4733.690367955188,
+        "holder_count": 2,
+        "holders_details": [
+          {
+            "holder_rank": 49,
+            "holder_address": "25mYnjJ2MXHZH6NvTTdA63JvjgRVcuiaj6MRiEQNs1Dq",
+            "balance": 1069958.548451,
+            "value_usd": 4733.681316945766
+          },
+          {
+            "holder_rank": 51,
+            "holder_address": "511bYc7dNx5LnH9VfPoYT56kfQLApr7uKWea2QG5r2Z9",
+            "balance": 2.035796,
+            "value_usd": 0.00905100942108678
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "solami",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "5c74v6Px9RKwdGWCfqLGfEk7UZfE3Y4qJbuYrLbVG63V",
+        "price_usd": 0.0,
+        "total_value": 4474.162478754183,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 96,
+            "holder_address": "EWkGyhD7XEgzJsutnTmN6qCobBBhMuDukaGXUmMhjM7f",
+            "balance": 4004653.395729,
+            "value_usd": 4474.162478754183
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "retire",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "zGh48JtNHVBb5evgoZLXwgPD2Qu4MhkWdJLGDAupump",
+        "price_usd": 0.0,
+        "total_value": 4359.943856634881,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 49,
+            "holder_address": "25mYnjJ2MXHZH6NvTTdA63JvjgRVcuiaj6MRiEQNs1Dq",
+            "balance": 1077839.261276,
+            "value_usd": 4359.943856634881
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "GOLD",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "79eXoT1aR7qhBMGKXzVNdV4ZcLqHsupqj2WTFvDumpSZ",
+        "price_usd": 0.0,
+        "total_value": 3852.162999627874,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 49,
+            "holder_address": "25mYnjJ2MXHZH6NvTTdA63JvjgRVcuiaj6MRiEQNs1Dq",
+            "balance": 10179295.96440903,
+            "value_usd": 3852.162999627874
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "OMNIS",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "G6iRK8kN67HJFrPA1CDA5KZaPJMiBu3bqdd9vdKBpump",
+        "price_usd": 0.0,
+        "total_value": 3765.1978127081447,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 1,
+            "holder_address": "5Q544fKrFoe6tsEbD7S8EmxGTJYAKtTVhAW5Q5pge4j1",
+            "balance": 13613830.0,
+            "value_usd": 3765.1978127081447
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "BUTTCOIN",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "FasH397CeZLNYWkd3wWK9vrmjd1z93n3b59DssRXpump",
+        "price_usd": 0.0,
+        "total_value": 3729.5823401652247,
+        "holder_count": 2,
+        "holders_details": [
+          {
+            "holder_rank": 4,
+            "holder_address": "34qSTYsfmQcqjq9LvrLGavarD4f8T7wJaNDqzo91KgBb",
+            "balance": 10000.0,
+            "value_usd": 18.17260683760207
+          },
+          {
+            "holder_rank": 96,
+            "holder_address": "EWkGyhD7XEgzJsutnTmN6qCobBBhMuDukaGXUmMhjM7f",
+            "balance": 2042310.036471,
+            "value_usd": 3711.4097333276227
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "GROKCHAIN",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "WAxxkziGPy6ThGBLg4MNKJce4eGrSKxCEfJ72ZLpump",
+        "price_usd": 0.0,
+        "total_value": 3679.449841884221,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 30,
+            "holder_address": "3YiackdmooZqgx43RrHyKQnqhm8tqhm2TNsVi2qtmagD",
+            "balance": 6482200.318985,
+            "value_usd": 3679.449841884221
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "Topless",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "4mWTS6KztDEoMu2uqsnbgbeGRh6chjq7Fbpmbr1Ypump",
+        "price_usd": 0.0,
+        "total_value": 3645.8518682077565,
+        "holder_count": 2,
+        "holders_details": [
+          {
+            "holder_rank": 75,
+            "holder_address": "A7JLaVrqaxrgedrGBYrC439zbapuR3TigxRsYx7Evz2T",
+            "balance": 4406616.010726,
+            "value_usd": 2851.4979716937855
+          },
+          {
+            "holder_rank": 88,
+            "holder_address": "9D1qtQ2RDo8MKfyYKKXdPy2esMUyry8oX5Kyi23nuems",
+            "balance": 1227569.731176,
+            "value_usd": 794.3538965139712
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "LEA",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "8SpPaFLycx897D6sowPZkEkcNdDahzRZb5itr6D8pump",
+        "price_usd": 0.0,
+        "total_value": 3552.9900701253564,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 87,
+            "holder_address": "FzjbMkvgRqnzCpP5uKSN9bCezEPKa4fi8rgRFPTHNo4y",
+            "balance": 1582671.688734,
+            "value_usd": 3552.9900701253564
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "saint",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "EQs4DEeaSyrhRPM6JPsf2ptLf4EHkcGXB7ybeufxpump",
+        "price_usd": 0.0,
+        "total_value": 3545.436902530504,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 47,
+            "holder_address": "2kVaTYHe4fQao9U5Ap6Wq1qPAtWvwBSoRECSBSgsYkXW",
+            "balance": 1000000.0,
+            "value_usd": 3545.436902530504
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "MEW",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "MEW1gQWJ3nEXg2qgERiKu7FAFj79PHvQVREQUzScPP5",
+        "price_usd": 0.0,
+        "total_value": 3424.103271014362,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 49,
+            "holder_address": "25mYnjJ2MXHZH6NvTTdA63JvjgRVcuiaj6MRiEQNs1Dq",
+            "balance": 1088877.95964,
+            "value_usd": 3424.103271014362
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "Quant",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "3an8rhdepsLCya22af7qDBKPbdomw8K4iCHXaA2Gpump",
+        "price_usd": 0.0,
+        "total_value": 3350.670983316668,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 96,
+            "holder_address": "EWkGyhD7XEgzJsutnTmN6qCobBBhMuDukaGXUmMhjM7f",
+            "balance": 3941366.740523,
+            "value_usd": 3350.670983316668
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "Wof",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "5kLu7okC3yrL2NKznwQtkvCVoGGyo3iWz2nht1fXbonk",
+        "price_usd": 0.0,
+        "total_value": 3322.935046219402,
+        "holder_count": 3,
+        "holders_details": [
+          {
+            "holder_rank": 51,
+            "holder_address": "511bYc7dNx5LnH9VfPoYT56kfQLApr7uKWea2QG5r2Z9",
+            "balance": 102316.95675,
+            "value_usd": 49.949922506640185
+          },
+          {
+            "holder_rank": 76,
+            "holder_address": "HCZgcnoYBSorLid2gogmqCGrkyb2UuTatCyDHNNo5K6F",
+            "balance": 6157352.390952,
+            "value_usd": 3005.94627267516
+          },
+          {
+            "holder_rank": 92,
+            "holder_address": "5N2DB6b7zZEqUMNhyxcys9afARn7L3tH2QUP12i1fPwa",
+            "balance": 546999.89912,
+            "value_usd": 267.03885103760183
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "BIAO",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "2ru87k7yAZnDRsnqVpgJYETFgqVApuBcwB2xDb19pump",
+        "price_usd": 0.0,
+        "total_value": 3321.713449329085,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 96,
+            "holder_address": "EWkGyhD7XEgzJsutnTmN6qCobBBhMuDukaGXUmMhjM7f",
+            "balance": 3284576.918249,
+            "value_usd": 3321.713449329085
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "AISLOP",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "2wzVMXhLypmP92mXNCq4fuFcd9TCC972AbMfuiH3pump",
+        "price_usd": 0.0,
+        "total_value": 3215.567598796184,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 96,
+            "holder_address": "EWkGyhD7XEgzJsutnTmN6qCobBBhMuDukaGXUmMhjM7f",
+            "balance": 9782962.677474,
+            "value_usd": 3215.567598796184
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "SolARBa",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "6Qd6mmFR84jzg24S3851TWNGeTTFrfPko76UiHyRMDMT",
+        "price_usd": 0.0,
+        "total_value": 3124.0462123401157,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 49,
+            "holder_address": "25mYnjJ2MXHZH6NvTTdA63JvjgRVcuiaj6MRiEQNs1Dq",
+            "balance": 1034.571829,
+            "value_usd": 3124.0462123401157
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "MAD",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "madHpjRn6bd8t78Rsy7NuSuNwWa2HU8ByPobZprHbHv",
+        "price_usd": 0.0,
+        "total_value": 3121.6370130997575,
+        "holder_count": 2,
+        "holders_details": [
+          {
+            "holder_rank": 22,
+            "holder_address": "EFW5CwoiBqxVFdAYrnPMj1GEgoFoHaWaGb4tXtSXsLDV",
+            "balance": 211259082.355102,
+            "value_usd": 791.0295826134965
+          },
+          {
+            "holder_rank": 54,
+            "holder_address": "3rxNo1RsmRH8AZskiWPRrZDjHFGXqs3PctrnDkyCQEVv",
+            "balance": 622431825.454348,
+            "value_usd": 2330.607430486261
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "ESX",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "28G7z3VyHDFNhrnvSTf1GssKoGrtCrdiguASQy2BsHiF",
+        "price_usd": 0.0,
+        "total_value": 3109.6343182276396,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 14,
+            "holder_address": "3rVfGfGxomNCA2qfK4QVuQV4DzypZFkHfSPaphWpgAqd",
+            "balance": 133721.56269788,
+            "value_usd": 3109.6343182276396
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "RAT",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "3vJenGaGsuKG5shPhi7rjnuy3MV6xjmBTGjYqYzXpump",
+        "price_usd": 0.0,
+        "total_value": 2866.316684096249,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 22,
+            "holder_address": "EFW5CwoiBqxVFdAYrnPMj1GEgoFoHaWaGb4tXtSXsLDV",
+            "balance": 5078854.697394,
+            "value_usd": 2866.316684096249
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "CHILLHOUSE",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "GkyPYa7NnCFbduLknCfBfP7p8564X1VZhwZYJ6CZpump",
+        "price_usd": 0.0,
+        "total_value": 2849.9856428243543,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 78,
+            "holder_address": "F5NvuP1htcKph9vjktbPVDkc85dwvzNFHvUs3nS6gxHd",
+            "balance": 195767.675437,
+            "value_usd": 2849.9856428243543
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "SINGULARRY",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "HwKE9CPg9Z9WzAeQSj6jeLBizK7LJs5m6LTVx6pLpump",
+        "price_usd": 0.0,
+        "total_value": 2841.879460062766,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 49,
+            "holder_address": "25mYnjJ2MXHZH6NvTTdA63JvjgRVcuiaj6MRiEQNs1Dq",
+            "balance": 1082260.590757,
+            "value_usd": 2841.879460062766
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "CHILLGUY",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "Df6yfrKC8kZE3KNkrHERKzAetSxbrWeniQfyJY4Jpump",
+        "price_usd": 0.0,
+        "total_value": 2804.3706599094485,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 54,
+            "holder_address": "3rxNo1RsmRH8AZskiWPRrZDjHFGXqs3PctrnDkyCQEVv",
+            "balance": 52567.748364,
+            "value_usd": 2804.3706599094485
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "HNT",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "hntyVP6YFm1Hg25TN9WGLqM12b8TQmcknKrdu1oxWux",
+        "price_usd": 0.0,
+        "total_value": 2631.551116350085,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 49,
+            "holder_address": "25mYnjJ2MXHZH6NvTTdA63JvjgRVcuiaj6MRiEQNs1Dq",
+            "balance": 1001.7903389,
+            "value_usd": 2631.551116350085
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "ALPHA",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "2sCUCJdVkmyXp4dT8sFaA9LKgSMK4yDPi9zLHiwXpump",
+        "price_usd": 0.0,
+        "total_value": 2593.958196618341,
+        "holder_count": 2,
+        "holders_details": [
+          {
+            "holder_rank": 55,
+            "holder_address": "9pSZw8E4EBMC4hc9pU8qC3ss4H6XKRabWqWqK8K3E6DF",
+            "balance": 2023404.758117,
+            "value_usd": 1125.5900692171886
+          },
+          {
+            "holder_rank": 85,
+            "holder_address": "4ckP3uN4N76qakK8sZxchGh1kFy5TB7V1A47mPMjF1gL",
+            "balance": 2639596.010044,
+            "value_usd": 1468.3681274011524
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "DRUGS",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "CX9YDTED9TWgVXVoFy8JL9gSSAEWcTv4mzjLSv17LQsj",
+        "price_usd": 0.0,
+        "total_value": 2544.7249186476374,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 49,
+            "holder_address": "25mYnjJ2MXHZH6NvTTdA63JvjgRVcuiaj6MRiEQNs1Dq",
+            "balance": 1081870.876606322,
+            "value_usd": 2544.7249186476374
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "FAFO",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "BP8RUdhLKBL2vgVXc3n7oTSZKWaQVbD8S6QcPaMVBAPo",
+        "price_usd": 0.0,
+        "total_value": 2387.386781788824,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 47,
+            "holder_address": "2kVaTYHe4fQao9U5Ap6Wq1qPAtWvwBSoRECSBSgsYkXW",
+            "balance": 5000041.189801,
+            "value_usd": 2387.386781788824
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "C:\\memes",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "GtfNTYbt41BzVvNLj9ijeYsWsAAVEGidoDoERwg8bonk",
+        "price_usd": 0.0,
+        "total_value": 2279.9451769853767,
+        "holder_count": 2,
+        "holders_details": [
+          {
+            "holder_rank": 40,
+            "holder_address": "J9oCqq3nbGoNPAX4TX7US54vhPkz7ggyaktaDi85nbLs",
+            "balance": 175281.6436,
+            "value_usd": 40.836622141046874
+          },
+          {
+            "holder_rank": 76,
+            "holder_address": "HCZgcnoYBSorLid2gogmqCGrkyb2UuTatCyDHNNo5K6F",
+            "balance": 9610849.456068,
+            "value_usd": 2239.10855484433
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "bbSOL",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "Bybit2vBJGhPF52GBdNaQfUJ6ZpThSgHBobjWZpLPb4B",
+        "price_usd": 0.0,
+        "total_value": 2179.4433029451243,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 49,
+            "holder_address": "25mYnjJ2MXHZH6NvTTdA63JvjgRVcuiaj6MRiEQNs1Dq",
+            "balance": 10.208994316,
+            "value_usd": 2179.4433029451243
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "Shoggoth",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "H2c31USxu35MDkBrGph8pUDUnmzo2e4Rf4hnvL2Upump",
+        "price_usd": 0.0,
+        "total_value": 2086.1006690187605,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 47,
+            "holder_address": "2kVaTYHe4fQao9U5Ap6Wq1qPAtWvwBSoRECSBSgsYkXW",
+            "balance": 400000.0,
+            "value_usd": 2086.1006690187605
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "CHACHA",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "9Wkcek2EZFmJf5L2XmC5rfnNVBrdndbMe6yW8fbfbonk",
+        "price_usd": 0.0,
+        "total_value": 2020.8525585417074,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 50,
+            "holder_address": "5d4TCx3mvXeRx7wVqNgA7X2CnkUrg3qPLUzgwcpY8aby",
+            "balance": 13458431.432623,
+            "value_usd": 2020.8525585417074
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "STONKS",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "6NcdiK8B5KK2DzKvzvCfqi8EHaEqu48fyEzC8Mm9pump",
+        "price_usd": 0.0,
+        "total_value": 1987.5170468205429,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 78,
+            "holder_address": "F5NvuP1htcKph9vjktbPVDkc85dwvzNFHvUs3nS6gxHd",
+            "balance": 100000.226487,
+            "value_usd": 1987.5170468205429
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "THC",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "BmwJNuAAjFdKMfE9sWFb1YJJReJJGHLFsENPLkhjLbuT",
+        "price_usd": 0.0,
+        "total_value": 1905.1814219517146,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 1,
+            "holder_address": "5Q544fKrFoe6tsEbD7S8EmxGTJYAKtTVhAW5Q5pge4j1",
+            "balance": 1110000.0,
+            "value_usd": 1905.1814219517146
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "KORI",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "HtTYHz1Kf3rrQo6AqDLmss7gq5WrkWAaXn3tupUZbonk",
+        "price_usd": 0.0,
+        "total_value": 1891.1095959696097,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 78,
+            "holder_address": "F5NvuP1htcKph9vjktbPVDkc85dwvzNFHvUs3nS6gxHd",
+            "balance": 73767.691834,
+            "value_usd": 1891.1095959696097
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "USEFUL",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "HD3JBABeFkdZwUgKwhwJYqjLNrPWXEaDVfH4uMqRpump",
+        "price_usd": 0.0,
+        "total_value": 1864.378049499503,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 76,
+            "holder_address": "HCZgcnoYBSorLid2gogmqCGrkyb2UuTatCyDHNNo5K6F",
+            "balance": 3088862.731095,
+            "value_usd": 1864.378049499503
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "HAPPY",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "HAPPYwgFcjEJDzRtfWE6tiHE9zGdzpNky2FvjPHsvvGZ",
+        "price_usd": 0.0,
+        "total_value": 1758.888402983094,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 47,
+            "holder_address": "2kVaTYHe4fQao9U5Ap6Wq1qPAtWvwBSoRECSBSgsYkXW",
+            "balance": 1000000.0,
+            "value_usd": 1758.888402983094
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "bread",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "4MM1JVkuYdv5WmhS6YbXE3rub6tiZ5vr7G6miiLUbonk",
+        "price_usd": 0.0,
+        "total_value": 1507.2312452738447,
+        "holder_count": 2,
+        "holders_details": [
+          {
+            "holder_rank": 76,
+            "holder_address": "HCZgcnoYBSorLid2gogmqCGrkyb2UuTatCyDHNNo5K6F",
+            "balance": 11580472.923635,
+            "value_usd": 1434.634606713945
+          },
+          {
+            "holder_rank": 92,
+            "holder_address": "5N2DB6b7zZEqUMNhyxcys9afARn7L3tH2QUP12i1fPwa",
+            "balance": 586005.247089,
+            "value_usd": 72.59663855989974
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "House",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "DitHyRMQiSDhn5cnKMJV2CDDt6sVct96YrECiM49pump",
+        "price_usd": 0.0,
+        "total_value": 1463.5352070836848,
+        "holder_count": 2,
+        "holders_details": [
+          {
+            "holder_rank": 91,
+            "holder_address": "4JnpVQBMoX3AAEDvSSTxUPYedvGNsL4FtZHLhSKXwDmU",
+            "balance": 23.973983,
+            "value_usd": 0.4497317475004682
+          },
+          {
+            "holder_rank": 98,
+            "holder_address": "Bka38LDfNRCJqvc3Bgy7i6RpVdgCFPGM22pGYPPaGTVf",
+            "balance": 78074.498169,
+            "value_usd": 1463.0854753361843
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "WRONG",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "5B8jpiDY6WftBdwEyL3LWwYKeDSVikUpXoSYZhFxbonk",
+        "price_usd": 0.0,
+        "total_value": 1363.3129907973616,
+        "holder_count": 3,
+        "holders_details": [
+          {
+            "holder_rank": 9,
+            "holder_address": "AgezeV8FWoKYStx9dzobPvcUsH9RDDPCumtkR8KUKcsd",
+            "balance": 14754742.343917,
+            "value_usd": 536.1557047680477
+          },
+          {
+            "holder_rank": 10,
+            "holder_address": "EFS7EkPWzgyJxJ2GXyNekXhYWKE421naxkGCVFrwaaar",
+            "balance": 10618384.46678,
+            "value_usd": 385.8493272592891
+          },
+          {
+            "holder_rank": 90,
+            "holder_address": "tYeqethXvq6TURQdMaRcq33dCdnB8xaCqK2WHkKcfoZ",
+            "balance": 12144578.837949,
+            "value_usd": 441.30795877002487
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "PEPE",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "AGF2AW8nosA9rDxgfkHpqN5tTxoqBPreS5MqhRxxzg6i",
+        "price_usd": 0.0,
+        "total_value": 1316.0847391473358,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 78,
+            "holder_address": "F5NvuP1htcKph9vjktbPVDkc85dwvzNFHvUs3nS6gxHd",
+            "balance": 19821845.803087,
+            "value_usd": 1316.0847391473358
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "VINE",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "6AJcP7wuLwmRYLBNbi825wgguaPsWzPBEHcHndpRpump",
+        "price_usd": 0.0,
+        "total_value": 1308.3741124316616,
+        "holder_count": 2,
+        "holders_details": [
+          {
+            "holder_rank": 7,
+            "holder_address": "C8xKCjdzgqVPegGdNKL5wfyvdJ1Jx1EjXgyoU2sfcYqr",
+            "balance": 21106.6401,
+            "value_usd": 1308.34996386276
+          },
+          {
+            "holder_rank": 45,
+            "holder_address": "FNqYztxBM8ugDTEufY6ot8KvJFoYziQCbLQqF1adTmjt",
+            "balance": 0.389532,
+            "value_usd": 0.0241485689016
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "autism",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "BkVeSP2GsXV3AYoRJBSZTpFE8sXmcuGnRQcFgoWspump",
+        "price_usd": 0.0,
+        "total_value": 1303.1376197828206,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 78,
+            "holder_address": "F5NvuP1htcKph9vjktbPVDkc85dwvzNFHvUs3nS6gxHd",
+            "balance": 2122194.710437,
+            "value_usd": 1303.1376197828206
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "SAFEMOON",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "2kGfWRgNp1QaxUMFCX9CMN78E1iCbgjBAZuQNUjWpump",
+        "price_usd": 0.0,
+        "total_value": 1265.4278078572938,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 78,
+            "holder_address": "F5NvuP1htcKph9vjktbPVDkc85dwvzNFHvUs3nS6gxHd",
+            "balance": 2185924.852549,
+            "value_usd": 1265.4278078572938
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "SOLC",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "DLUNTKRQt7CrpqSX1naHUYoBznJ9pvMP65uCeWQgYnRK",
+        "price_usd": 0.0,
+        "total_value": 1264.5647361417637,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 1,
+            "holder_address": "5Q544fKrFoe6tsEbD7S8EmxGTJYAKtTVhAW5Q5pge4j1",
+            "balance": 55400.028384,
+            "value_usd": 1264.5647361417637
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "MINIDOGE",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "8J6CexwfJ8CSzn2DgWhzQe1NHd2hK9DKX59FCNNMo2hu",
+        "price_usd": 0.0,
+        "total_value": 1222.6741357237956,
+        "holder_count": 2,
+        "holders_details": [
+          {
+            "holder_rank": 55,
+            "holder_address": "9pSZw8E4EBMC4hc9pU8qC3ss4H6XKRabWqWqK8K3E6DF",
+            "balance": 7532464.974011,
+            "value_usd": 668.3483830585799
+          },
+          {
+            "holder_rank": 77,
+            "holder_address": "EpNDMVvKtYM4Jn47xKV6mCvSefY1DmmuvyxZH29WcoWu",
+            "balance": 6247399.443139,
+            "value_usd": 554.3257526652159
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "memestock",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "8wvLsACsR3owhGzmLLHTgh2waW2vKNtVYWDs9cCopump",
+        "price_usd": 0.0,
+        "total_value": 1194.2656577935347,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 76,
+            "holder_address": "HCZgcnoYBSorLid2gogmqCGrkyb2UuTatCyDHNNo5K6F",
+            "balance": 8596915.039954,
+            "value_usd": 1194.2656577935347
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "CHAT",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "947tEoG318GUmyjVYhraNRvWpMX7fpBTDQFBoJvSkSG3",
+        "price_usd": 0.0,
+        "total_value": 1174.9999251044742,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 6,
+            "holder_address": "C7ZZSpPQfSw95AbEAdZdWFYL2K2Ek55gyqAbsBEWuE1B",
+            "balance": 3387.968363232,
+            "value_usd": 1174.9999251044742
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "SOLDIER",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "GGUxJxZqUDfNbnzQqdCnrEzUX7LuCA9usdAkkSfApump",
+        "price_usd": 0.0,
+        "total_value": 1169.1503606322806,
+        "holder_count": 3,
+        "holders_details": [
+          {
+            "holder_rank": 12,
+            "holder_address": "EjtZWQtMyBN5HH9eEQJhZXjF4E3Xnn3agFobyKUPEh9s",
+            "balance": 12864919.365452,
+            "value_usd": 319.39338376723134
+          },
+          {
+            "holder_rank": 35,
+            "holder_address": "6n8TR5M5kTpVyCRfHVd85DQLyEYb9vig6KRZPccS9qXJ",
+            "balance": 9089158.452216,
+            "value_usd": 225.6537325407328
+          },
+          {
+            "holder_rank": 54,
+            "holder_address": "3rxNo1RsmRH8AZskiWPRrZDjHFGXqs3PctrnDkyCQEVv",
+            "balance": 25138397.731497,
+            "value_usd": 624.1032443243164
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "TPU",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "RdTSEwJwHA8vh6BALTu9hYVYv4FgWDS5JsK9hnApump",
+        "price_usd": 0.0,
+        "total_value": 1133.3217599070204,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 71,
+            "holder_address": "DUFwznTAZ6G6ZfEPWqcyauxKdhdDa4YkrvmmC5w3rBfh",
+            "balance": 32938065.8424,
+            "value_usd": 1133.3217599070204
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "MIM",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "7e4UkovqYoLmBfAdvrmkda6f4dgCJLpgmanEvso5HGgs",
+        "price_usd": 0.0,
+        "total_value": 1080.6742157199765,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 88,
+            "holder_address": "9D1qtQ2RDo8MKfyYKKXdPy2esMUyry8oX5Kyi23nuems",
+            "balance": 7261922.023325,
+            "value_usd": 1080.6742157199765
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "Buckazoids",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "BQQzEvYT4knThhkSPBvSKBLg1LEczisWLhx5ydJipump",
+        "price_usd": 0.0,
+        "total_value": 985.3163422395615,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 82,
+            "holder_address": "ALU8tUp4tmYoBY37os6wPhBwrQst5d6UaLCFiMsno24c",
+            "balance": 2047520.825107,
+            "value_usd": 985.3163422395615
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "VIBE",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "8tSeXYSXzFvaDX1nbWrEFFaFuPHuWqpzksKYxQPvpump",
+        "price_usd": 0.0,
+        "total_value": 963.5480265903122,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 95,
+            "holder_address": "3vpi8QbrDVcSpTtVEoajRPNqzAdBadD4CBrH93uHm9FY",
+            "balance": 827945.500072,
+            "value_usd": 963.5480265903122
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "BATCOIN",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "9Nc7qznSyhq1YV2r9EeNJgsfH7yjKVd6Zty3Suzibonk",
+        "price_usd": 0.0,
+        "total_value": 911.9980615229983,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 6,
+            "holder_address": "C7ZZSpPQfSw95AbEAdZdWFYL2K2Ek55gyqAbsBEWuE1B",
+            "balance": 10734088.746498,
+            "value_usd": 911.9980615229983
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "FWAGA",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "3UNQFXy3JMaZtYjvjDD6ifJbYF9wUk4cnHjrnBU1pump",
+        "price_usd": 0.0,
+        "total_value": 909.637396808877,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 1,
+            "holder_address": "5Q544fKrFoe6tsEbD7S8EmxGTJYAKtTVhAW5Q5pge4j1",
+            "balance": 133089087.783088,
+            "value_usd": 909.637396808877
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "Kardashev ",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "77So53fUVeqn3j6zTBiczp5aFeCp9zRKe7LjSxXZpump",
+        "price_usd": 0.0,
+        "total_value": 905.8001934001538,
+        "holder_count": 3,
+        "holders_details": [
+          {
+            "holder_rank": 55,
+            "holder_address": "9pSZw8E4EBMC4hc9pU8qC3ss4H6XKRabWqWqK8K3E6DF",
+            "balance": 45538644.597764,
+            "value_usd": 303.89984678929943
+          },
+          {
+            "holder_rank": 77,
+            "holder_address": "EpNDMVvKtYM4Jn47xKV6mCvSefY1DmmuvyxZH29WcoWu",
+            "balance": 30386300.758645,
+            "value_usd": 202.78144478413412
+          },
+          {
+            "holder_rank": 85,
+            "holder_address": "4ckP3uN4N76qakK8sZxchGh1kFy5TB7V1A47mPMjF1gL",
+            "balance": 59806985.803248,
+            "value_usd": 399.1189018267202
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "MLG",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "7XJiwLDrjzxDYdZipnJXzpr1iDTmK55XixSFAa7JgNEL",
+        "price_usd": 0.0,
+        "total_value": 836.657570343799,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 98,
+            "holder_address": "Bka38LDfNRCJqvc3Bgy7i6RpVdgCFPGM22pGYPPaGTVf",
+            "balance": 104428.66444,
+            "value_usd": 836.657570343799
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "shiyo",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "EBCqxfSMVSJPDGFLcf2yAfQoeLJRD1z8VbEUemZSbonk",
+        "price_usd": 0.0,
+        "total_value": 819.9707024046664,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 50,
+            "holder_address": "5d4TCx3mvXeRx7wVqNgA7X2CnkUrg3qPLUzgwcpY8aby",
+            "balance": 15301738.003935,
+            "value_usd": 819.9707024046664
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "GARY",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "5SRer48NRfmhsut1n4ZwSAVUJAErNjdKcXTMVaxdpump",
+        "price_usd": 0.0,
+        "total_value": 819.0071282905129,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 99,
+            "holder_address": "G7MHDeoCSMafEqwqQkmmitQc7eAJgVVmP8du1Fr9NU5X",
+            "balance": 260000.0,
+            "value_usd": 819.0071282905129
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "RENT",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "7hB4AgnZp7RiThvtFTGMedkrU3G8X34fwHzy1vQjpump",
+        "price_usd": 0.0,
+        "total_value": 767.7017637021922,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 82,
+            "holder_address": "ALU8tUp4tmYoBY37os6wPhBwrQst5d6UaLCFiMsno24c",
+            "balance": 10070026.857925,
+            "value_usd": 767.7017637021922
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "TRT",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "5hrT5zyNe9NDG3C1AvuxT3oAfhKNM6uSNQ3fRsxXpump",
+        "price_usd": 0.0,
+        "total_value": 736.309053109705,
+        "holder_count": 3,
+        "holders_details": [
+          {
+            "holder_rank": 55,
+            "holder_address": "9pSZw8E4EBMC4hc9pU8qC3ss4H6XKRabWqWqK8K3E6DF",
+            "balance": 8000000.0,
+            "value_usd": 210.71972248856
+          },
+          {
+            "holder_rank": 77,
+            "holder_address": "EpNDMVvKtYM4Jn47xKV6mCvSefY1DmmuvyxZH29WcoWu",
+            "balance": 12998945.817485,
+            "value_usd": 342.39178191303336
+          },
+          {
+            "holder_rank": 85,
+            "holder_address": "4ckP3uN4N76qakK8sZxchGh1kFy5TB7V1A47mPMjF1gL",
+            "balance": 6955117.311074,
+            "value_usd": 183.1975487081116
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "vvaifu",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "FQ1tyso61AH1tzodyJfSwmzsD3GToybbRNoZxUBz21p8",
+        "price_usd": 0.0,
+        "total_value": 714.7589693807864,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 47,
+            "holder_address": "2kVaTYHe4fQao9U5Ap6Wq1qPAtWvwBSoRECSBSgsYkXW",
+            "balance": 250809.872644,
+            "value_usd": 714.7589693807864
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "BPengu",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "2oDJSodK3bbSYvAPeJwFX8Vg9QFeQzAnrd6EcQpHRfFd",
+        "price_usd": 0.0,
+        "total_value": 706.8995180063621,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 1,
+            "holder_address": "5Q544fKrFoe6tsEbD7S8EmxGTJYAKtTVhAW5Q5pge4j1",
+            "balance": 2000000000018.0,
+            "value_usd": 706.8995180063621
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "Nala",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "J5HzihzWjHwf4YgToYhUkLpft5276ZkKFHht3vKiQWRp",
+        "price_usd": 0.0,
+        "total_value": 654.4942310283117,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 1,
+            "holder_address": "5Q544fKrFoe6tsEbD7S8EmxGTJYAKtTVhAW5Q5pge4j1",
+            "balance": 200442194.018871,
+            "value_usd": 654.4942310283117
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "lowkey",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "7Aa3Ypk1x48d2Se8ddTWr56HMdfhL1AzRRPK1DYspump",
+        "price_usd": 0.0,
+        "total_value": 635.7607565933213,
+        "holder_count": 2,
+        "holders_details": [
+          {
+            "holder_rank": 77,
+            "holder_address": "EpNDMVvKtYM4Jn47xKV6mCvSefY1DmmuvyxZH29WcoWu",
+            "balance": 7394127.541022,
+            "value_usd": 204.84481128406495
+          },
+          {
+            "holder_rank": 85,
+            "holder_address": "4ckP3uN4N76qakK8sZxchGh1kFy5TB7V1A47mPMjF1gL",
+            "balance": 15554445.529295,
+            "value_usd": 430.9159453092563
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "RCAT",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "ECbbgVcPcgbG1rJidrpDmKzZpfGKH7Bpcmam8o1vpump",
+        "price_usd": 0.0,
+        "total_value": 619.4265194068852,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 1,
+            "holder_address": "5Q544fKrFoe6tsEbD7S8EmxGTJYAKtTVhAW5Q5pge4j1",
+            "balance": 105674607.557149,
+            "value_usd": 619.4265194068852
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "BEBE",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "4T1d5M8X8dfKL2JbZaosQGbc7WqwL1McWGCJP6fVpump",
+        "price_usd": 0.0,
+        "total_value": 577.385183021933,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 1,
+            "holder_address": "5Q544fKrFoe6tsEbD7S8EmxGTJYAKtTVhAW5Q5pge4j1",
+            "balance": 108804234.637586,
+            "value_usd": 577.385183021933
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "REALIS",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "EBGaJP7srpUUN8eRdta1MsojrNtweuHYsdP3P1TRpump",
+        "price_usd": 0.0,
+        "total_value": 570.7031053231958,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 98,
+            "holder_address": "Bka38LDfNRCJqvc3Bgy7i6RpVdgCFPGM22pGYPPaGTVf",
+            "balance": 316197.99995,
+            "value_usd": 570.7031053231958
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "ZEREBRO",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "8x5VqbHA8D7NkD52uNuS5nnt3PwA8pLD34ymskeSo2Wn",
+        "price_usd": 0.0,
+        "total_value": 545.9896367198065,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 54,
+            "holder_address": "3rxNo1RsmRH8AZskiWPRrZDjHFGXqs3PctrnDkyCQEVv",
+            "balance": 19996.030878,
+            "value_usd": 545.9896367198065
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "MEOW",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "HAgX1HSfok8DohiNCS54FnC2UJkDSrRVnT38W3iWFwc8",
+        "price_usd": 0.0,
+        "total_value": 542.2124780982149,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 85,
+            "holder_address": "4ckP3uN4N76qakK8sZxchGh1kFy5TB7V1A47mPMjF1gL",
+            "balance": 6976994.208755639,
+            "value_usd": 542.2124780982149
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "BULLY",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "79yTpy8uwmAkrdgZdq6ZSBTvxKsgPrNqTLvYQBh1pump",
+        "price_usd": 0.0,
+        "total_value": 505.3563528154845,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 98,
+            "holder_address": "Bka38LDfNRCJqvc3Bgy7i6RpVdgCFPGM22pGYPPaGTVf",
+            "balance": 614368.024949,
+            "value_usd": 505.3563528154845
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "BRUV",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "nFXLang7pEKP9gyEmkuVhGTByhPd3Soa1pA7Q8Lpump",
+        "price_usd": 0.0,
+        "total_value": 498.3314179917481,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 54,
+            "holder_address": "3rxNo1RsmRH8AZskiWPRrZDjHFGXqs3PctrnDkyCQEVv",
+            "balance": 3878355.121815,
+            "value_usd": 498.3314179917481
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "LIGHT",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "LiGHtkg3uTa9836RaNkKLLriqTNRcMdRAhqjGWNv777",
+        "price_usd": 0.0,
+        "total_value": 494.42161747302026,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 81,
+            "holder_address": "BvFEfQjCCBgV29KRX1oo1bng5RxjXZjgp9rTjhYrWAy8",
+            "balance": 11134.89449,
+            "value_usd": 494.42161747302026
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "GIGADAD",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "9iCCVaGu9oPcVczW7F1hNQmbz8q8LJwivQM8aXSPpump",
+        "price_usd": 0.0,
+        "total_value": 491.1750711731942,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 92,
+            "holder_address": "5N2DB6b7zZEqUMNhyxcys9afARn7L3tH2QUP12i1fPwa",
+            "balance": 13342200.118579,
+            "value_usd": 491.1750711731942
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "AVB",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "6d5zHW5B8RkGKd51Lpb9RqFQSqDudr9GJgZ1SgQZpump",
+        "price_usd": 0.0,
+        "total_value": 464.3939329179346,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 54,
+            "holder_address": "3rxNo1RsmRH8AZskiWPRrZDjHFGXqs3PctrnDkyCQEVv",
+            "balance": 286226.880799,
+            "value_usd": 464.3939329179346
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "VCAT",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "VP9UaBXLM4KYRvyjisu65rz8BU5xNAbewU7LVmyU2x4",
+        "price_usd": 0.0,
+        "total_value": 345.09924685677083,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 95,
+            "holder_address": "3vpi8QbrDVcSpTtVEoajRPNqzAdBadD4CBrH93uHm9FY",
+            "balance": 2589.475554486,
+            "value_usd": 345.09924685677083
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "BHM",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "9MmYJen1thytTQUm2ns3X95D3X7n3wC57QSx747xsAwj",
+        "price_usd": 0.0,
+        "total_value": 333.6995420714042,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 93,
+            "holder_address": "HnKWADuvemQb1o5JWnHjhykPKkUSDWqr7UaMMo6HCu5j",
+            "balance": 5644303.224264645,
+            "value_usd": 333.6995420714042
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "sdog",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "3wQy28SWKL7CHXSGgU8EfdmYrqmF3tyCCAGQXQqnF6H1",
+        "price_usd": 0.0,
+        "total_value": 323.71898371959134,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 95,
+            "holder_address": "3vpi8QbrDVcSpTtVEoajRPNqzAdBadD4CBrH93uHm9FY",
+            "balance": 31708621.809221,
+            "value_usd": 323.71898371959134
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "$SORANA",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "ExbN9KVhLMZT1Pt6uEQ5eMyWdfbTAvdLP9cBTwaK8EHL",
+        "price_usd": 0.0,
+        "total_value": 288.0401099945503,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 43,
+            "holder_address": "AQi3KQh54j8nhxxcRqjphd5MbjZkbZiTbiYcWSFWsbqY",
+            "balance": 2868744.502362,
+            "value_usd": 288.0401099945503
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "Coin",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "Fshf9niKKQbAS3KjAxkyhPTTyBcW5k3kVE6DhB1fpump",
+        "price_usd": 0.0,
+        "total_value": 269.122836648115,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 85,
+            "holder_address": "4ckP3uN4N76qakK8sZxchGh1kFy5TB7V1A47mPMjF1gL",
+            "balance": 10185696.345112,
+            "value_usd": 269.122836648115
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "ALT",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "Cdq1WR1d4i2hMrqKUWgZeUbRpkhamGHSvm1f6ATpuray",
+        "price_usd": 0.0,
+        "total_value": 232.95158154924223,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 60,
+            "holder_address": "632xX5AAwJ7Z5phYdc5p6k3LTFk4JtRXGN196iqwHAoj",
+            "balance": 328363.320186,
+            "value_usd": 232.95158154924223
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "Vlad",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "LNmmn7GHMiqShhZd8ZVXAuMo1uoCr3mfhbP6xdMpump",
+        "price_usd": 0.0,
+        "total_value": 225.84934125910704,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 60,
+            "holder_address": "632xX5AAwJ7Z5phYdc5p6k3LTFk4JtRXGN196iqwHAoj",
+            "balance": 6165263.909941,
+            "value_usd": 225.84934125910704
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "DOGE",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "EAYzfe1rUTPMaRX2cyJ9igR6QyjG1bYEfTobaADnpump",
+        "price_usd": 0.0,
+        "total_value": 219.71152596632993,
+        "holder_count": 2,
+        "holders_details": [
+          {
+            "holder_rank": 32,
+            "holder_address": "FVrq4FbdWQrTBgyDUFbZbrdt5FFtWiDkhRTFM6HEGRh6",
+            "balance": 11500.0,
+            "value_usd": 0.162243089460297
+          },
+          {
+            "holder_rank": 55,
+            "holder_address": "9pSZw8E4EBMC4hc9pU8qC3ss4H6XKRabWqWqK8K3E6DF",
+            "balance": 15561937.099958,
+            "value_usd": 219.54928287686963
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "HIKI",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "Hnq9gGF2HFShcNg7U6pU1xxNs7zwvD5E1LoLdjMApump",
+        "price_usd": 0.0,
+        "total_value": 205.2313769859263,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 82,
+            "holder_address": "ALU8tUp4tmYoBY37os6wPhBwrQst5d6UaLCFiMsno24c",
+            "balance": 10025672.211435,
+            "value_usd": 205.2313769859263
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "ODINDOGE",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "BXYQqDsko5tQAwyLazhEv6NLbqPqnPsiWw4i9jBipump",
+        "price_usd": 0.0,
+        "total_value": 205.06088384755313,
+        "holder_count": 2,
+        "holders_details": [
+          {
+            "holder_rank": 7,
+            "holder_address": "C8xKCjdzgqVPegGdNKL5wfyvdJ1Jx1EjXgyoU2sfcYqr",
+            "balance": 10006181.973932,
+            "value_usd": 141.5571051049296
+          },
+          {
+            "holder_rank": 79,
+            "holder_address": "AFs7qiiid5rh22RLxS9miXxFVCUxRUq8qE9QJMDuwH1J",
+            "balance": 4488862.396981,
+            "value_usd": 63.50377874262353
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "XSTOCKS",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "MtCJMNfa98DNNk2zvsH8t34Xq6VVdpoDY94qY3spump",
+        "price_usd": 0.0,
+        "total_value": 196.8885147240676,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 85,
+            "holder_address": "4ckP3uN4N76qakK8sZxchGh1kFy5TB7V1A47mPMjF1gL",
+            "balance": 5844535.609327,
+            "value_usd": 196.8885147240676
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "WHATRR",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "G95DeH1mNbG48MWsfRx1WXngtUhHvjWE97P4piXZbonk",
+        "price_usd": 0.0,
+        "total_value": 186.82625366251344,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 81,
+            "holder_address": "BvFEfQjCCBgV29KRX1oo1bng5RxjXZjgp9rTjhYrWAy8",
+            "balance": 2312818.765111,
+            "value_usd": 186.82625366251344
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "PFI",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "EyHsYBNMzyDu7oGUM6S2E5poYWtwfyyMNNnqFXh81ger",
+        "price_usd": 0.0,
+        "total_value": 175.40967236970886,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 10,
+            "holder_address": "EFS7EkPWzgyJxJ2GXyNekXhYWKE421naxkGCVFrwaaar",
+            "balance": 16206577.898695,
+            "value_usd": 175.40967236970886
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "SHINY",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "9SSQG27xmGU2znxtuPTKCFiU1RGK2NfTcmK2pbWLpump",
+        "price_usd": 0.0,
+        "total_value": 173.36706828193726,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 41,
+            "holder_address": "54a2nSQEgX3JD2itpXuz3iZk1ivPwb2BJTK6rueyV9qZ",
+            "balance": 34612903.225806,
+            "value_usd": 173.36706828193726
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "MANA",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "Bw5K8eZaf361uDLHgX2UUn1PNfC7XtgQVvY9sSappump",
+        "price_usd": 0.0,
+        "total_value": 172.71074569713386,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 82,
+            "holder_address": "ALU8tUp4tmYoBY37os6wPhBwrQst5d6UaLCFiMsno24c",
+            "balance": 1081940.234064,
+            "value_usd": 172.71074569713386
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "POOL",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "DPgYSEECreJTG9dTei6tqhryCkf9f23cibTcNNtfpump",
+        "price_usd": 0.0,
+        "total_value": 170.87108298569973,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 85,
+            "holder_address": "4ckP3uN4N76qakK8sZxchGh1kFy5TB7V1A47mPMjF1gL",
+            "balance": 2304577.037739,
+            "value_usd": 170.87108298569973
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "MUSK",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "CzHc1ugMNhim5JCJC8ebbp4k14jfrbZx1HNcMyEppump",
+        "price_usd": 0.0,
+        "total_value": 137.1866017593038,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 82,
+            "holder_address": "ALU8tUp4tmYoBY37os6wPhBwrQst5d6UaLCFiMsno24c",
+            "balance": 1030453.037957,
+            "value_usd": 137.1866017593038
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "STINKCOIN",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "9ZWmgaewdaH2Ljfi3iE8A7umcJcxJz83ZakkfEPApump",
+        "price_usd": 0.0,
+        "total_value": 129.9638983621225,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 77,
+            "holder_address": "EpNDMVvKtYM4Jn47xKV6mCvSefY1DmmuvyxZH29WcoWu",
+            "balance": 6500000.0,
+            "value_usd": 129.9638983621225
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "Tako",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "GKkZ6bSRmyUVMD2ur9kqxEokHSrDLkZ7oqXUstJDpump",
+        "price_usd": 0.0,
+        "total_value": 129.6943908513439,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 14,
+            "holder_address": "3rVfGfGxomNCA2qfK4QVuQV4DzypZFkHfSPaphWpgAqd",
+            "balance": 10606221.7552,
+            "value_usd": 129.6943908513439
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "footcoin",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "EUdQbKfHucJe99GVt3HQMUZCQtWtvXFyjvrqDWctpump",
+        "price_usd": 0.0,
+        "total_value": 123.07407294139075,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 55,
+            "holder_address": "9pSZw8E4EBMC4hc9pU8qC3ss4H6XKRabWqWqK8K3E6DF",
+            "balance": 1912724.936963,
+            "value_usd": 123.07407294139075
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "LEGS",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "8tBUx7LPnA2utkURbyWX85hUus3JhYU14svS3YfGpump",
+        "price_usd": 0.0,
+        "total_value": 119.2457300729541,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 40,
+            "holder_address": "J9oCqq3nbGoNPAX4TX7US54vhPkz7ggyaktaDi85nbLs",
+            "balance": 401123.13515,
+            "value_usd": 119.2457300729541
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "ICE",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "3fhzatoYoh9y8tHBcZnN2WAjL1FRZdQ7VFWFEcgLpump",
+        "price_usd": 0.0,
+        "total_value": 99.83650902348337,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 75,
+            "holder_address": "A7JLaVrqaxrgedrGBYrC439zbapuR3TigxRsYx7Evz2T",
+            "balance": 4009415.196108,
+            "value_usd": 99.83650902348337
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "CATF",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "7uCHQdxAz2ojRgEpXRHas1nJAeTTo9b7JWNgpXXi9D9p",
+        "price_usd": 0.0,
+        "total_value": 95.42737184242947,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 83,
+            "holder_address": "458erScYN24wtNhP2voUtkab2qemunersoSbgd7e74CY",
+            "balance": 1014810.346764,
+            "value_usd": 95.42737184242947
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "BOOMER",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "7jmaTFBooHkaSrBJDftu3LcK85KPtqWTCaFZCDxQV7ZW",
+        "price_usd": 0.0,
+        "total_value": 88.183903043208,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 77,
+            "holder_address": "EpNDMVvKtYM4Jn47xKV6mCvSefY1DmmuvyxZH29WcoWu",
+            "balance": 1500000.0,
+            "value_usd": 88.183903043208
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "FARTCLUB",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "6zkZPeSVSynKoNgPjb6yCfJ5BFFro4gcKXuMrPtvpump",
+        "price_usd": 0.0,
+        "total_value": 87.81268793224176,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 73,
+            "holder_address": "4176mDBGAaKmatA4ACZVA72AGNWYKqp6tZWEKei4RjX9",
+            "balance": 4347177.137225,
+            "value_usd": 87.81268793224176
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "BUTTCOIN",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "77KhqraBouiU91KRchLPY8DYbVtfsH4nSBgHCd4UAwBY",
+        "price_usd": 0.0,
+        "total_value": 86.12770532463641,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 55,
+            "holder_address": "9pSZw8E4EBMC4hc9pU8qC3ss4H6XKRabWqWqK8K3E6DF",
+            "balance": 2856771.526734,
+            "value_usd": 86.12770532463641
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "streamer",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "27k66FaixfXPjUTugnYsi3gQtp7AWr277nDrZiXopump",
+        "price_usd": 0.0,
+        "total_value": 81.5637840691466,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 77,
+            "holder_address": "EpNDMVvKtYM4Jn47xKV6mCvSefY1DmmuvyxZH29WcoWu",
+            "balance": 2600000.0,
+            "value_usd": 81.5637840691466
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "BAG",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "B9jYrBoCPN7FcXVHe56KXsYgJE5gbTxsadjvyFiVpump",
+        "price_usd": 0.0,
+        "total_value": 77.95298353520164,
+        "holder_count": 2,
+        "holders_details": [
+          {
+            "holder_rank": 40,
+            "holder_address": "J9oCqq3nbGoNPAX4TX7US54vhPkz7ggyaktaDi85nbLs",
+            "balance": 97059.003033,
+            "value_usd": 77.95298353439848
+          },
+          {
+            "holder_rank": 45,
+            "holder_address": "FNqYztxBM8ugDTEufY6ot8KvJFoYziQCbLQqF1adTmjt",
+            "balance": 1e-06,
+            "value_usd": 8.03150466195233e-10
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "Beenz",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "9sbrLLnk4vxJajnZWXP9h5qk1NDFw7dz2eHjgemcpump",
+        "price_usd": 0.0,
+        "total_value": 72.58571412633171,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 93,
+            "holder_address": "HnKWADuvemQb1o5JWnHjhykPKkUSDWqr7UaMMo6HCu5j",
+            "balance": 228313.106684,
+            "value_usd": 72.58571412633171
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "BFC",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "HWeZgfKdPWRkLBGnmze5YokeZg9tQ2MYceYUChDNpump",
+        "price_usd": 0.0,
+        "total_value": 68.33672055557307,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 93,
+            "holder_address": "HnKWADuvemQb1o5JWnHjhykPKkUSDWqr7UaMMo6HCu5j",
+            "balance": 1582308.975986,
+            "value_usd": 68.33672055557307
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "WTF",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "AgDNMAi8r2QS1FQEeTHLsZSmkQKCK7xXP2bR7jQ2pump",
+        "price_usd": 0.0,
+        "total_value": 66.80477677354375,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 92,
+            "holder_address": "5N2DB6b7zZEqUMNhyxcys9afARn7L3tH2QUP12i1fPwa",
+            "balance": 42695.150549,
+            "value_usd": 66.80477677354375
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "PINO",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "7b36cKRYFZsMp3vLByVwfVQxW2ndcYth5rhPnyypump",
+        "price_usd": 0.0,
+        "total_value": 65.99914371219883,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 75,
+            "holder_address": "A7JLaVrqaxrgedrGBYrC439zbapuR3TigxRsYx7Evz2T",
+            "balance": 27686.389573,
+            "value_usd": 65.99914371219883
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "BC",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "BCNT4t3rv5Hva8RnUtJUJLnxzeFAabcYp8CghC1SmWin",
+        "price_usd": 0.0,
+        "total_value": 54.8793188677125,
+        "holder_count": 3,
+        "holders_details": [
+          {
+            "holder_rank": 9,
+            "holder_address": "AgezeV8FWoKYStx9dzobPvcUsH9RDDPCumtkR8KUKcsd",
+            "balance": 2100.0,
+            "value_usd": 18.2931062892375
+          },
+          {
+            "holder_rank": 16,
+            "holder_address": "EtU73MSYSw2RbGu3QGA8HxNeZudnRDeSBuHFCKd8gawv",
+            "balance": 2100.0,
+            "value_usd": 18.2931062892375
+          },
+          {
+            "holder_rank": 83,
+            "holder_address": "458erScYN24wtNhP2voUtkab2qemunersoSbgd7e74CY",
+            "balance": 2100.0,
+            "value_usd": 18.2931062892375
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "ORANGE",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "fmGLjVuQfBLbWPo5zxc8sSss3ixMW3u3bRP95uGpump",
+        "price_usd": 0.0,
+        "total_value": 53.94151931541161,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 92,
+            "holder_address": "5N2DB6b7zZEqUMNhyxcys9afARn7L3tH2QUP12i1fPwa",
+            "balance": 16948.094806,
+            "value_usd": 53.94151931541161
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "INU",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "CMva3U9E7WvrpLkRnYF2Hr3sVEhBkTBSDXBWVv5Qpump",
+        "price_usd": 0.0,
+        "total_value": 50.59963578574661,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 88,
+            "holder_address": "9D1qtQ2RDo8MKfyYKKXdPy2esMUyry8oX5Kyi23nuems",
+            "balance": 3540488.24321,
+            "value_usd": 50.59963578574661
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "MTRUMPWIF",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "3Nkm1tMSyCdLkiUXnxCZhUEBazNazt897pHnJ6Da1ofq",
+        "price_usd": 0.0,
+        "total_value": 50.52613946893251,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 43,
+            "holder_address": "AQi3KQh54j8nhxxcRqjphd5MbjZkbZiTbiYcWSFWsbqY",
+            "balance": 15078293.846979,
+            "value_usd": 50.52613946893251
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "DOG",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "2B5Rs88FYyFp4XciFrJ7zovvEeybiinZA8PXsSptBAGS",
+        "price_usd": 0.0,
+        "total_value": 48.705902486638955,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 88,
+            "holder_address": "9D1qtQ2RDo8MKfyYKKXdPy2esMUyry8oX5Kyi23nuems",
+            "balance": 220851.685739145,
+            "value_usd": 48.705902486638955
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "Ivank",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "24McxRroHBqR1D42m8K1N9VjB5BND1smEwxsCoxJpump",
+        "price_usd": 0.0,
+        "total_value": 42.767571069552254,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 43,
+            "holder_address": "AQi3KQh54j8nhxxcRqjphd5MbjZkbZiTbiYcWSFWsbqY",
+            "balance": 5428800.861748,
+            "value_usd": 42.767571069552254
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "PegeCoin",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "G4ZgRBCFYMEm3JmFRg29epeTTWrWt8kbhjgsY8BFpump",
+        "price_usd": 0.0,
+        "total_value": 39.41349672838537,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 60,
+            "holder_address": "632xX5AAwJ7Z5phYdc5p6k3LTFk4JtRXGN196iqwHAoj",
+            "balance": 506197.062653,
+            "value_usd": 39.41349672838537
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "VILLA",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "5fujj5KEuDSrP3fA1kKeb4BRwcJybh7ykTueEe3SPvxg",
+        "price_usd": 0.0,
+        "total_value": 28.561699710793388,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 71,
+            "holder_address": "DUFwznTAZ6G6ZfEPWqcyauxKdhdDa4YkrvmmC5w3rBfh",
+            "balance": 1722064.096589,
+            "value_usd": 28.561699710793388
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "APE",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "AE3x7KKjgMidP5sMP1Rcwzsh2UpFJayjrc14Z9ECpump",
+        "price_usd": 0.0,
+        "total_value": 26.99851003784088,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 60,
+            "holder_address": "632xX5AAwJ7Z5phYdc5p6k3LTFk4JtRXGN196iqwHAoj",
+            "balance": 1055842.53004,
+            "value_usd": 26.99851003784088
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "SPERG",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "4vKEwZ2ZHmHFuQEE69emXV2Zq1EKeJYVCESsMqydpump",
+        "price_usd": 0.0,
+        "total_value": 26.65665678181944,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 41,
+            "holder_address": "54a2nSQEgX3JD2itpXuz3iZk1ivPwb2BJTK6rueyV9qZ",
+            "balance": 373566.663615,
+            "value_usd": 26.65665678181944
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "JINPING",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "GfeYVzB9aky3RSZ1KMAwp2XnYvkwjFufT3uqyeH8pump",
+        "price_usd": 0.0,
+        "total_value": 25.291545880720435,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 43,
+            "holder_address": "AQi3KQh54j8nhxxcRqjphd5MbjZkbZiTbiYcWSFWsbqY",
+            "balance": 3391874.792294,
+            "value_usd": 25.291545880720435
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "PEPPINO",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "6weVNmZzgnkNuFZoxUTzbGaFVfgX3vnWpFoQtEWqpump",
+        "price_usd": 0.0,
+        "total_value": 22.51690860067337,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 60,
+            "holder_address": "632xX5AAwJ7Z5phYdc5p6k3LTFk4JtRXGN196iqwHAoj",
+            "balance": 2591866.16222,
+            "value_usd": 22.51690860067337
+          }
+        ],
+        "is_target_token": false
+      },
+      {
+        "symbol": "SASHA",
+        "name": "Solana",
+        "chain": "Unknown",
+        "address": "JBk8c7tiAUpCXd1PQrZjqe8rLbmVdnKJycvaBrb8pump",
+        "price_usd": 0.0,
+        "total_value": 21.49068132146,
+        "holder_count": 1,
+        "holders_details": [
+          {
+            "holder_rank": 4,
+            "holder_address": "34qSTYsfmQcqjq9LvrLGavarD4f8T7wJaNDqzo91KgBb",
+            "balance": 5000000.0,
+            "value_usd": 21.49068132146
+          }
+        ],
+        "is_target_token": false
+      }
+    ]
+  }
+}
