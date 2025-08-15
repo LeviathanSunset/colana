@@ -1,7 +1,8 @@
 {
   "bot": {
-    "telegram_token": "YOUR_BOT_TOKEN_HERE",
-    "telegram_chat_id": "YOUR_CHAT_ID_HERE",
+    "telegram_token": "7962867262:AAGg0abpPE3nr4spCrFklnewq5gMFJWNqgY",
+    "telegram_chat_id": "-1002760368002",
+    "message_thread_id": "40517",
     "interval": 58,
     "threshold": 0.05,
     "min_market_cap": 0,

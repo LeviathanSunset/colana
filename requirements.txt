@@ -1,5 +1,5 @@
 # 项目依赖
-telebot>=4.0.0
+pyTelegramBotAPI>=4.0.0
 requests>=2.25.0
 jieba>=0.42.0
 

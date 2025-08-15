@@ -61,10 +61,11 @@ class TokenAnalysisBot:
         # 测试命令
         @self.bot.message_handler(commands=['testtopic'])
         def test_topic_handler(message):
+            thread_id = self.config.bot.message_thread_id
             self.bot.send_message(
                 self.config.bot.telegram_chat_id,
-                "测试消息已发送到40517 topic!",
-                message_thread_id=40517
+                f"测试消息已发送到{thread_id or '主群'} topic!",
+                message_thread_id=thread_id
             )
     
     def compare_and_filter(self, pre_path: str, now_path: str) -> list:
@@ -211,7 +212,7 @@ class TokenAnalysisBot:
                     self.config.bot.telegram_chat_id,
                     f'⚠️ 检测到{total}个涨幅币种（共{pages}页），为避免刷屏，仅显示前{max_pages}页（{max_pages*page_size}个币种）',
                     parse_mode='HTML',
-                    message_thread_id=40517,
+                    message_thread_id=self.config.bot.message_thread_id,
                     disable_web_page_preview=True
                 )
                 pages = max_pages
@@ -231,7 +232,7 @@ class TokenAnalysisBot:
                         message,
                         parse_mode='HTML',
                         disable_web_page_preview=True,
-                        message_thread_id=40517
+                        message_thread_id=self.config.bot.message_thread_id
                     )
                     
                     if page < pages - 1:

@@ -1,0 +1,19 @@
+[Unit]
+Description=Solana Token Analysis Bot
+After=network.target
+Wants=network.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/home/root/telegram-bot/colana
+ExecStart=/home/root/telegram-bot/colana/start.sh
+Restart=always
+RestartSec=10
+Environment=PATH=/home/root/telegram-bot/colana/venv/bin:/usr/local/bin:/usr/bin:/bin
+EnvironmentFile=/home/root/telegram-bot/colana/.env
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

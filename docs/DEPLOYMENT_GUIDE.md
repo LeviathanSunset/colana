@@ -12,6 +12,7 @@ nano ~/.env
 # 添加以下内容：
 export TELEGRAM_TOKEN="your_bot_token_here"
 export TELEGRAM_CHAT_ID="your_chat_id_here"
+export MESSAGE_THREAD_ID="40517"  # 可选：指定推送到的Topic ID
 export HTTP_PROXY="http://127.0.0.1:10808"  # 如果需要代理
 export HTTPS_PROXY="http://127.0.0.1:10808"
 export PROXY_ENABLED="false"  # 服务器可能不需要代理
@@ -312,7 +313,7 @@ networks:
 ```python
 # 不要在代码中硬编码敏感信息
 # ❌ 错误做法
-TELEGRAM_TOKEN = "7962867262:AAGg0abpPE3nr4spCrFklnewq5gMFJWNqgY"
+TELEGRAM_TOKEN = "YOUR_ACTUAL_TOKEN_HERE"
 
 # ✅ 正确做法
 TELEGRAM_TOKEN = os.getenv('TELEGRAM_TOKEN')

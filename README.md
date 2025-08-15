@@ -134,6 +134,7 @@ INTERVAL = 58
   "bot": {
     "telegram_token": "your_token",
     "telegram_chat_id": "your_chat_id", 
+    "message_thread_id": 40517,
     "interval": 58
   }
 }
