@@ -774,8 +774,9 @@ class HoldingAnalysisHandler:
     ):
         """在后台运行排名分析"""
         try:
-            # 执行排名分析
-            ranking_result = analyze_target_token_rankings(result)
+            # 执行排名分析，传入原始持有者数据
+            original_holders = result.get("original_holders_data", [])
+            ranking_result = analyze_target_token_rankings(result, original_holders)
 
             if ranking_result and ranking_result.get("rankings"):
                 # 缓存排名分析结果
@@ -970,6 +971,7 @@ class HoldingAnalysisHandler:
                 holder_rank = ranking["holder_rank"]
                 target_rank = ranking["target_token_rank"]
                 target_value = ranking["target_token_value"]
+                target_supply_percentage = ranking.get("target_supply_percentage", 0)
                 total_tokens = ranking["total_tokens"]
                 portfolio_value = ranking["portfolio_value"]
                 holder_address = ranking["holder_address"]
@@ -1010,12 +1012,15 @@ class HoldingAnalysisHandler:
                 
                 msg += f"<b>{i:2d}.</b> 大户#{holder_rank} {addr_with_link}\n"
                 if rank_part == "over10":
-                    msg += f"    {rank_emoji} 排名: <b>第{target_rank}名</b>/{total_tokens} | 价值: {value_str}\n"
+                    percentage_str = f"({target_supply_percentage:.3f}%)" if target_supply_percentage > 0 else ""
+                    msg += f"    {rank_emoji} 排名: <b>第{target_rank}名</b>/{total_tokens} | 价值: {value_str} {percentage_str}\n"
                 elif rank_part == "conspiracy":
                     target_percentage = ranking.get("target_percentage", 0)
-                    msg += f"    🔴 排名: <b>第{target_rank}名</b>/{total_tokens} | 占比: <b>{target_percentage:.1f}%</b> | 价值: {value_str}\n"
+                    percentage_str = f"({target_supply_percentage:.3f}%)" if target_supply_percentage > 0 else ""
+                    msg += f"    🔴 排名: <b>第{target_rank}名</b>/{total_tokens} | 占比: <b>{target_percentage:.1f}%</b> | 价值: {value_str} {percentage_str}\n"
                 else:
-                    msg += f"    {rank_emoji} 排名: <b>{rank_title}</b>/{total_tokens} | 价值: {value_str}\n"
+                    percentage_str = f"({target_supply_percentage:.3f}%)" if target_supply_percentage > 0 else ""
+                    msg += f"    {rank_emoji} 排名: <b>{rank_title}</b>/{total_tokens} | 价值: {value_str} {percentage_str}\n"
                 msg += f"    💼 总资产: {portfolio_str}\n\n"
                 
                 # 限制显示条数，避免消息过长
