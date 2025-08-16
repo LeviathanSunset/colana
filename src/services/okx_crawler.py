@@ -103,6 +103,16 @@ class OKXCrawlerForBot:
                     try:
                         data = response.json()
 
+                        # 保存原始的holderRankingList数据到日志文件
+                        if data.get("code") == 0:
+                            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+                            raw_data_file = os.path.join(
+                                self.log_dir, f"holders_raw_{token_address}_{timestamp}.json"
+                            )
+                            with open(raw_data_file, "w", encoding="utf-8") as f:
+                                json.dump(data, f, ensure_ascii=False, indent=2)
+                            self.log_info(f"原始持有者数据已保存到: {raw_data_file}")
+
                         if data.get("code") == 0:
                             holders_data = data.get("data", {})
 
@@ -478,6 +488,245 @@ class OKXCrawlerForBot:
         )
 
         return analysis_result
+
+
+def analyze_target_token_rankings(analysis_result: Dict) -> Dict:
+    """
+    分析目标代币在各个地址内的价值排名
+    
+    Args:
+        analysis_result: analyze_token_holders 的结果
+        
+    Returns:
+        Dict: 排名分析结果，包含排名分布和统计
+    """
+    token_stats = analysis_result.get("token_statistics", {})
+    all_tokens = token_stats.get("top_tokens_by_value", [])
+    target_token_address = analysis_result.get("token_address", "")
+    
+    if not all_tokens or not target_token_address:
+        return {"rankings": [], "statistics": {}}
+    
+    # 找到目标代币信息
+    target_token = None
+    for token in all_tokens:
+        if token.get("address") == target_token_address:
+            target_token = token
+            break
+    
+    if not target_token:
+        return {"rankings": [], "statistics": {}}
+    
+    # 构建所有分析的大户地址集合
+    all_analyzed_addresses = set()
+    for token in all_tokens:
+        for holder_info in token.get("holders_details", []):
+            holder_address = holder_info.get("holder_address")
+            if holder_address:
+                all_analyzed_addresses.add(holder_address)
+    
+    print(f"总共分析了 {len(all_analyzed_addresses)} 个大户地址")
+    
+    # 构建每个地址的代币价值排名
+    address_rankings = []
+    
+    # 获取持有目标代币的地址
+    target_holders_dict = {}
+    for holder_detail in target_token.get("holders_details", []):
+        holder_address = holder_detail.get("holder_address")
+        if holder_address:
+            target_holders_dict[holder_address] = holder_detail
+    
+    print(f"其中 {len(target_holders_dict)} 个地址持有目标代币")
+    
+    # 遍历所有分析的大户地址
+    for holder_address in all_analyzed_addresses:
+        # 收集该地址持有的所有代币价值（前10大持仓）
+        holder_tokens = []
+        
+        for token in all_tokens:
+            for holder_info in token.get("holders_details", []):
+                if holder_info.get("holder_address") == holder_address:
+                    holder_tokens.append({
+                        "symbol": token["symbol"],
+                        "address": token["address"],
+                        "value_usd": holder_info.get("value_usd", 0),
+                        "is_target": token["address"] == target_token_address
+                    })
+                    break
+        
+        # 按价值排序，获取该地址的投资组合排名
+        holder_tokens.sort(key=lambda x: x["value_usd"], reverse=True)
+        
+        # 找到目标代币的排名
+        target_rank = None
+        target_value = 0
+        
+        for i, token in enumerate(holder_tokens, 1):
+            if token["is_target"]:
+                target_rank = i
+                target_value = token["value_usd"]
+                break
+        
+        # 确定该地址在原始大户排行榜中的排名
+        holder_rank = 0
+        if holder_address in target_holders_dict:
+            holder_rank = target_holders_dict[holder_address].get("holder_rank", 0)
+        else:
+            # 如果不在目标代币持有者中，尝试从其他代币的持有者信息中找到排名
+            for token in all_tokens:
+                for holder_info in token.get("holders_details", []):
+                    if holder_info.get("holder_address") == holder_address:
+                        holder_rank = holder_info.get("holder_rank", 0)
+                        break
+                if holder_rank > 0:
+                    break
+        
+        # 如果没有找到目标代币，说明排名>10
+        if target_rank is None:
+            target_rank = 11  # 表示>10名
+            target_value = 0   # 该地址不持有目标代币
+        
+        # 计算目标代币价值占比，判断是否为阴谋钱包
+        portfolio_total_value = sum(token["value_usd"] for token in holder_tokens)
+        target_percentage = 0
+        is_conspiracy_wallet = False
+        
+        if portfolio_total_value > 0 and target_value > 0:
+            target_percentage = (target_value / portfolio_total_value) * 100
+            is_conspiracy_wallet = target_percentage > 50  # 阴谋钱包：目标代币占比>50%
+        
+        address_rankings.append({
+            "holder_address": holder_address,
+            "holder_rank": holder_rank,
+            "target_token_rank": target_rank,
+            "target_token_value": target_value,
+            "total_tokens": len(holder_tokens),
+            "portfolio_value": portfolio_total_value,
+            "target_percentage": target_percentage,
+            "is_conspiracy_wallet": is_conspiracy_wallet
+        })
+    
+    print(f"最终统计了 {len(address_rankings)} 个地址的排名")
+    
+    # 计算统计信息
+    if address_rankings:
+        ranks = [addr["target_token_rank"] for addr in address_rankings]
+        
+        # 排名分布统计
+        rank_distribution = {}
+        for rank in ranks:
+            if rank <= 10:
+                rank_key = f"第{rank}名"
+            else:
+                rank_key = ">10名"
+            rank_distribution[rank_key] = rank_distribution.get(rank_key, 0) + 1
+        
+        # 基础统计（只计算实际持有的地址，排除>10名）
+        actual_ranks = [r for r in ranks if r <= 10]
+        if actual_ranks:
+            avg_rank = sum(actual_ranks) / len(actual_ranks)
+            median_rank = sorted(actual_ranks)[len(actual_ranks) // 2]
+        else:
+            avg_rank = 0
+            median_rank = 0
+        
+        # 阴谋钱包统计
+        conspiracy_wallets = [addr for addr in address_rankings if addr["is_conspiracy_wallet"]]
+        conspiracy_count = len(conspiracy_wallets)
+        conspiracy_total_value = sum(wallet["target_token_value"] for wallet in conspiracy_wallets)
+        
+        # 智能分析
+        analysis_text = _generate_ranking_analysis(address_rankings, avg_rank, rank_distribution)
+        
+        statistics = {
+            "total_addresses": len(address_rankings),
+            "actual_holders": len(actual_ranks),  # 实际持有目标代币的地址数
+            "conspiracy_wallets": conspiracy_count,  # 阴谋钱包数量
+            "conspiracy_total_value": conspiracy_total_value,  # 阴谋钱包总价值
+            "average_rank": avg_rank,
+            "median_rank": median_rank,
+            "rank_distribution": rank_distribution,
+            "top3_count": len([r for r in ranks if r <= 3]),
+            "top5_count": len([r for r in ranks if r <= 5]),
+            "top10_count": len([r for r in ranks if r <= 10]),
+            "over10_count": len([r for r in ranks if r > 10]),
+            "analysis": analysis_text
+        }
+    else:
+        statistics = {
+            "total_addresses": 0,
+            "actual_holders": 0,
+            "conspiracy_wallets": 0,
+            "conspiracy_total_value": 0,
+            "average_rank": 0,
+            "median_rank": 0,
+            "rank_distribution": {},
+            "analysis": "未找到分析数据"
+        }
+    
+    return {
+        "target_token": {
+            "symbol": target_token["symbol"],
+            "address": target_token_address
+        },
+        "rankings": address_rankings,
+        "statistics": statistics
+    }
+
+
+def _generate_ranking_analysis(rankings: List[Dict], avg_rank: float, distribution: Dict) -> str:
+    """生成智能排名分析"""
+    total_addresses = len(rankings)
+    top3_count = len([r for r in rankings if r["target_token_rank"] <= 3])
+    top5_count = len([r for r in rankings if r["target_token_rank"] <= 5])
+    top10_count = len([r for r in rankings if r["target_token_rank"] <= 10])
+    over10_count = len([r for r in rankings if r["target_token_rank"] > 10])
+    
+    # 计算百分比（基于总地址数）
+    top3_pct = (top3_count / total_addresses) * 100
+    top5_pct = (top5_count / total_addresses) * 100
+    top10_pct = (top10_count / total_addresses) * 100
+    over10_pct = (over10_count / total_addresses) * 100
+    
+    analysis_parts = []
+    
+    # 根据实际持有比例分析
+    if over10_count == 0:
+        analysis_parts.append("🔥 所有分析的大户都将目标代币列入前10大持仓，显示极强共识")
+    elif over10_pct <= 20:
+        analysis_parts.append("⭐ 绝大多数大户将目标代币列入核心持仓，市场认可度极高")
+    elif over10_pct <= 50:
+        analysis_parts.append("📈 多数大户认可目标代币价值，但仍有部分持仓较少")
+    else:
+        analysis_parts.append("⚠️ 超过半数大户未将目标代币列入前10持仓，市场分歧较大")
+    
+    # 平均排名分析（只针对实际持有的地址）
+    if avg_rank > 0:
+        if avg_rank <= 3:
+            analysis_parts.append("� 在持有者中平均排名极高，是绝对的核心资产")
+        elif avg_rank <= 5:
+            analysis_parts.append("🚀 在持有者中平均排名较高，属于重要配置")
+        elif avg_rank <= 8:
+            analysis_parts.append("� 在持有者中排名中等，有一定投资价值")
+        else:
+            analysis_parts.append("⚡ 在持有者中排名偏低，多为边缘配置")
+    
+    # Top分布分析
+    if top3_pct >= 30:
+        analysis_parts.append(f"🎯 {top3_pct:.1f}%的大户将其列为前3大持仓，信心极强")
+    elif top5_pct >= 25:
+        analysis_parts.append(f"🌟 {top5_pct:.1f}%的大户将其列为前5大持仓，认可度较高")
+    elif top10_pct >= 20:
+        analysis_parts.append(f"� {top10_pct:.1f}%的大户将其列为前10大持仓，有基础共识")
+    
+    # 集中度分析
+    if over10_pct >= 70:
+        analysis_parts.append("🔄 多数大户配置权重极低，可能处于观望或试探阶段")
+    elif top3_pct >= 50:
+        analysis_parts.append("🎯 高度集中的顶级配置，大户策略极其一致")
+    
+    return " ".join(analysis_parts)
 
 
 def analyze_address_clusters(analysis_result: Dict) -> Dict:
@@ -988,3 +1237,142 @@ def format_cluster_analysis(cluster_result: Dict, max_clusters: int = 5, page: i
     msg += f"• 百分比：集群在该代币中的持仓占大户总持仓的比例\n"
 
     return msg, page, total_pages
+
+
+def format_target_token_rankings(ranking_result: Dict) -> str:
+    """
+    格式化目标代币排名分析结果为Telegram消息
+    
+    Args:
+        ranking_result: 排名分析结果
+        
+    Returns:
+        str: 格式化的消息文本
+    """
+    target_token = ranking_result.get("target_token", {})
+    rankings = ranking_result.get("rankings", [])
+    statistics = ranking_result.get("statistics", {})
+    
+    if not rankings:
+        return "❌ 未找到持有目标代币的地址数据"
+    
+    symbol = target_token.get("symbol", "Unknown")
+    total_addresses = statistics.get("total_addresses", 0)
+    actual_holders = statistics.get("actual_holders", 0)
+    conspiracy_count = statistics.get("conspiracy_wallets", 0)
+    conspiracy_total_value = statistics.get("conspiracy_total_value", 0)
+    avg_rank = statistics.get("average_rank", 0)
+    median_rank = statistics.get("median_rank", 0)
+    distribution = statistics.get("rank_distribution", {})
+    analysis = statistics.get("analysis", "")
+    
+    msg = f"📊 <b>{symbol} 价值排名分析</b>\n"
+    msg += f"🎯 分析地址: <b>{total_addresses}</b> 个大户\n"
+    msg += f"💎 实际持有: <b>{actual_holders}</b> 个 ({(actual_holders/total_addresses)*100:.1f}%)\n"
+    
+    # 阴谋钱包信息
+    if conspiracy_count > 0:
+        conspiracy_percentage = (conspiracy_count / total_addresses) * 100
+        if conspiracy_total_value >= 1_000_000:
+            conspiracy_value_str = f"${conspiracy_total_value/1_000_000:.2f}M"
+        elif conspiracy_total_value >= 1_000:
+            conspiracy_value_str = f"${conspiracy_total_value/1_000:.2f}K"
+        else:
+            conspiracy_value_str = f"${conspiracy_total_value:.0f}"
+        msg += f"🔴 阴谋钱包: <b>{conspiracy_count}</b> 个 ({conspiracy_percentage:.1f}%) | 总值: {conspiracy_value_str}\n"
+    
+    msg += "─" * 35 + "\n\n"
+    
+    # 统计信息
+    if avg_rank > 0:
+        msg += f"📈 <b>排名统计</b> (仅统计持有者)\n"
+        msg += f"• 平均排名: <b>第{avg_rank:.1f}名</b>\n"
+        msg += f"• 中位数排名: <b>第{median_rank}名</b>\n\n"
+    else:
+        msg += f"📈 <b>排名统计</b>\n"
+        msg += f"• 所有分析地址均未持有目标代币\n\n"
+    
+    # 计算每个排名的总价值
+    rank_values = {}  # {rank: total_value}
+    for ranking in rankings:
+        rank = ranking["target_token_rank"]
+        value = ranking["target_token_value"]
+        if rank <= 10:
+            rank_key = f"第{rank}名"
+        else:
+            rank_key = ">10名"
+        rank_values[rank_key] = rank_values.get(rank_key, 0) + value
+    
+    # 排名分布（包含>10名）
+    msg += f"📊 <b>排名分布</b> (按人数统计)\n"
+    
+    # 定义排名区间和对应emoji
+    rank_ranges = [
+        ("第1名", "🥇"),
+        ("第2名", "🥈"), 
+        ("第3名", "🥉"),
+        ("第4名", "🏅"),
+        ("第5名", "🏅"),
+        ("第6名", "⭐"),
+        ("第7名", "⭐"),
+        ("第8名", "⭐"),
+        ("第9名", "⭐"),
+        ("第10名", "⭐"),
+    ]
+    
+    # 统计>10名的情况
+    over_10_count = len([r for r in rankings if r["target_token_rank"] > 10])
+    if over_10_count > 0:
+        distribution[">10名"] = over_10_count
+        rank_values[">10名"] = sum(r["target_token_value"] for r in rankings if r["target_token_rank"] > 10)
+    
+    for rank_key, emoji in rank_ranges:
+        count = distribution.get(rank_key, 0)
+        if count > 0:
+            percentage = (count / total_addresses) * 100
+            value = rank_values.get(rank_key, 0)
+            if value >= 1_000_000:
+                value_str = f"${value/1_000_000:.2f}M"
+            elif value >= 1_000:
+                value_str = f"${value/1_000:.2f}K"
+            else:
+                value_str = f"${value:.0f}"
+            msg += f"{emoji} {rank_key}: <b>{count}</b> 人 (总值: {value_str}) ({percentage:.1f}%)\n"
+    
+    # 添加>10名统计
+    if over_10_count > 0:
+        percentage = (over_10_count / total_addresses) * 100
+        value = rank_values.get(">10名", 0)
+        if value >= 1_000_000:
+            value_str = f"${value/1_000_000:.2f}M"
+        elif value >= 1_000:
+            value_str = f"${value/1_000:.2f}K"
+        else:
+            value_str = f"${value:.0f}"
+        msg += f"📉 >10名: <b>{over_10_count}</b> 人 (总值: {value_str}) ({percentage:.1f}%)\n"
+    
+    # Top排名统计
+    top3_count = statistics.get("top3_count", 0)
+    top5_count = statistics.get("top5_count", 0) 
+    top10_count = statistics.get("top10_count", 0)
+    
+    msg += f"\n🎯 <b>重点统计</b>\n"
+    msg += f"🔥 前3名: <b>{top3_count}</b> 人 ({(top3_count/total_addresses)*100:.1f}%)\n"
+    msg += f"⭐ 前5名: <b>{top5_count}</b> 人 ({(top5_count/total_addresses)*100:.1f}%)\n"
+    msg += f"📈 前10名: <b>{top10_count}</b> 人 ({(top10_count/total_addresses)*100:.1f}%)\n"
+    
+    # 阴谋钱包统计
+    if conspiracy_count > 0:
+        conspiracy_percentage = (conspiracy_count / total_addresses) * 100
+        msg += f"🔴 阴谋钱包: <b>{conspiracy_count}</b> 人 ({conspiracy_percentage:.1f}%) | 持仓占比>50%\n"
+    
+    msg += "\n"
+    
+    # 智能分析
+    msg += f"🧠 <b>智能分析</b>\n"
+    msg += f"{analysis}\n\n"
+    
+    msg += f"� <i>点击下方按钮查看对应排名的地址详情</i>\n"
+    msg += f"� <i>百分比说明：按持有该排名的人数统计，非持仓比例</i>\n"
+    
+    return msg

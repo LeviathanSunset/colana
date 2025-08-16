@@ -18,6 +18,8 @@ try:
         format_token_holders_detail,
         analyze_address_clusters,
         format_cluster_analysis,
+        analyze_target_token_rankings,
+        format_target_token_rankings,
     )
 except ImportError:
     print("⚠️ 无法导入OKX爬虫模块，/ca1功能可能不可用")
@@ -147,13 +149,22 @@ class HoldingAnalysisHandler:
                     cache_key=cache_key,
                 )
 
+                # 获取目标代币信息
+                target_token_info = None
+                for token in result["token_statistics"]["top_tokens_by_value"]:
+                    if token.get("address") == token_address:
+                        target_token_info = token
+                        break
+                
+                target_symbol = target_token_info.get("symbol", "Unknown") if target_token_info else "Unknown"
+                
                 # 添加分析信息
-                analysis_info = f"\n📊 <b>分析统计</b>\n"
+                analysis_info = f"\n📊 <b>{target_symbol} 分析统计</b>\n"
                 analysis_info += f"🕒 分析时间: {result.get('analysis_time', '').split('T')[0]}\n"
                 analysis_info += f"👥 分析地址: 前{result.get('total_holders_analyzed', 0)} 个\n"
                 target_holders = result.get("target_token_actual_holders", 0)
                 if target_holders > 0:
-                    analysis_info += f"🎯 实际持有目标代币: {target_holders} 人\n"
+                    analysis_info += f"🎯 实际持有 {target_symbol}: {target_holders} 人\n"
                 analysis_info += f"📈 统计范围: 每个地址的前10大持仓\n"
 
                 final_msg = table_msg + analysis_info
@@ -169,15 +180,18 @@ class HoldingAnalysisHandler:
                             "👥 按人数排序 ✅", callback_data=f"ca1_sort_count_{cache_key}"
                         ),
                     )
-                    # 添加集群分析按钮
+                    # 添加集群分析和排名分析按钮
                     table_markup.add(
                         InlineKeyboardButton(
                             "🎯 地址集群分析", callback_data=f"ca1_cluster_{cache_key}"
+                        ),
+                        InlineKeyboardButton(
+                            "📊 代币排名分析", callback_data=f"ca1_ranking_{cache_key}"
                         )
                     )
                     markup = table_markup
                 else:
-                    # 如果没有代币详情按钮，只添加排序和集群按钮
+                    # 如果没有代币详情按钮，只添加排序、集群和排名按钮
                     markup = InlineKeyboardMarkup(row_width=2)
                     markup.add(
                         InlineKeyboardButton(
@@ -190,6 +204,9 @@ class HoldingAnalysisHandler:
                     markup.add(
                         InlineKeyboardButton(
                             "🎯 地址集群分析", callback_data=f"ca1_cluster_{cache_key}"
+                        ),
+                        InlineKeyboardButton(
+                            "📊 代币排名分析", callback_data=f"ca1_ranking_{cache_key}"
                         )
                     )
 
@@ -294,10 +311,13 @@ class HoldingAnalysisHandler:
                             "👥 按人数排序 ✅", callback_data=f"ca1_sort_count_{cache_key}"
                         ),
                     )
-                # 添加集群分析按钮
+                # 添加集群分析和排名分析按钮
                 table_markup.add(
                     InlineKeyboardButton(
                         "🎯 地址集群分析", callback_data=f"ca1_cluster_{cache_key}"
+                    ),
+                    InlineKeyboardButton(
+                        "📊 代币排名分析", callback_data=f"ca1_ranking_{cache_key}"
                     )
                 )
                 markup = table_markup
@@ -325,6 +345,9 @@ class HoldingAnalysisHandler:
                 markup.add(
                     InlineKeyboardButton(
                         "🎯 地址集群分析", callback_data=f"ca1_cluster_{cache_key}"
+                    ),
+                    InlineKeyboardButton(
+                        "📊 代币排名分析", callback_data=f"ca1_ranking_{cache_key}"
                     )
                 )
 
@@ -472,9 +495,18 @@ class HoldingAnalysisHandler:
                 self._show_expired_data_option(call, token_address)
                 return
 
+            # 获取目标代币信息
+            target_token_info = None
+            for token in result["token_statistics"]["top_tokens_by_value"]:
+                if token.get("address") == token_address:
+                    target_token_info = token
+                    break
+            
+            target_symbol = target_token_info.get("symbol", "Unknown") if target_token_info else "Unknown"
+
             # 显示正在分析的消息
             self.bot.edit_message_text(
-                f"🎯 正在进行地址集群分析...\n代币: <code>{token_address}</code>\n⏳ 分析大户间的共同投资模式...",
+                f"🎯 正在进行地址集群分析...\n代币: <b>{target_symbol}</b> (<code>{token_address}</code>)\n⏳ 分析大户间的共同投资模式...",
                 call.message.chat.id,
                 call.message.message_id,
                 parse_mode="HTML",
@@ -685,6 +717,338 @@ class HoldingAnalysisHandler:
         )
         self.bot.answer_callback_query(call.id, "❌ 数据已过期，请重新分析")
 
+    def handle_ca1_ranking(self, call: CallbackQuery) -> None:
+        """处理代币排名分析回调"""
+        try:
+            # 解析回调数据: ca1_ranking_{cache_key}
+            cache_key = call.data[len("ca1_ranking_"):]
+            print(f"代币排名分析回调: cache_key={cache_key}")
+            
+            # 从缓存中获取分析结果
+            if cache_key not in self.analysis_cache:
+                self.bot.answer_callback_query(call.id, "❌ 数据缓存已失效，请重新运行 /ca1 命令")
+                return
+
+            cached_data = self.analysis_cache[cache_key]
+            result = cached_data["result"]
+            token_address = cached_data["token_address"]
+
+            # 检查缓存是否过期
+            if time.time() - cached_data["timestamp"] > 24 * 3600:
+                self._show_expired_data_option(call, token_address)
+                return
+
+            # 获取目标代币信息
+            target_token_info = None
+            for token in result["token_statistics"]["top_tokens_by_value"]:
+                if token.get("address") == token_address:
+                    target_token_info = token
+                    break
+            
+            target_symbol = target_token_info.get("symbol", "Unknown") if target_token_info else "Unknown"
+
+            # 显示正在分析的消息
+            self.bot.edit_message_text(
+                f"📊 正在进行代币排名分析...\n代币: <b>{target_symbol}</b> (<code>{token_address}</code>)\n⏳ 分析目标代币在各大户钱包中的排名...",
+                call.message.chat.id,
+                call.message.message_id,
+                parse_mode="HTML",
+            )
+
+            # 在后台线程中运行排名分析
+            ranking_thread = threading.Thread(
+                target=self._run_ranking_analysis,
+                args=(call, cache_key, result, token_address),
+                daemon=True,
+            )
+            ranking_thread.start()
+
+            self.bot.answer_callback_query(call.id, "📊 开始排名分析...")
+
+        except Exception as e:
+            print(f"排名分析回调错误: error={str(e)}")
+            self.bot.answer_callback_query(call.id, f"❌ 启动排名分析失败: {str(e)}")
+
+    def _run_ranking_analysis(
+        self, call: CallbackQuery, cache_key: str, result: dict, token_address: str
+    ):
+        """在后台运行排名分析"""
+        try:
+            # 执行排名分析
+            ranking_result = analyze_target_token_rankings(result)
+
+            if ranking_result and ranking_result.get("rankings"):
+                # 缓存排名分析结果
+                ranking_cache_key = f"{cache_key}_rankings"
+                self.analysis_cache[ranking_cache_key] = {
+                    "ranking_result": ranking_result,
+                    "timestamp": time.time(),
+                }
+
+                # 格式化排名消息
+                ranking_msg = format_target_token_rankings(ranking_result)
+
+                # 创建排名按钮 (1-10名 + >10名)
+                markup = InlineKeyboardMarkup(row_width=5)
+                
+                # 第一行：1-5名
+                rank_buttons_1 = []
+                for rank in range(1, 6):
+                    count = sum(1 for r in ranking_result["rankings"] if r["target_token_rank"] == rank)
+                    if count > 0:
+                        rank_buttons_1.append(
+                            InlineKeyboardButton(f"{rank}名({count})", callback_data=f"ca1_rank_{cache_key}_{rank}")
+                        )
+                if rank_buttons_1:
+                    markup.row(*rank_buttons_1)
+                
+                # 第二行：6-10名
+                rank_buttons_2 = []
+                for rank in range(6, 11):
+                    count = sum(1 for r in ranking_result["rankings"] if r["target_token_rank"] == rank)
+                    if count > 0:
+                        rank_buttons_2.append(
+                            InlineKeyboardButton(f"{rank}名({count})", callback_data=f"ca1_rank_{cache_key}_{rank}")
+                        )
+                if rank_buttons_2:
+                    markup.row(*rank_buttons_2)
+                
+                # 第三行：>10名 + 阴谋钱包
+                third_row_buttons = []
+                over_10_count = sum(1 for r in ranking_result["rankings"] if r["target_token_rank"] > 10)
+                if over_10_count > 0:
+                    third_row_buttons.append(
+                        InlineKeyboardButton(f">10名({over_10_count})", callback_data=f"ca1_rank_{cache_key}_over10")
+                    )
+                
+                # 添加阴谋钱包按钮
+                conspiracy_count = sum(1 for r in ranking_result["rankings"] if r.get("is_conspiracy_wallet", False))
+                if conspiracy_count > 0:
+                    third_row_buttons.append(
+                        InlineKeyboardButton(f"🔴阴谋({conspiracy_count})", callback_data=f"ca1_rank_{cache_key}_conspiracy")
+                    )
+                
+                if third_row_buttons:
+                    markup.row(*third_row_buttons)
+                
+                # 功能按钮
+                markup.add(
+                    InlineKeyboardButton("⬅️ 返回代币排行", callback_data=f"ca1_sort_count_{cache_key}"),
+                    InlineKeyboardButton("🎯 地址集群分析", callback_data=f"ca1_cluster_{cache_key}")
+                )
+                markup.add(
+                    InlineKeyboardButton("🔄 重新运行", callback_data=f"ca1_ranking_{cache_key}")
+                )
+
+                # 更新消息
+                self.bot.edit_message_text(
+                    ranking_msg,
+                    call.message.chat.id,
+                    call.message.message_id,
+                    parse_mode="HTML",
+                    reply_markup=markup,
+                    disable_web_page_preview=True,
+                )
+
+            else:
+                # 分析失败或无数据
+                error_msg = f"❌ 排名分析失败\n代币: <code>{token_address}</code>\n"
+                error_msg += "💡 可能原因:\n• 没有大户持有目标代币\n• 数据不足以进行排名分析"
+
+                markup = InlineKeyboardMarkup()
+                markup.add(
+                    InlineKeyboardButton("⬅️ 返回代币排行", callback_data=f"ca1_sort_count_{cache_key}")
+                )
+
+                self.bot.edit_message_text(
+                    error_msg,
+                    call.message.chat.id,
+                    call.message.message_id,
+                    parse_mode="HTML",
+                    reply_markup=markup,
+                    disable_web_page_preview=True,
+                )
+
+        except Exception as e:
+            print(f"排名分析执行错误: cache_key={cache_key}, error={str(e)}")
+            import traceback
+            traceback.print_exc()
+
+            # 显示错误消息
+            error_msg = f"❌ 排名分析失败\n代币: <code>{token_address}</code>\n错误: {str(e)}"
+
+            markup = InlineKeyboardMarkup()
+            markup.add(
+                InlineKeyboardButton("⬅️ 返回代币排行", callback_data=f"ca1_sort_count_{cache_key}")
+            )
+
+            self.bot.edit_message_text(
+                error_msg,
+                call.message.chat.id,
+                call.message.message_id,
+                parse_mode="HTML",
+                reply_markup=markup,
+                disable_web_page_preview=True,
+            )
+
+    def handle_ca1_rank_detail(self, call: CallbackQuery) -> None:
+        """处理排名详情查看回调"""
+        try:
+            # 解析回调数据: ca1_rank_{cache_key}_{rank} 或 ca1_rank_{cache_key}_over10
+            data_parts = call.data[len("ca1_rank_"):].split("_")
+            if len(data_parts) < 2:
+                self.bot.answer_callback_query(call.id, "❌ 回调数据格式错误")
+                return
+                
+            cache_key = "_".join(data_parts[:-1])  # 重组cache_key，可能包含下划线
+            rank_part = data_parts[-1]
+            
+            print(f"排名详情回调: cache_key={cache_key}, rank_part={rank_part}")
+            
+            # 从缓存中获取排名分析结果
+            ranking_cache_key = f"{cache_key}_rankings"
+            if ranking_cache_key not in self.analysis_cache:
+                self.bot.answer_callback_query(call.id, "❌ 排名数据缓存已失效，请重新运行排名分析")
+                return
+
+            cached_data = self.analysis_cache[ranking_cache_key]
+            ranking_result = cached_data["ranking_result"]
+            
+            # 检查缓存是否过期
+            if time.time() - cached_data["timestamp"] > 24 * 3600:
+                self.bot.answer_callback_query(call.id, "❌ 数据已过期，请重新分析")
+                return
+
+            # 根据rank_part筛选地址
+            rankings = ranking_result.get("rankings", [])
+            if rank_part == "over10":
+                filtered_rankings = [r for r in rankings if r["target_token_rank"] > 10]
+                rank_title = ">10名"
+            elif rank_part == "conspiracy":
+                filtered_rankings = [r for r in rankings if r.get("is_conspiracy_wallet", False)]
+                rank_title = "阴谋钱包"
+            else:
+                try:
+                    target_rank = int(rank_part)
+                    filtered_rankings = [r for r in rankings if r["target_token_rank"] == target_rank]
+                    rank_title = f"第{target_rank}名"
+                except ValueError:
+                    self.bot.answer_callback_query(call.id, "❌ 排名参数格式错误")
+                    return
+            
+            if not filtered_rankings:
+                self.bot.answer_callback_query(call.id, f"❌ 没有找到{rank_title}的地址")
+                return
+            
+            # 格式化详情消息
+            target_token = ranking_result.get("target_token", {})
+            symbol = target_token.get("symbol", "Unknown")
+            
+            msg = f"📊 <b>{symbol} - {rank_title}地址详情</b>\n"
+            msg += f"👥 共 <b>{len(filtered_rankings)}</b> 个地址\n"
+            
+            # 为阴谋钱包添加特殊说明
+            if rank_part == "conspiracy":
+                msg += f"🔴 <i>阴谋钱包：{symbol}代币价值占总资产>50%的地址</i>\n"
+            
+            msg += "─" * 35 + "\n\n"
+            
+            # 按价值排序显示
+            sorted_rankings = sorted(filtered_rankings, key=lambda x: x["target_token_value"], reverse=True)
+            
+            total_value = sum(r["target_token_value"] for r in sorted_rankings)
+            if total_value >= 1_000_000:
+                total_value_str = f"${total_value/1_000_000:.2f}M"
+            elif total_value >= 1_000:
+                total_value_str = f"${total_value/1_000:.2f}K"
+            else:
+                total_value_str = f"${total_value:.0f}"
+            
+            msg += f"💰 <b>总价值: {total_value_str}</b>\n\n"
+            
+            for i, ranking in enumerate(sorted_rankings, 1):
+                holder_rank = ranking["holder_rank"]
+                target_rank = ranking["target_token_rank"]
+                target_value = ranking["target_token_value"]
+                total_tokens = ranking["total_tokens"]
+                portfolio_value = ranking["portfolio_value"]
+                holder_address = ranking["holder_address"]
+                
+                # 格式化价值显示
+                if target_value >= 1_000_000:
+                    value_str = f"${target_value/1_000_000:.2f}M"
+                elif target_value >= 1_000:
+                    value_str = f"${target_value/1_000:.2f}K"
+                else:
+                    value_str = f"${target_value:.0f}"
+                    
+                if portfolio_value >= 1_000_000:
+                    portfolio_str = f"${portfolio_value/1_000_000:.2f}M"
+                elif portfolio_value >= 1_000:
+                    portfolio_str = f"${portfolio_value/1_000:.2f}K"
+                else:
+                    portfolio_str = f"${portfolio_value:.0f}"
+                
+                # 地址显示和链接
+                addr_display = f"{holder_address[:6]}...{holder_address[-4:]}"
+                gmgn_link = f"https://gmgn.ai/sol/address/{holder_address}"
+                addr_with_link = f"<a href='{gmgn_link}'>{addr_display}</a>"
+                
+                # 排名emoji
+                if target_rank == 1:
+                    rank_emoji = "🥇"
+                elif target_rank == 2:
+                    rank_emoji = "🥈"
+                elif target_rank == 3:
+                    rank_emoji = "🥉"
+                elif target_rank <= 5:
+                    rank_emoji = "🏅"
+                elif target_rank <= 10:
+                    rank_emoji = "⭐"
+                else:
+                    rank_emoji = "📉"
+                
+                msg += f"<b>{i:2d}.</b> 大户#{holder_rank} {addr_with_link}\n"
+                if rank_part == "over10":
+                    msg += f"    {rank_emoji} 排名: <b>第{target_rank}名</b>/{total_tokens} | 价值: {value_str}\n"
+                elif rank_part == "conspiracy":
+                    target_percentage = ranking.get("target_percentage", 0)
+                    msg += f"    🔴 排名: <b>第{target_rank}名</b>/{total_tokens} | 占比: <b>{target_percentage:.1f}%</b> | 价值: {value_str}\n"
+                else:
+                    msg += f"    {rank_emoji} 排名: <b>{rank_title}</b>/{total_tokens} | 价值: {value_str}\n"
+                msg += f"    💼 总资产: {portfolio_str}\n\n"
+                
+                # 限制显示条数，避免消息过长
+                if i >= 15:
+                    remaining = len(sorted_rankings) - 15
+                    if remaining > 0:
+                        msg += f"... 还有 {remaining} 个地址未显示\n"
+                    break
+            
+            # 创建返回按钮
+            markup = InlineKeyboardMarkup()
+            markup.add(
+                InlineKeyboardButton("⬅️ 返回排名分析", callback_data=f"ca1_ranking_{cache_key}")
+            )
+            
+            # 更新消息
+            self.bot.edit_message_text(
+                msg,
+                call.message.chat.id,
+                call.message.message_id,
+                parse_mode="HTML",
+                reply_markup=markup,
+                disable_web_page_preview=True,
+            )
+            
+            self.bot.answer_callback_query(call.id, f"已显示{rank_title}的地址详情")
+
+        except Exception as e:
+            print(f"排名详情回调错误: error={str(e)}")
+            import traceback
+            traceback.print_exc()
+            self.bot.answer_callback_query(call.id, f"❌ 获取排名详情失败: {str(e)}")
+
     def _show_expired_data_option(self, call: CallbackQuery, token_address: str):
         """显示过期数据选项"""
         markup = InlineKeyboardMarkup()
@@ -715,6 +1079,14 @@ class HoldingAnalysisHandler:
         @self.bot.callback_query_handler(func=lambda call: call.data.startswith("ca1_cluster_"))
         def ca1_cluster_handler(call):
             self.handle_ca1_cluster(call)
+
+        @self.bot.callback_query_handler(func=lambda call: call.data.startswith("ca1_ranking_"))
+        def ca1_ranking_handler(call):
+            self.handle_ca1_ranking(call)
+
+        @self.bot.callback_query_handler(func=lambda call: call.data.startswith("ca1_rank_"))
+        def ca1_rank_detail_handler(call):
+            self.handle_ca1_rank_detail(call)
 
         @self.bot.callback_query_handler(func=lambda call: call.data.startswith("token_detail_"))
         def token_detail_handler(call):
