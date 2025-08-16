@@ -761,180 +761,95 @@ def analyze_target_token_rankings(analysis_result: Dict, original_holders: List[
 
 
 def _generate_ranking_analysis(rankings: List[Dict], avg_rank: float, distribution: Dict) -> str:
-    """生成简化的投资建议分析 - 专注于阴谋持仓比例和大户持仓信心"""
-    # 1. 计算基础指标
-    metrics = _calculate_analysis_metrics(rankings)
-    
-    analysis_parts = []
-    
-    # 2. 阴谋钱包风险评估
-    conspiracy_analysis = _analyze_conspiracy_risk(metrics)
-    analysis_parts.append(conspiracy_analysis)
-    
-    # 3. 大户持仓信心评估
-    confidence_analysis = _analyze_holder_confidence(avg_rank, metrics)
-    analysis_parts.append(confidence_analysis)
-    
-    # 4. 大户分布信心补充
-    distribution_analysis = _analyze_distribution_confidence(metrics)
-    analysis_parts.append(distribution_analysis)
-    
-    # 5. 综合投资建议
-    investment_advice = _generate_investment_advice(metrics, avg_rank)
-    analysis_parts.append(investment_advice)
-    
-    return " ".join(analysis_parts)
-
-
-def _calculate_analysis_metrics(rankings: List[Dict]) -> Dict:
-    """计算分析所需的所有指标"""
+    """生成基于流通量的智能排名分析"""
     total_addresses = len(rankings)
     
-    # 阴谋钱包相关
-    conspiracy_wallets = [r for r in rankings if r.get("is_conspiracy_wallet", False)]
-    conspiracy_count = len(conspiracy_wallets)
-    conspiracy_supply = sum(r.get("target_supply_percentage", 0) for r in conspiracy_wallets)
+    # 计算各层级的流通量占比
+    top3_supply = sum(r.get("target_supply_percentage", 0) for r in rankings if r["target_token_rank"] <= 3)
+    top5_supply = sum(r.get("target_supply_percentage", 0) for r in rankings if r["target_token_rank"] <= 5)
+    top10_supply = sum(r.get("target_supply_percentage", 0) for r in rankings if r["target_token_rank"] <= 10)
+    over10_supply = sum(r.get("target_supply_percentage", 0) for r in rankings if r["target_token_rank"] > 10)
+    total_supply = top10_supply + over10_supply
     
-    # 排名分布统计
+    # 计算阴谋钱包流通量占比
+    conspiracy_supply = sum(r.get("target_supply_percentage", 0) for r in rankings if r.get("is_conspiracy_wallet", False))
+    conspiracy_count = len([r for r in rankings if r.get("is_conspiracy_wallet", False)])
+    
+    # 计算人数分布
     top3_count = len([r for r in rankings if r["target_token_rank"] <= 3])
     top5_count = len([r for r in rankings if r["target_token_rank"] <= 5])
     top10_count = len([r for r in rankings if r["target_token_rank"] <= 10])
+    over10_count = len([r for r in rankings if r["target_token_rank"] > 10])
     
-    # 百分比计算
+    # 计算百分比（基于总地址数）
     top3_pct = (top3_count / total_addresses) * 100 if total_addresses > 0 else 0
     top5_pct = (top5_count / total_addresses) * 100 if total_addresses > 0 else 0
     top10_pct = (top10_count / total_addresses) * 100 if total_addresses > 0 else 0
+    over10_pct = (over10_count / total_addresses) * 100 if total_addresses > 0 else 0
     
-    # 总流通量
-    total_supply = sum(r.get("target_supply_percentage", 0) for r in rankings)
-    conspiracy_risk_ratio = conspiracy_supply / total_supply if total_supply > 0 else 0
+    analysis_parts = []
     
-    return {
-        "total_addresses": total_addresses,
-        "conspiracy_count": conspiracy_count,
-        "conspiracy_supply": conspiracy_supply,
-        "conspiracy_risk_ratio": conspiracy_risk_ratio,
-        "top3_count": top3_count,
-        "top5_count": top5_count,
-        "top10_count": top10_count,
-        "top3_pct": top3_pct,
-        "top5_pct": top5_pct,
-        "top10_pct": top10_pct,
-        "total_supply": total_supply
-    }
-
-
-def _analyze_conspiracy_risk(metrics: Dict) -> str:
-    """分析阴谋钱包风险"""
-    conspiracy_count = metrics["conspiracy_count"]
-    conspiracy_supply = metrics["conspiracy_supply"]
-    conspiracy_risk_ratio = metrics["conspiracy_risk_ratio"]
-    
-    if conspiracy_count == 0:
-        return "✅ 无阴谋风险：未发现过度集中持仓钱包"
-    
-    if conspiracy_risk_ratio >= 0.6:
-        return f"🔴 阴谋风险极高：{conspiracy_count}个钱包过度集中({conspiracy_supply:.1f}%)，砸盘风险大"
-    elif conspiracy_risk_ratio >= 0.3:
-        return f"🟡 阴谋风险中等：{conspiracy_count}个钱包集中持仓({conspiracy_supply:.1f}%)，需谨慎"
+    # 🏆 集中度风险评估
+    if top3_supply >= 50:
+        analysis_parts.append("� 超高集中度风险：前3名大户控制>50%流通量，存在操控风险")
+    elif top3_supply >= 30:
+        analysis_parts.append("⚠️ 高集中度：前3名大户控制30%+流通量，需警惕大户动向")
+    elif top5_supply >= 40:
+        analysis_parts.append("📊 中等集中度：前5名大户控制40%+流通量，筹码相对集中")
+    elif top10_supply >= 50:
+        analysis_parts.append("🎯 相对分散：前10名大户控制50%+流通量，分布较为均衡")
     else:
-        return f"🟢 阴谋风险较低：{conspiracy_count}个集中钱包占比{conspiracy_supply:.1f}%，可控"
-
-
-def _analyze_holder_confidence(avg_rank: float, metrics: Dict) -> str:
-    """分析大户持仓信心"""
-    if avg_rank <= 0:
-        return "⚡ 大户信心偏弱：无有效持仓数据"
+        analysis_parts.append("💎 筹码分散：大户控制有限，散户参与度较高")
     
-    if avg_rank <= 3:
-        return "🔥 大户信心极强：平均排名前3，属核心重仓资产"
-    elif avg_rank <= 5:
-        return "🚀 大户信心较强：平均排名前5，属重要配置"
-    elif avg_rank <= 8:
-        return "📈 大户信心一般：平均排名中等，适度配置"
-    else:
-        return "⚡ 大户信心偏弱：排名偏低，多为试探性配置"
-
-
-def _analyze_distribution_confidence(metrics: Dict) -> str:
-    """分析大户分布信心"""
-    top3_pct = metrics["top3_pct"]
-    top5_pct = metrics["top5_pct"]
-    top10_pct = metrics["top10_pct"]
+    # 平均排名分析（只针对实际持有的地址）
+    if avg_rank > 0:
+        if avg_rank <= 3:
+            analysis_parts.append("� 在持有者中平均排名极高，是绝对的核心资产")
+        elif avg_rank <= 5:
+            analysis_parts.append("🚀 在持有者中平均排名较高，属于重要配置")
+        elif avg_rank <= 8:
+            analysis_parts.append("� 在持有者中排名中等，有一定投资价值")
+        else:
+            analysis_parts.append("⚡ 在持有者中排名偏低，多为边缘配置")
     
-    if top3_pct >= 50:
-        return f"💪 {top3_pct:.1f}%大户将其列为前3重仓，信心度极高"
-    elif top5_pct >= 50:
-        return f"⭐ {top5_pct:.1f}%大户将其列为前5配置，认可度较高"
-    elif top10_pct >= 50:
-        return f"📊 {top10_pct:.1f}%大户将其列为前10配置，有基础共识"
-    else:
-        return "🔄 多数大户仅试探性配置，整体信心不足"
-
-
-def _generate_investment_advice(metrics: Dict, avg_rank: float) -> str:
-    """生成投资建议"""
-    # 评估阴谋风险等级
-    conspiracy_risk = _evaluate_conspiracy_risk(metrics)
+    # Top分布分析
+    if top3_pct >= 30:
+        analysis_parts.append(f"🎯 {top3_pct:.1f}%的大户将其列为前3大持仓，信心极强")
+    elif top5_pct >= 25:
+        analysis_parts.append(f"🌟 {top5_pct:.1f}%的大户将其列为前5大持仓，认可度较高")
+    elif top10_pct >= 20:
+        analysis_parts.append(f"� {top10_pct:.1f}%的大户将其列为前10大持仓，有基础共识")
     
-    # 评估大户信心等级
-    holder_confidence = _evaluate_holder_confidence(avg_rank, metrics)
+    # 集中度分析
+    if over10_pct >= 70:
+        analysis_parts.append("🔄 多数大户配置权重极低，可能处于观望或试探阶段")
+    elif top3_pct >= 50:
+        analysis_parts.append("🎯 高度集中的顶级配置，大户策略极其一致")
     
-    # 投资建议映射表
-    advice_map = {
-        ("无风险", "极强"): "✅ 投资建议：BUY - 阴谋风险低，大户信心强，适合重仓",
-        ("无风险", "较强"): "✅ 投资建议：BUY - 阴谋风险低，大户信心强，适合重仓",
-        ("低风险", "极强"): "✅ 投资建议：BUY - 阴谋风险可控，大户看好，推荐配置",
-        ("低风险", "较强"): "✅ 投资建议：BUY - 阴谋风险可控，大户看好，推荐配置",
-        ("无风险", "一般"): "📊 投资建议：HODL - 风险可控但信心一般，适度配置",
-        ("低风险", "一般"): "📊 投资建议：HODL - 风险可控但信心一般，适度配置",
-        ("中风险", "极强"): "⚠️ 投资建议：小仓位 - 大户看好但有阴谋风险，控制仓位",
-        ("中风险", "较强"): "⚠️ 投资建议：小仓位 - 大户看好但有阴谋风险，控制仓位",
-        ("高风险", "*"): "🔴 投资建议：PASS - 阴谋风险过高，不建议投资"
-    }
+    # 🎪 阴谋钱包风险评估
+    if conspiracy_count > 0:
+        conspiracy_risk_ratio = conspiracy_supply / total_supply if total_supply > 0 else 0
+        if conspiracy_risk_ratio >= 0.3:
+            analysis_parts.append(f"🔴 高阴谋风险：{conspiracy_count}个钱包过度集中持仓({conspiracy_supply:.1f}%)，存在砸盘风险")
+        elif conspiracy_risk_ratio >= 0.15:
+            analysis_parts.append(f"🟡 中度阴谋风险：{conspiracy_count}个钱包集中持仓({conspiracy_supply:.1f}%)，需关注")
+        elif conspiracy_count >= 5:
+            analysis_parts.append(f"🟢 低阴谋风险：虽有{conspiracy_count}个集中钱包，但总占比较低")
     
-    # 优先检查高风险情况
-    if conspiracy_risk == "高风险":
-        return advice_map[("高风险", "*")]
+    # 📊 流动性与稳定性分析
+    if over10_supply >= 20:
+        analysis_parts.append(f"🌊 良好流动性：{over10_supply:.1f}%流通量在非核心持仓，有利于交易流动性")
     
-    # 查找匹配的建议
-    advice_key = (conspiracy_risk, holder_confidence)
-    if advice_key in advice_map:
-        return advice_map[advice_key]
+    if top10_supply >= 80:
+        analysis_parts.append("💪 大户高度认可：前10名控制80%+流通量，显示强烈看好")
     
-    # 默认建议
-    return "⚡ 投资建议：观望 - 大户信心不足，建议等待更好时机"
-
-
-def _evaluate_conspiracy_risk(metrics: Dict) -> str:
-    """评估阴谋风险等级"""
-    conspiracy_count = metrics["conspiracy_count"]
-    conspiracy_risk_ratio = metrics["conspiracy_risk_ratio"]
+    # 🎯 投资建议生成
+    if top3_supply < 25 and conspiracy_supply < 10 and avg_rank <= 5:
+        analysis_parts.append("✅ 投资环境良好：筹码分散、大户认可、风险可控")
+    elif top3_supply >= 40 or conspiracy_supply >= 20:
+        analysis_parts.append("⚠️ 投资需谨慎：存在集中度或阴谋风险，建议控制仓位")
     
-    if conspiracy_count == 0:
-        return "无风险"
-    elif conspiracy_risk_ratio < 0.3:
-        return "低风险"
-    elif conspiracy_risk_ratio < 0.6:
-        return "中风险"
-    else:
-        return "高风险"
-
-
-def _evaluate_holder_confidence(avg_rank: float, metrics: Dict) -> str:
-    """评估大户信心等级"""
-    top3_pct = metrics["top3_pct"]
-    top5_pct = metrics["top5_pct"]
-    top10_pct = metrics["top10_pct"]
-    
-    if avg_rank <= 3 and top3_pct >= 20:
-        return "极强"
-    elif avg_rank <= 5 and top5_pct >= 15:
-        return "较强"
-    elif avg_rank <= 8 and top10_pct >= 10:
-        return "一般"
-    else:
-        return "偏弱"
+    return " ".join(analysis_parts)
 
 
 def analyze_address_clusters(analysis_result: Dict) -> Dict:
@@ -1474,9 +1389,6 @@ def format_target_token_rankings(ranking_result: Dict) -> str:
     distribution = statistics.get("rank_distribution", {})
     analysis = statistics.get("analysis", "")
     
-    # 计算阴谋钱包流通量占比（需要在前面计算，因为后面会用到）
-    conspiracy_supply_percentage = sum(r.get("target_supply_percentage", 0) for r in rankings if r.get("is_conspiracy_wallet", False))
-    
     msg = f"📊 <b>{symbol} 价值排名分析</b>\n"
     msg += f"🎯 分析地址: <b>{total_addresses}</b> 个大户\n"
     msg += f"💎 实际持有: <b>{actual_holders}</b> 个 ({(actual_holders/total_addresses)*100:.1f}%)\n"
@@ -1584,6 +1496,7 @@ def format_target_token_rankings(ranking_result: Dict) -> str:
     top3_supply_percentage = sum(r.get("target_supply_percentage", 0) for r in rankings if r["target_token_rank"] <= 3)
     top5_supply_percentage = sum(r.get("target_supply_percentage", 0) for r in rankings if r["target_token_rank"] <= 5)
     top10_supply_percentage = sum(r.get("target_supply_percentage", 0) for r in rankings if r["target_token_rank"] <= 10)
+    conspiracy_supply_percentage = sum(r.get("target_supply_percentage", 0) for r in rankings if r.get("is_conspiracy_wallet", False))
     
     msg += f"\n🎯 <b>重点统计</b>\n"
     msg += f"🔥 前3名: <b>{top3_count}</b> 人 ({top3_supply_percentage:.2f}%)\n"
@@ -1600,7 +1513,7 @@ def format_target_token_rankings(ranking_result: Dict) -> str:
     msg += f"🧠 <b>智能分析</b>\n"
     msg += f"{analysis}\n\n"
     
-    msg += f"⭐ <i>点击下方按钮查看对应排名的地址详情</i>\n"
+    msg += f"� <i>点击下方按钮查看对应排名的地址详情</i>\n"
     msg += f"📊 <i>所有百分比均为占代币流通量的比例</i>\n"
     
     return msg
