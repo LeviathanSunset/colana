@@ -22,32 +22,32 @@ pip install --upgrade pip
 pip install -r requirements.txt
 
 # 3. 检查配置文件
-if [ ! -f ".env" ]; then
+if [ ! -f "config/.env" ]; then
     echo "⚠️  .env文件不存在，从示例文件创建..."
-    cp .env.example .env
-    echo "请编辑 .env 文件，填入你的Bot Token和Chat ID"
+    cp config/.env.example config/.env
+    echo "请编辑 config/.env 文件，填入你的Bot Token和Chat ID"
     exit 1
 fi
 
 # 4. 测试配置
 echo "🔧 测试配置..."
-export $(cat .env | grep -v '^#' | xargs)
+export $(cat config/.env | grep -v '^#' | xargs)
 python3 -c "
 import sys
 sys.path.insert(0, 'src')
 from src.core.config import ConfigManager
 config = ConfigManager()
 if config.bot.telegram_token == 'YOUR_BOT_TOKEN_HERE':
-    print('❌ 请在.env文件中设置正确的TELEGRAM_TOKEN')
+    print('❌ 请在config/.env文件中设置正确的TELEGRAM_TOKEN')
     exit(1)
 if config.bot.telegram_chat_id == 'YOUR_CHAT_ID_HERE':
-    print('❌ 请在.env文件中设置正确的TELEGRAM_CHAT_ID')
+    print('❌ 请在config/.env文件中设置正确的TELEGRAM_CHAT_ID')
     exit(1)
 print('✅ 配置检查通过')
 "
 
 if [ $? -ne 0 ]; then
-    echo "❌ 配置检查失败，请检查.env文件"
+    echo "❌ 配置检查失败，请检查config/.env文件"
     exit 1
 fi
 

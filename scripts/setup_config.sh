@@ -11,8 +11,8 @@ echo -e "${BLUE}🤖 Telegram Bot 配置助手${NC}"
 echo "==============================="
 
 # 检查配置文件
-CONFIG_FILE="config.json"
-ENV_FILE=".env"
+CONFIG_FILE="config/config.json"
+ENV_FILE="config/.env"
 
 if [ ! -f "$CONFIG_FILE" ]; then
     echo -e "${RED}❌ 配置文件 $CONFIG_FILE 不存在${NC}"

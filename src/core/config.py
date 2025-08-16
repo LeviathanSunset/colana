@@ -47,7 +47,7 @@ class ConfigManager:
     """配置管理器"""
 
     def __init__(self, config_file: str = None):
-        self.config_file = config_file or "config.json"
+        self.config_file = config_file or "config/config.json"
         self._bot_config = None
         self._analysis_config = None
         self._proxy_config = None

@@ -7,11 +7,11 @@ echo "🚀 启动代币大户分析Bot..."
 cd /home/root/telegram-bot/colana
 
 # 加载环境变量
-if [ -f .env ]; then
+if [ -f config/.env ]; then
     echo "📝 加载环境变量..."
-    export $(cat .env | grep -v '^#' | xargs)
+    export $(cat config/.env | grep -v '^#' | xargs)
 else
-    echo "❌ 未找到.env文件"
+    echo "❌ 未找到config/.env文件"
     exit 1
 fi
 
