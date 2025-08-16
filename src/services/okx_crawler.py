@@ -322,6 +322,33 @@ class OKXCrawlerForBot:
         all_tokens.sort(key=lambda x: x["value_usd"], reverse=True)
         return all_tokens
 
+    def is_excluded_holder(self, holder: Dict) -> bool:
+        """
+        判断持有者是否应该被排除（流动性池、交易所等）
+        """
+        # 检查 holderTagVO
+        holder_tag_vo = holder.get("holderTagVO", {})
+        if holder_tag_vo:
+            # 检查是否为流动性池
+            if holder_tag_vo.get("liquidityPool") == "1":
+                return True
+        
+        # 检查 tagList
+        tag_list = holder.get("tagList", [])
+        for tag in tag_list:
+            if isinstance(tag, list) and len(tag) > 0:
+                tag_name = tag[0]
+                # 排除流动性池和交易所
+                if tag_name in ["liquidityPool", "exchange"]:
+                    return True
+        
+        # 检查 userAddressTagVO
+        user_address_tag_vo = holder.get("userAddressTagVO", {})
+        if "liquidityPool" in user_address_tag_vo or "exchange" in user_address_tag_vo:
+            return True
+        
+        return False
+
     def analyze_token_holders(self, token_address: str, top_holders_count: int = None) -> Dict:
         """
         分析代币大户并返回代币统计信息
@@ -345,16 +372,38 @@ class OKXCrawlerForBot:
             self.log_info("无法获取持有者信息")
             return {}
 
+        # 过滤掉流动性池和交易所地址
+        filtered_holders = []
+        excluded_count = 0
+        
+        for holder in holders:
+            if self.is_excluded_holder(holder):
+                excluded_count += 1
+                # 记录被排除的地址信息
+                wallet_address = holder.get("holderWalletAddress", "")
+                tag_list = holder.get("tagList", [])
+                tag_names = [tag[0] if isinstance(tag, list) and len(tag) > 0 else str(tag) for tag in tag_list]
+                self.log_info(f"排除地址: {wallet_address[:8]}...{wallet_address[-6:]} (标签: {', '.join(tag_names)})")
+            else:
+                filtered_holders.append(holder)
+        
+        self.log_info(f"原始持有者: {len(holders)} 个，排除 {excluded_count} 个流动性池/交易所地址，剩余 {len(filtered_holders)} 个")
+
+        if not filtered_holders:
+            self.log_info("过滤后没有可分析的持有者")
+            return {}
+
         # 2. 分析每个大户的资产
         holder_analysis = []
 
-        for i, holder in enumerate(holders[:top_holders_count], 1):
-            # 从explorerUrl中提取钱包地址
+        # 使用过滤后的持有者列表，取前N名
+        for i, holder in enumerate(filtered_holders[:top_holders_count], 1):
+            # 从explorerUrl中提取钱包地址，或直接使用holderWalletAddress
             explorer_url = holder.get("explorerUrl", "")
             if "solscan.io/account/" in explorer_url:
                 wallet_address = explorer_url.split("solscan.io/account/")[-1]
             else:
-                wallet_address = holder.get("holderAddress", "")
+                wallet_address = holder.get("holderWalletAddress", "") or holder.get("holderAddress", "")
 
             if not wallet_address:
                 self.log_info(f"大户 #{i} 无法获取钱包地址")
@@ -467,6 +516,12 @@ class OKXCrawlerForBot:
         analysis_result = {
             "token_address": token_address,
             "analysis_time": datetime.now().isoformat(),
+            "filtering_stats": {
+                "original_holders_count": len(holders),
+                "excluded_holders_count": excluded_count,
+                "filtered_holders_count": len(filtered_holders),
+                "analyzed_holders_count": len(holder_analysis)
+            },
             "total_holders_analyzed": len(holder_analysis),
             "target_token_actual_holders": len(target_token_holders),  # 添加实际持有目标代币的人数
             "token_statistics": {
@@ -483,6 +538,7 @@ class OKXCrawlerForBot:
             json.dump(analysis_result, f, ensure_ascii=False, indent=2)
 
         self.log_info(f"分析完成，结果已保存到: {log_file}")
+        self.log_info(f"过滤统计: 原始 {len(holders)} 个持有者，排除 {excluded_count} 个流动性池/交易所，分析 {len(holder_analysis)} 个真实投资者")
         self.log_info(
             f"发现 {len(all_tokens)} 种代币，过滤后 {len(filtered_tokens)} 种代币(≥$20)，总价值 ${sum(token['total_value'] for token in sorted_tokens):,.2f}"
         )
