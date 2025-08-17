@@ -8,13 +8,14 @@ from telebot.types import Message, CallbackQuery, InlineKeyboardMarkup, InlineKe
 from ..core.config import get_config
 from ..services.formatter import MessageFormatter
 from ..services.blacklist import get_blacklist_manager
+from ..handlers.base import BaseCommandHandler
 
 
-class ConfigCommandHandler:
+class ConfigCommandHandler(BaseCommandHandler):
     """配置命令处理器"""
 
     def __init__(self, bot: TeleBot):
-        self.bot = bot
+        super().__init__(bot)
         self.config = get_config()
         self.formatter = MessageFormatter()
         self.blacklist_manager = get_blacklist_manager()
@@ -24,7 +25,7 @@ class ConfigCommandHandler:
         config_msg = self.formatter.format_config_message(self.config)
         keyboard = self._create_config_keyboard()
 
-        self.bot.reply_to(message, config_msg, parse_mode="HTML", reply_markup=keyboard)
+        self.reply_with_topic(message, config_msg, parse_mode="HTML", reply_markup=keyboard)
 
     def _create_config_keyboard(self) -> InlineKeyboardMarkup:
         """创建配置键盘"""
@@ -32,11 +33,11 @@ class ConfigCommandHandler:
 
         # 主要功能模块 - 6个核心功能按钮
         keyboard.add(
-            InlineKeyboardButton("� 泵检警报", callback_data="config_pump_alert"),
+            InlineKeyboardButton("🔔 泵检警报", callback_data="config_pump_alert"),
             InlineKeyboardButton("🤖 自动泵检分析", callback_data="config_auto_pump_analysis"),
         )
         keyboard.add(
-            InlineKeyboardButton("� 持有者分析", callback_data="config_holder_analysis"),
+            InlineKeyboardButton("📊 持有者分析", callback_data="config_holder_analysis"),
             InlineKeyboardButton("🪐 Jupiter分析", callback_data="config_jup_analysis"),
         )
 

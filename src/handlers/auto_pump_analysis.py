@@ -1,7 +1,31 @@
 """
-自动pump分析处理器
-处理 /capump on(off) 命令，自动分析pump异动（>10%）的持仓
+自动pump分析命令处理器
+处理 /capump 命令和自动分析功能
 """
+
+import threading
+import time
+from collections import defaultdict
+from datetime import datetime, timedelta
+from telebot import TeleBot
+from telebot.types import Message, CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton
+from ..core.config import get_config
+from ..services.okx_crawler import OKXCrawlerForBot
+from ..services.crawler import PumpFunCrawler
+from ..services.formatter import MessageFormatter
+from ..handlers.base import BaseCommandHandler
+
+
+class AutoPumpAnalysisHandler(BaseCommandHandler):
+    """自动pump分析处理器"""
+
+    def __init__(self, bot: TeleBot):
+        super().__init__(bot)
+        self.config = get_config()
+        self.formatter = MessageFormatter()
+        self.analysis_status = {}  # 每个群组的分析状态
+        self.analysis_threads = {}  # 分析线程管理
+        self.rate_limiter = defaultdict(list)  # 频率限制
 
 import time
 import threading
@@ -47,6 +71,23 @@ class AutoPumpAnalysisHandler:
         self.restore_analysis_threads()
         
         self.logger.info("✅ AutoPumpAnalysisHandler 初始化完成")
+
+    def reply_with_topic(self, message: Message, text: str, **kwargs):
+        """统一的回复方法，回复到用户消息所在的topic"""
+        # 获取用户消息所在的topic ID
+        user_topic_id = getattr(message, "message_thread_id", None)
+        
+        if user_topic_id:
+            # 如果用户在某个topic中发送消息，回复到同一个topic
+            kwargs['message_thread_id'] = user_topic_id
+            return self.bot.send_message(
+                chat_id=message.chat.id,
+                text=text,
+                **kwargs
+            )
+        else:
+            # 如果不在topic中，使用普通回复
+            return self.bot.reply_to(message, text, **kwargs)
     
     def load_status(self):
         """加载自动分析状态"""
@@ -88,7 +129,7 @@ class AutoPumpAnalysisHandler:
     def handle_capump(self, message: Message) -> None:
         """处理 /capump 命令"""
         if not OKXCrawlerForBot:
-            self.bot.reply_to(message, "❌ OKX分析功能暂时不可用\n请检查依赖模块是否正确安装")
+            self.reply_with_topic(message, "❌ OKX分析功能暂时不可用\n请检查依赖模块是否正确安装")
             return
         
         # 检查群组权限
@@ -96,7 +137,7 @@ class AutoPumpAnalysisHandler:
         allowed_groups = self.config.ca1_allowed_groups
         
         if allowed_groups and chat_id not in allowed_groups:
-            self.bot.reply_to(
+            self.reply_with_topic(
                 message, 
                 "❌ 此功能仅在特定群组中可用\n如需使用，请联系管理员"
             )
@@ -109,7 +150,7 @@ class AutoPumpAnalysisHandler:
             current_status = self.analysis_status.get(chat_id, False)
             status_text = "🟢 已启用" if current_status else "🔴 已关闭"
             
-            self.bot.reply_to(
+            self.reply_with_topic(
                 message,
                 f"🤖 自动pump分析状态: {status_text}\n\n"
                 f"📋 功能说明:\n"
@@ -131,7 +172,7 @@ class AutoPumpAnalysisHandler:
         elif action == "off":
             self._disable_auto_analysis(message, chat_id)
         else:
-            self.bot.reply_to(
+            self.reply_with_topic(
                 message,
                 "❌ 无效参数\n\n"
                 "💡 使用方法:\n"
@@ -144,7 +185,7 @@ class AutoPumpAnalysisHandler:
     def _enable_auto_analysis(self, message: Message, chat_id: str):
         """启用自动分析"""
         if chat_id in self.analysis_status and self.analysis_status[chat_id]:
-            self.bot.reply_to(message, "✅ 自动pump分析已经在运行中")
+            self.reply_with_topic(message, "✅ 自动pump分析已经在运行中")
             return
         
         # 启用状态
@@ -155,7 +196,7 @@ class AutoPumpAnalysisHandler:
         # 启动分析线程
         self._start_analysis_thread(chat_id)
         
-        self.bot.reply_to(
+        self.reply_with_topic(
             message,
             "🟢 已启用自动pump分析\n\n"
             "📊 监控条件:\n"
@@ -168,7 +209,7 @@ class AutoPumpAnalysisHandler:
     def _disable_auto_analysis(self, message: Message, chat_id: str):
         """关闭自动分析"""
         if chat_id not in self.analysis_status or not self.analysis_status[chat_id]:
-            self.bot.reply_to(message, "🔴 自动pump分析已经关闭")
+            self.reply_with_topic(message, "🔴 自动pump分析已经关闭")
             return
         
         # 停止分析线程
@@ -180,7 +221,7 @@ class AutoPumpAnalysisHandler:
             del self.analyzed_tokens[chat_id]
         self.save_status()
         
-        self.bot.reply_to(message, "🔴 已关闭自动pump分析")
+        self.reply_with_topic(message, "🔴 已关闭自动pump分析")
     
     def _start_analysis_thread(self, chat_id: str):
         """启动分析线程"""
@@ -385,13 +426,13 @@ class AutoPumpAnalysisHandler:
                     f"🔥 检测到pump异动，开始自动分析... ({i+1}/{len(pump_tokens)})\n\n"
                     f"💰 代币: {token_data['symbol']} ({token_data['name']})\n"
                     f"📈 涨幅: {token_data['change']:.1%}\n"
-                    f"� 市值: ${token_data['old_cap']:,.0f} → ${token_data['new_cap']:,.0f}\n"
-                    f"�📍 地址: <code>{token_address}</code>\n\n"
+                    f"💸 市值: ${token_data['old_cap']:,.0f} → ${token_data['new_cap']:,.0f}\n"
+                    f"📍 地址: <code>{token_address}</code>\n\n"
                     f"⏳ 正在分析大户持仓..."
                 )
                 
                 try:
-                    start_message = self.bot.send_message(
+                    start_message = self.send_to_topic(
                         chat_id,
                         start_msg,
                         parse_mode='HTML',

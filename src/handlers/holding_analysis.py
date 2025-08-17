@@ -1,7 +1,27 @@
 """
 持仓分析命令处理器
-处理 /ca1 命令和相关的OKX大户分析功能
+处理 /ca1 命令和相关回调
 """
+
+import time
+import threading
+from telebot import TeleBot
+from telebot.types import Message, CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton
+from ..core.config import get_config
+from ..services.okx_crawler import OKXCrawlerForBot, format_tokens_table
+from ..services.formatter import MessageFormatter
+from ..handlers.base import BaseCommandHandler
+
+
+class HoldingAnalysisHandler(BaseCommandHandler):
+    """持仓分析处理器"""
+
+    def __init__(self, bot: TeleBot):
+        super().__init__(bot)
+        self.config = get_config()
+        self.formatter = MessageFormatter()
+        self.analysis_cache = {}  # 缓存分析结果
+        self.cache_ttl = 3600  # 缓存1小时
 
 import time
 import threading
@@ -40,6 +60,23 @@ class HoldingAnalysisHandler:
         # 启动缓存清理线程
         self._start_cache_cleanup()
 
+    def reply_with_topic(self, message: Message, text: str, **kwargs):
+        """统一的回复方法，回复到用户消息所在的topic"""
+        # 获取用户消息所在的topic ID
+        user_topic_id = getattr(message, "message_thread_id", None)
+        
+        if user_topic_id:
+            # 如果用户在某个topic中发送消息，回复到同一个topic
+            kwargs['message_thread_id'] = user_topic_id
+            return self.bot.send_message(
+                chat_id=message.chat.id,
+                text=text,
+                **kwargs
+            )
+        else:
+            # 如果不在topic中，使用普通回复
+            return self.bot.reply_to(message, text, **kwargs)
+
     def _start_cache_cleanup(self):
         """启动缓存清理线程"""
 
@@ -73,7 +110,7 @@ class HoldingAnalysisHandler:
     def handle_ca1(self, message: Message) -> None:
         """处理 /ca1 命令 - OKX大户分析"""
         if not OKXCrawlerForBot:
-            self.bot.reply_to(message, "❌ OKX分析功能暂时不可用\n请检查依赖模块是否正确安装")
+            self.reply_with_topic(message, "❌ OKX分析功能暂时不可用\n请检查依赖模块是否正确安装")
             return
 
         # 检查群组权限
@@ -81,7 +118,7 @@ class HoldingAnalysisHandler:
         allowed_groups = self.config.ca1_allowed_groups
         
         if allowed_groups and chat_id not in allowed_groups:
-            self.bot.reply_to(
+            self.reply_with_topic(
                 message, 
                 "❌ 此功能仅在特定群组中可用\n如需使用，请联系管理员"
             )
@@ -90,21 +127,21 @@ class HoldingAnalysisHandler:
         # 提取代币地址参数
         parts = message.text.split(maxsplit=1)
         if len(parts) < 2:
-            self.bot.reply_to(message, "❌ 请提供代币地址\n用法: /ca1 <token_address>")
+            self.reply_with_topic(message, "❌ 请提供代币地址\n用法: /ca1 <token_address>")
             return
 
         token_address = parts[1].strip()
 
         if not token_address:
-            self.bot.reply_to(message, "❌ 请提供代币地址\n用法: /ca1 <token_address>")
+            self.reply_with_topic(message, "❌ 请提供代币地址\n用法: /ca1 <token_address>")
             return
 
         if len(token_address) < 20:  # 简单验证地址长度
-            self.bot.reply_to(message, "❌ 请输入有效的代币地址")
+            self.reply_with_topic(message, "❌ 请输入有效的代币地址")
             return
 
         # 发送开始分析的消息
-        processing_msg = self.bot.reply_to(
+        processing_msg = self.reply_with_topic(
             message,
             f"🔍 正在分析代币大户持仓...\n代币地址: `{token_address}`\n⏳ 预计需要1-2分钟，请稍候...",
             parse_mode="Markdown",

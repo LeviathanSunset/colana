@@ -10,6 +10,7 @@ from telebot import TeleBot
 from telebot.types import Message, InlineKeyboardMarkup, InlineKeyboardButton
 from ..core.config import get_config
 from ..services.blacklist import is_blacklisted
+from ..handlers.base import BaseCommandHandler
 
 # 导入Jupiter爬虫
 try:
@@ -26,11 +27,11 @@ except ImportError:
     OKXCrawlerForBot = None
 
 
-class JupiterAnalysisHandler:
+class JupiterAnalysisHandler(BaseCommandHandler):
     """Jupiter代币分析处理器"""
     
     def __init__(self, bot: TeleBot):
-        self.bot = bot
+        super().__init__(bot)
         self.config = get_config()
         self.analysis_threads = {}  # chat_id -> thread
         self.analysis_status = {}   # chat_id -> status info
@@ -39,7 +40,7 @@ class JupiterAnalysisHandler:
         """处理 /cajup 命令"""
         # 检查依赖模块
         if not JupiterAnalyzer or not OKXCrawlerForBot:
-            self.bot.reply_to(
+            self.reply_with_topic(
                 message, 
                 "❌ Jupiter分析功能暂时不可用\n请检查依赖模块是否正确安装"
             )
@@ -50,7 +51,7 @@ class JupiterAnalysisHandler:
         allowed_groups = self.config.ca1_allowed_groups
         
         if allowed_groups and chat_id not in allowed_groups:
-            self.bot.reply_to(
+            self.reply_with_topic(
                 message, 
                 "❌ 此功能仅在特定群组中可用\n如需使用，请联系管理员"
             )
@@ -62,7 +63,7 @@ class JupiterAnalysisHandler:
             current = status.get('current', 0)
             total = status.get('total', 0)
             
-            self.bot.reply_to(
+            self.reply_with_topic(
                 message,
                 f"⏳ Jupiter分析正在进行中...\n\n"
                 f"📊 进度: {current}/{total}\n"
@@ -80,7 +81,7 @@ class JupiterAnalysisHandler:
                 token_count = int(parts[1])
                 token_count = max(1, min(token_count, 50))  # 限制在1-50之间
             except ValueError:
-                self.bot.reply_to(
+                self.reply_with_topic(
                     message,
                     "❌ 参数错误\n\n"
                     "💡 使用方法:\n"
@@ -100,7 +101,7 @@ class JupiterAnalysisHandler:
             f"正在获取热门代币列表..."
         )
         
-        processing_msg = self.bot.reply_to(message, start_msg)
+        processing_msg = self.reply_with_topic(message, start_msg)
         
         # 保存原始消息的thread_id用于后续回复
         original_thread_id = message.message_thread_id
@@ -370,13 +371,12 @@ class JupiterAnalysisHandler:
                         final_msg += f"\n{cross_holding_info}"
                     
                     # 发送分析结果到topic（如果有的话）
-                    self.bot.send_message(
+                    self.send_to_topic(
                         chat_id,
                         final_msg,
                         parse_mode="HTML",
                         reply_markup=table_markup,
-                        disable_web_page_preview=True,
-                        message_thread_id=thread_id  # 重要：使用原始消息的thread_id
+                        disable_web_page_preview=True
                     )
                     
                     return True

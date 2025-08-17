@@ -13,6 +13,9 @@ from datetime import datetime
 from typing import List, Dict, Optional
 from ..utils.data_manager import DataManager
 
+# 全局分析缓存，用于存储分析结果以供按钮回调使用
+analysis_cache = {}
+
 
 class OKXCrawlerForBot:
     """

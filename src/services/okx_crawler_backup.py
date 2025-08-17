@@ -791,7 +791,7 @@ def _generate_ranking_analysis(rankings: List[Dict], avg_rank: float, distributi
     
     # 🏆 集中度风险评估
     if top3_supply >= 50:
-        analysis_parts.append("� 超高集中度风险：前3名大户控制>50%流通量，存在操控风险")
+        analysis_parts.append("🚨 超高集中度风险：前3名大户控制>50%流通量，存在操控风险")
     elif top3_supply >= 30:
         analysis_parts.append("⚠️ 高集中度：前3名大户控制30%+流通量，需警惕大户动向")
     elif top5_supply >= 40:
@@ -804,11 +804,11 @@ def _generate_ranking_analysis(rankings: List[Dict], avg_rank: float, distributi
     # 平均排名分析（只针对实际持有的地址）
     if avg_rank > 0:
         if avg_rank <= 3:
-            analysis_parts.append("� 在持有者中平均排名极高，是绝对的核心资产")
+            analysis_parts.append("⭐ 在持有者中平均排名极高，是绝对的核心资产")
         elif avg_rank <= 5:
             analysis_parts.append("🚀 在持有者中平均排名较高，属于重要配置")
         elif avg_rank <= 8:
-            analysis_parts.append("� 在持有者中排名中等，有一定投资价值")
+            analysis_parts.append("📈 在持有者中排名中等，有一定投资价值")
         else:
             analysis_parts.append("⚡ 在持有者中排名偏低，多为边缘配置")
     
@@ -818,7 +818,7 @@ def _generate_ranking_analysis(rankings: List[Dict], avg_rank: float, distributi
     elif top5_pct >= 25:
         analysis_parts.append(f"🌟 {top5_pct:.1f}%的大户将其列为前5大持仓，认可度较高")
     elif top10_pct >= 20:
-        analysis_parts.append(f"� {top10_pct:.1f}%的大户将其列为前10大持仓，有基础共识")
+        analysis_parts.append(f"📊 {top10_pct:.1f}%的大户将其列为前10大持仓，有基础共识")
     
     # 集中度分析
     if over10_pct >= 70:
@@ -1513,7 +1513,7 @@ def format_target_token_rankings(ranking_result: Dict) -> str:
     msg += f"🧠 <b>智能分析</b>\n"
     msg += f"{analysis}\n\n"
     
-    msg += f"� <i>点击下方按钮查看对应排名的地址详情</i>\n"
+    msg += f"👆 <i>点击下方按钮查看对应排名的地址详情</i>\n"
     msg += f"📊 <i>所有百分比均为占代币流通量的比例</i>\n"
     
     return msg
