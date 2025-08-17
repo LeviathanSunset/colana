@@ -40,9 +40,8 @@ class ConfigCommandHandler:
             InlineKeyboardButton("🪐 Jupiter分析", callback_data="config_jup_analysis"),
         )
 
-        # 存储管理和黑名单管理
+        # 黑名单管理
         keyboard.add(
-            InlineKeyboardButton("📁 存储管理", callback_data="storage_management"),
             InlineKeyboardButton("🚫 黑名单管理", callback_data="blacklist_menu"),
         )
 
@@ -526,119 +525,6 @@ class ConfigCommandHandler:
             error_msg = self.formatter.format_error_message(f"❌ 保存配置失败: {str(e)}")
             self.bot.reply_to(message, error_msg, parse_mode="HTML")
 
-    def handle_storage_management(self, call: CallbackQuery) -> None:
-        """处理存储管理页面"""
-        try:
-            from ..utils.data_manager import get_storage_status
-            info = get_storage_status()
-            
-            response = "💾 <b>存储管理</b>\n\n"
-            response += f"📊 <b>存储统计</b>\n"
-            response += f"总文件数: <code>{info['total_files']}</code>\n"
-            response += f"总大小: <code>{info['total_size_mb']} MB</code>\n\n"
-            
-            response += "📁 <b>分类详情</b>\n"
-            for file_type, details in info["by_type"].items():
-                if details['count'] > 0:
-                    response += f"• {details['description']}: "
-                    response += f"<code>{details['count']}/{details['max_files']}</code> 个文件, "
-                    response += f"<code>{details['size_mb']} MB</code>\n"
-            
-            keyboard = InlineKeyboardMarkup(row_width=2)
-            keyboard.add(
-                InlineKeyboardButton("🗑️ 立即清理", callback_data="cleanup_storage"),
-                InlineKeyboardButton("📊 刷新状态", callback_data="storage_management"),
-            )
-            keyboard.add(InlineKeyboardButton("⬅️ 返回主菜单", callback_data="back_to_config"))
-            
-            self.bot.edit_message_text(
-                response,
-                call.message.chat.id,
-                call.message.message_id,
-                parse_mode="HTML",
-                reply_markup=keyboard,
-            )
-        except ImportError:
-            response = "❌ 存储管理功能不可用\n\n存储管理模块未正确加载"
-            keyboard = InlineKeyboardMarkup()
-            keyboard.add(InlineKeyboardButton("⬅️ 返回主菜单", callback_data="back_to_config"))
-            
-            self.bot.edit_message_text(
-                response,
-                call.message.chat.id,
-                call.message.message_id,
-                parse_mode="HTML",
-                reply_markup=keyboard,
-            )
-        except Exception as e:
-            response = f"❌ 获取存储信息失败: {str(e)}"
-            keyboard = InlineKeyboardMarkup()
-            keyboard.add(InlineKeyboardButton("⬅️ 返回主菜单", callback_data="back_to_config"))
-            
-            self.bot.edit_message_text(
-                response,
-                call.message.chat.id,
-                call.message.message_id,
-                parse_mode="HTML",
-                reply_markup=keyboard,
-            )
-        
-        self.bot.answer_callback_query(call.id)
-
-    def handle_cleanup_storage(self, call: CallbackQuery) -> None:
-        """处理存储清理"""
-        try:
-            from ..utils.data_manager import cleanup_storage, get_storage_status
-            
-            # 获取清理前状态
-            before_info = get_storage_status()
-            
-            # 执行清理
-            cleanup_storage()
-            
-            # 获取清理后状态
-            after_info = get_storage_status()
-            
-            # 计算清理效果
-            files_removed = before_info['total_files'] - after_info['total_files']
-            space_freed = before_info['total_size_mb'] - after_info['total_size_mb']
-            
-            response = "🗑️ <b>存储清理完成</b>\n\n"
-            response += f"删除文件数: <code>{files_removed}</code>\n"
-            response += f"释放空间: <code>{space_freed:.2f} MB</code>\n\n"
-            response += f"当前状态:\n"
-            response += f"• 总文件数: <code>{after_info['total_files']}</code>\n"
-            response += f"• 总大小: <code>{after_info['total_size_mb']} MB</code>\n"
-            
-            keyboard = InlineKeyboardMarkup(row_width=2)
-            keyboard.add(
-                InlineKeyboardButton("📊 查看详情", callback_data="storage_management"),
-                InlineKeyboardButton("⬅️ 返回主菜单", callback_data="back_to_config"),
-            )
-            
-            self.bot.edit_message_text(
-                response,
-                call.message.chat.id,
-                call.message.message_id,
-                parse_mode="HTML",
-                reply_markup=keyboard,
-            )
-            
-        except Exception as e:
-            response = f"❌ 存储清理失败: {str(e)}"
-            keyboard = InlineKeyboardMarkup()
-            keyboard.add(InlineKeyboardButton("⬅️ 返回主菜单", callback_data="back_to_config"))
-            
-            self.bot.edit_message_text(
-                response,
-                call.message.chat.id,
-                call.message.message_id,
-                parse_mode="HTML",
-                reply_markup=keyboard,
-            )
-            
-        self.bot.answer_callback_query(call.id)
-
     def handle_back_to_config(self, call: CallbackQuery) -> None:
         """返回配置菜单"""
         config_msg = self.formatter.format_config_message(self.config)
@@ -727,11 +613,3 @@ class ConfigCommandHandler:
         @self.bot.callback_query_handler(func=lambda call: call.data == "toggle_capump_auto_analysis")
         def toggle_capump_auto_analysis_handler(call):
             self.handle_toggle_capump_auto_analysis(call)
-
-        @self.bot.callback_query_handler(func=lambda call: call.data == "storage_management")
-        def storage_management_handler(call):
-            self.handle_storage_management(call)
-
-        @self.bot.callback_query_handler(func=lambda call: call.data == "cleanup_storage")
-        def cleanup_storage_handler(call):
-            self.handle_cleanup_storage(call)

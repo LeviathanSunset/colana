@@ -29,8 +29,7 @@ from src.handlers.jupiter_analysis import JupiterAnalysisHandler
 from src.handlers.auto_pump_analysis import AutoPumpAnalysisHandler
 from src.models import TokenInfo, PriceChangeResult
 from src.utils import format_number, format_percentage, chunk_list
-from src.utils.data_manager import DataManager
-from src.utils.data_manager import DataManager
+from src.utils.data_manager import DataManager, clear_all_storage
 
 
 class TokenAnalysisBot:
@@ -44,6 +43,11 @@ class TokenAnalysisBot:
         
         try:
             self.config = get_config()
+            
+            # Bot重启时清空所有存储文件
+            self.logger.info("🗑️ Bot重启，清空所有存储文件...")
+            clear_all_storage()
+            
             self.data_manager = DataManager()
             setup_proxy()
             
