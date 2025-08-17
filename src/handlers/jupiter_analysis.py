@@ -497,6 +497,26 @@ class JupiterAnalysisHandler(BaseCommandHandler):
         @self.bot.callback_query_handler(func=lambda call: call.data.startswith("cajup_"))
         def cajup_callback_handler(call):
             self.handle_cajup_callback(call)
+            
+        # 代币详情按钮回调处理（专门为cajup分析结果生成的token_detail按钮）
+        @self.bot.callback_query_handler(func=lambda call: call.data.startswith("token_detail_") and self._is_cajup_token_detail(call.data))
+        def cajup_token_detail_handler(call):
+            self.handle_cajup_token_detail(call)
+    
+    def _is_cajup_token_detail(self, callback_data: str) -> bool:
+        """检查是否是cajup分析结果的代币详情按钮"""
+        try:
+            # 提取cache_key并检查是否在cajup的缓存中
+            parts = callback_data[len("token_detail_"):].split("_")
+            if len(parts) < 3:
+                return False
+            cache_key = "_".join(parts[:-2])
+            
+            # 检查cache_key是否存在于analysis_cache中
+            from ..services.okx_crawler import analysis_cache
+            return cache_key in analysis_cache
+        except Exception:
+            return False
     
     def handle_cajup_callback(self, call):
         """处理cajup回调"""
@@ -507,10 +527,14 @@ class JupiterAnalysisHandler(BaseCommandHandler):
                 self.bot.answer_callback_query(call.id, "📊 请使用 /cajup 30 分析更多代币")
             elif call.data.startswith("cajup_sort_"):
                 self.handle_cajup_sort(call)
+            elif call.data.startswith("cajup_cluster_page_"):
+                self.handle_cajup_cluster_page(call)
             elif call.data.startswith("cajup_cluster_"):
                 self.handle_cajup_cluster(call)
             elif call.data.startswith("cajup_ranking_"):
                 self.handle_cajup_ranking(call)
+            elif call.data.startswith("cajup_rank_"):
+                self.handle_cajup_rank_detail(call)
         except Exception as e:
             print(f"❌ 处理cajup回调失败: {e}")
             self.bot.answer_callback_query(call.id, "❌ 操作失败")
@@ -650,11 +674,46 @@ class JupiterAnalysisHandler(BaseCommandHandler):
             
             # 执行集群分析
             clusters = analyze_address_clusters(result)
-            cluster_msg = format_cluster_analysis(clusters, page=0)
+            
+            # 缓存集群分析结果
+            cluster_cache_key = f"{cache_key}_clusters"
+            analysis_cache[cluster_cache_key] = {
+                "cluster_result": clusters,
+                "timestamp": time.time(),
+            }
+            
+            # 格式化集群分析结果（支持分页）
+            clusters_per_page = self.config.analysis.clusters_per_page
+            cluster_msg, current_page, total_pages = format_cluster_analysis(
+                clusters, 
+                page=1, 
+                clusters_per_page=clusters_per_page
+            )
             
             if cluster_msg:
-                # 创建返回按钮
-                markup = InlineKeyboardMarkup()
+                # 创建分页按钮
+                markup = InlineKeyboardMarkup(row_width=3)
+                
+                # 添加分页导航按钮
+                nav_buttons = []
+                if current_page > 1:
+                    nav_buttons.append(
+                        InlineKeyboardButton("⬅️ 上一页", callback_data=f"cajup_cluster_page_{cache_key}_{current_page-1}")
+                    )
+                
+                nav_buttons.append(
+                    InlineKeyboardButton(f"{current_page}/{total_pages}", callback_data="noop")
+                )
+                
+                if current_page < total_pages:
+                    nav_buttons.append(
+                        InlineKeyboardButton("下一页 ➡️", callback_data=f"cajup_cluster_page_{cache_key}_{current_page+1}")
+                    )
+                
+                if nav_buttons:
+                    markup.row(*nav_buttons)
+                
+                # 添加功能按钮
                 markup.add(
                     InlineKeyboardButton("⬅️ 返回代币排行", callback_data=f"cajup_sort_count_{cache_key}"),
                     InlineKeyboardButton("🔄 重新运行", callback_data=f"cajup_cluster_{cache_key}"),
@@ -738,8 +797,57 @@ class JupiterAnalysisHandler(BaseCommandHandler):
             ranking_msg = format_target_token_rankings(rankings)
             
             if ranking_msg:
-                # 创建返回按钮
-                markup = InlineKeyboardMarkup()
+                # 缓存排名分析结果
+                ranking_cache_key = f"{cache_key}_rankings"
+                analysis_cache[ranking_cache_key] = {
+                    "ranking_result": rankings,
+                    "timestamp": time.time(),
+                }
+                
+                # 创建排名按钮 (1-10名 + >10名)
+                markup = InlineKeyboardMarkup(row_width=5)
+                
+                # 第一行：1-5名
+                rank_buttons_1 = []
+                for rank in range(1, 6):
+                    count = sum(1 for r in rankings["rankings"] if r["target_token_rank"] == rank)
+                    if count > 0:
+                        rank_buttons_1.append(
+                            InlineKeyboardButton(f"{rank}名({count})", callback_data=f"cajup_rank_{cache_key}_{rank}")
+                        )
+                if rank_buttons_1:
+                    markup.row(*rank_buttons_1)
+                
+                # 第二行：6-10名
+                rank_buttons_2 = []
+                for rank in range(6, 11):
+                    count = sum(1 for r in rankings["rankings"] if r["target_token_rank"] == rank)
+                    if count > 0:
+                        rank_buttons_2.append(
+                            InlineKeyboardButton(f"{rank}名({count})", callback_data=f"cajup_rank_{cache_key}_{rank}")
+                        )
+                if rank_buttons_2:
+                    markup.row(*rank_buttons_2)
+                
+                # 第三行：>10名 + 阴谋钱包
+                third_row_buttons = []
+                over_10_count = sum(1 for r in rankings["rankings"] if r["target_token_rank"] > 10)
+                if over_10_count > 0:
+                    third_row_buttons.append(
+                        InlineKeyboardButton(f">10名({over_10_count})", callback_data=f"cajup_rank_{cache_key}_over10")
+                    )
+                
+                # 添加阴谋钱包按钮
+                conspiracy_count = sum(1 for r in rankings["rankings"] if r.get("is_conspiracy_wallet", False))
+                if conspiracy_count > 0:
+                    third_row_buttons.append(
+                        InlineKeyboardButton(f"🔴阴谋({conspiracy_count})", callback_data=f"cajup_rank_{cache_key}_conspiracy")
+                    )
+                
+                if third_row_buttons:
+                    markup.row(*third_row_buttons)
+                
+                # 功能按钮
                 markup.add(
                     InlineKeyboardButton("⬅️ 返回代币排行", callback_data=f"cajup_sort_count_{cache_key}"),
                     InlineKeyboardButton("🎯 地址集群分析", callback_data=f"cajup_cluster_{cache_key}")
@@ -780,3 +888,312 @@ class JupiterAnalysisHandler(BaseCommandHandler):
         except Exception as e:
             print(f"❌ 处理cajup排名分析回调失败: {e}")
             self.bot.answer_callback_query(call.id, "❌ 排名分析失败")
+
+    def handle_cajup_rank_detail(self, call):
+        """处理cajup排名详情查看回调"""
+        try:
+            # 解析回调数据: cajup_rank_{cache_key}_{rank} 或 cajup_rank_{cache_key}_over10
+            data_parts = call.data[len("cajup_rank_"):].split("_")
+            if len(data_parts) < 2:
+                self.bot.answer_callback_query(call.id, "❌ 回调数据格式错误")
+                return
+                
+            cache_key = "_".join(data_parts[:-1])  # 重组cache_key，可能包含下划线
+            rank_part = data_parts[-1]
+            
+            print(f"CAJUP排名详情回调: cache_key={cache_key}, rank_part={rank_part}")
+            
+            # 从缓存中获取排名分析结果
+            from ..services.okx_crawler import analysis_cache
+            ranking_cache_key = f"{cache_key}_rankings"
+            if ranking_cache_key not in analysis_cache:
+                self.bot.answer_callback_query(call.id, "❌ 排名数据缓存已失效，请重新运行排名分析")
+                return
+                
+            ranking_data = analysis_cache[ranking_cache_key]
+            ranking_result = ranking_data["ranking_result"]
+            
+            # 解析rank_part
+            if rank_part == "over10":
+                target_rank = ">10"
+                filtered_rankings = [r for r in ranking_result["rankings"] if r["target_token_rank"] > 10]
+            elif rank_part == "conspiracy":
+                target_rank = "阴谋"
+                filtered_rankings = [r for r in ranking_result["rankings"] if r.get("is_conspiracy_wallet", False)]
+            else:
+                try:
+                    target_rank = int(rank_part)
+                    filtered_rankings = [r for r in ranking_result["rankings"] if r["target_token_rank"] == target_rank]
+                except ValueError:
+                    self.bot.answer_callback_query(call.id, "❌ 无效的排名参数")
+                    return
+            
+            if not filtered_rankings:
+                self.bot.answer_callback_query(call.id, f"❌ 没有找到排名 {target_rank} 的数据")
+                return
+            
+            # 格式化排名详情消息
+            target_token = ranking_result.get("target_token", {})
+            symbol = target_token.get("symbol", "Unknown")
+            
+            if rank_part == "over10":
+                rank_title = ">10名"
+            elif rank_part == "conspiracy":
+                rank_title = "阴谋钱包"
+            else:
+                rank_title = f"第{target_rank}名"
+            
+            msg = f"📊 <b>{symbol} - {rank_title}地址详情</b>\n"
+            msg += f"👥 共 <b>{len(filtered_rankings)}</b> 个地址\n"
+            
+            # 为阴谋钱包添加特殊说明
+            if rank_part == "conspiracy":
+                msg += f"🔴 <i>阴谋钱包：{symbol}代币价值占总资产>50%的地址</i>\n"
+            
+            msg += "─" * 35 + "\n\n"
+            
+            # 按价值排序显示
+            sorted_rankings = sorted(filtered_rankings, key=lambda x: x["target_token_value"], reverse=True)
+            
+            total_value = sum(r["target_token_value"] for r in sorted_rankings)
+            if total_value >= 1_000_000:
+                total_value_str = f"${total_value/1_000_000:.2f}M"
+            elif total_value >= 1_000:
+                total_value_str = f"${total_value/1_000:.2f}K"
+            else:
+                total_value_str = f"${total_value:.0f}"
+            
+            msg += f"💰 <b>总价值: {total_value_str}</b>\n\n"
+            
+            for i, ranking in enumerate(sorted_rankings, 1):
+                holder_rank = ranking["holder_rank"]
+                target_rank = ranking["target_token_rank"]
+                target_value = ranking["target_token_value"]
+                target_supply_percentage = ranking.get("target_supply_percentage", 0)
+                total_tokens = ranking["total_tokens"]
+                portfolio_value = ranking["portfolio_value"]
+                holder_address = ranking["holder_address"]
+                
+                # 格式化价值显示
+                if target_value >= 1_000_000:
+                    value_str = f"${target_value/1_000_000:.2f}M"
+                elif target_value >= 1_000:
+                    value_str = f"${target_value/1_000:.2f}K"
+                else:
+                    value_str = f"${target_value:.0f}"
+                    
+                if portfolio_value >= 1_000_000:
+                    portfolio_str = f"${portfolio_value/1_000_000:.2f}M"
+                elif portfolio_value >= 1_000:
+                    portfolio_str = f"${portfolio_value/1_000:.2f}K"
+                else:
+                    portfolio_str = f"${portfolio_value:.0f}"
+                
+                # 地址显示和链接
+                addr_display = f"{holder_address[:6]}...{holder_address[-4:]}"
+                gmgn_link = f"https://gmgn.ai/sol/address/{holder_address}"
+                addr_with_link = f"<a href='{gmgn_link}'>{addr_display}</a>"
+                
+                # 排名emoji
+                if target_rank == 1:
+                    rank_emoji = "🥇"
+                elif target_rank == 2:
+                    rank_emoji = "🥈"
+                elif target_rank == 3:
+                    rank_emoji = "🥉"
+                elif target_rank <= 5:
+                    rank_emoji = "🏅"
+                elif target_rank <= 10:
+                    rank_emoji = "⭐"
+                else:
+                    rank_emoji = "📉"
+                
+                msg += f"<b>{i:2d}.</b> 大户#{holder_rank} {addr_with_link}\n"
+                if rank_part == "over10":
+                    percentage_str = f"({target_supply_percentage:.3f}%)" if target_supply_percentage > 0 else ""
+                    msg += f"    {rank_emoji} 排名: <b>第{target_rank}名</b>/{total_tokens} | 价值: {value_str} {percentage_str}\n"
+                elif rank_part == "conspiracy":
+                    target_percentage = ranking.get("target_percentage", 0)
+                    percentage_str = f"({target_supply_percentage:.3f}%)" if target_supply_percentage > 0 else ""
+                    msg += f"    🔴 排名: <b>第{target_rank}名</b>/{total_tokens} | 占比: <b>{target_percentage:.1f}%</b> | 价值: {value_str} {percentage_str}\n"
+                else:
+                    percentage_str = f"({target_supply_percentage:.3f}%)" if target_supply_percentage > 0 else ""
+                    msg += f"    {rank_emoji} 排名: <b>{rank_title}</b>/{total_tokens} | 价值: {value_str} {percentage_str}\n"
+                msg += f"    💼 总资产: {portfolio_str}\n\n"
+                
+                # 限制显示条数，避免消息过长
+                if i >= 15:
+                    remaining = len(sorted_rankings) - 15
+                    if remaining > 0:
+                        msg += f"... 还有 {remaining} 个地址未显示\n"
+                    break
+            
+            # 创建返回按钮
+            markup = InlineKeyboardMarkup()
+            markup.add(
+                InlineKeyboardButton("⬅️ 返回排名分析", callback_data=f"cajup_ranking_{cache_key}")
+            )
+            
+            # 编辑消息显示详情
+            self.bot.edit_message_text(
+                msg,
+                call.message.chat.id,
+                call.message.message_id,
+                parse_mode="HTML",
+                reply_markup=markup,
+                disable_web_page_preview=True,
+            )
+            
+            self.bot.answer_callback_query(call.id, f"✅ 显示排名 {target_rank} 详情")
+            
+        except Exception as e:
+            print(f"❌ 处理cajup排名详情回调失败: {e}")
+            self.bot.answer_callback_query(call.id, "❌ 显示详情失败")
+
+    def handle_cajup_token_detail(self, call):
+        """处理cajup代币详情回调"""
+        try:
+            # 解析回调数据: token_detail_{cache_key}_{token_index}_{sort_by}
+            parts = call.data[len("token_detail_"):].split("_")
+            if len(parts) < 3:
+                self.bot.answer_callback_query(call.id, "❌ 回调数据格式错误")
+                return
+                
+            # 重建cache_key（可能包含下划线）
+            cache_key = "_".join(parts[:-2])
+            token_index = int(parts[-2])
+            sort_by = parts[-1]
+            
+            # 从缓存获取分析结果
+            from ..services.okx_crawler import analysis_cache, format_token_holders_detail
+            cached_data = analysis_cache.get(cache_key)
+            
+            if not cached_data:
+                self.bot.answer_callback_query(call.id, "❌ 分析结果已过期，请重新分析")
+                return
+                
+            result = cached_data['result']
+            token_address = cached_data['token_address']
+            
+            # 获取代币统计数据
+            token_stats = result["token_statistics"]
+            all_tokens = token_stats["top_tokens_by_value"]
+            
+            # 根据排序方式重新排序
+            if sort_by == "count":
+                sorted_tokens = sorted(all_tokens, key=lambda x: x["holder_count"], reverse=True)
+            else:
+                sorted_tokens = sorted(all_tokens, key=lambda x: x["total_value"], reverse=True)
+            
+            # 检查索引是否有效
+            if token_index >= len(sorted_tokens):
+                self.bot.answer_callback_query(call.id, "❌ 代币索引无效")
+                return
+                
+            selected_token = sorted_tokens[token_index]
+            
+            # 格式化代币大户详情
+            detail_msg = format_token_holders_detail(selected_token, token_stats)
+            
+            # 创建返回按钮
+            from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
+            markup = InlineKeyboardMarkup()
+            markup.add(
+                InlineKeyboardButton(
+                    "⬅️ 返回代币排行",
+                    callback_data=f"cajup_sort_{sort_by}_{cache_key}"
+                )
+            )
+            
+            # 编辑消息显示代币详情
+            self.bot.edit_message_text(
+                detail_msg,
+                call.message.chat.id,
+                call.message.message_id,
+                parse_mode="HTML",
+                reply_markup=markup,
+                disable_web_page_preview=True,
+            )
+            
+            self.bot.answer_callback_query(call.id, f"📊 {selected_token['symbol']} 大户详情")
+            
+        except Exception as e:
+            print(f"❌ 处理cajup代币详情回调失败: {e}")
+            self.bot.answer_callback_query(call.id, "❌ 查看代币详情失败")
+
+    def handle_cajup_cluster_page(self, call):
+        """处理cajup集群分页回调"""
+        try:
+            # 解析回调数据: cajup_cluster_page_{cache_key}_{page}
+            parts = call.data[len("cajup_cluster_page_"):].split("_")
+            if len(parts) < 2:
+                self.bot.answer_callback_query(call.id, "❌ 分页回调数据格式错误")
+                return
+                
+            cache_key = "_".join(parts[:-1])
+            page = int(parts[-1])
+            
+            print(f"CAJUP集群分页回调: cache_key={cache_key}, page={page}")
+            
+            # 从缓存获取集群分析结果
+            from ..services.okx_crawler import analysis_cache, format_cluster_analysis
+            cluster_cache_key = f"{cache_key}_clusters"
+            
+            if cluster_cache_key not in analysis_cache:
+                self.bot.answer_callback_query(call.id, "❌ 集群数据缓存已失效，请重新运行集群分析")
+                return
+                
+            cluster_data = analysis_cache[cluster_cache_key]
+            clusters = cluster_data["cluster_result"]
+            
+            # 格式化集群分析结果（支持分页）
+            clusters_per_page = self.config.analysis.clusters_per_page
+            cluster_msg, current_page, total_pages = format_cluster_analysis(
+                clusters, 
+                page=page, 
+                clusters_per_page=clusters_per_page
+            )
+            
+            # 创建分页按钮
+            markup = InlineKeyboardMarkup(row_width=3)
+            
+            # 添加分页导航按钮
+            nav_buttons = []
+            if current_page > 1:
+                nav_buttons.append(
+                    InlineKeyboardButton("⬅️ 上一页", callback_data=f"cajup_cluster_page_{cache_key}_{current_page-1}")
+                )
+            
+            nav_buttons.append(
+                InlineKeyboardButton(f"{current_page}/{total_pages}", callback_data="noop")
+            )
+            
+            if current_page < total_pages:
+                nav_buttons.append(
+                    InlineKeyboardButton("下一页 ➡️", callback_data=f"cajup_cluster_page_{cache_key}_{current_page+1}")
+                )
+            
+            if nav_buttons:
+                markup.row(*nav_buttons)
+            
+            # 添加功能按钮
+            markup.add(
+                InlineKeyboardButton("⬅️ 返回代币排行", callback_data=f"cajup_sort_count_{cache_key}"),
+                InlineKeyboardButton("🔄 重新运行", callback_data=f"cajup_cluster_{cache_key}"),
+            )
+            
+            # 更新消息
+            self.bot.edit_message_text(
+                cluster_msg,
+                call.message.chat.id,
+                call.message.message_id,
+                parse_mode="HTML",
+                reply_markup=markup,
+                disable_web_page_preview=True,
+            )
+            
+            self.bot.answer_callback_query(call.id, f"已切换到第{current_page}页")
+            
+        except Exception as e:
+            print(f"❌ 处理cajup集群分页回调失败: {e}")
+            self.bot.answer_callback_query(call.id, "❌ 切换页面失败")
