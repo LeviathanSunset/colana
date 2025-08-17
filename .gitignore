@@ -137,3 +137,8 @@ okx_log/
 # OS
 .DS_Store
 Thumbs.db
+
+# Storage目录 - 忽略所有文件但保留文件夹结构
+storage/*
+!storage/*/
+!storage/*/.gitkeep
