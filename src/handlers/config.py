@@ -30,6 +30,12 @@ class ConfigCommandHandler:
         """创建配置键盘"""
         keyboard = InlineKeyboardMarkup(row_width=2)
 
+        # 主要功能设置 - 两个并列按钮
+        keyboard.add(
+            InlineKeyboardButton("🔍 自动警报配置", callback_data="config_auto_alert"),
+            InlineKeyboardButton("🚀 Capump配置", callback_data="config_capump"),
+        )
+
         # 监控设置
         keyboard.add(
             InlineKeyboardButton("⏱️ 检查间隔", callback_data="edit_interval"),
@@ -181,6 +187,136 @@ class ConfigCommandHandler:
         self.bot.send_message(call.message.chat.id, response, parse_mode="HTML")
         self.bot.answer_callback_query(call.id)
 
+    def handle_auto_alert_config(self, call: CallbackQuery) -> None:
+        """处理自动警报配置页面"""
+        config = self.config.bot
+        
+        response = (
+            "🔍 <b>自动警报配置</b>\n\n"
+            f"⏱️ 检查间隔: <code>{config.interval}</code> 秒\n"
+            f"📈 涨幅阈值: <code>{config.threshold * 100:.1f}%</code>\n"
+            f"💰 最小市值: <code>${config.min_market_cap:,.0f}</code>\n"
+            f"📅 最小年龄: <code>{config.min_age_days}</code> 天\n"
+        )
+        
+        keyboard = InlineKeyboardMarkup(row_width=2)
+        keyboard.add(
+            InlineKeyboardButton("⏱️ 检查间隔", callback_data="edit_interval"),
+            InlineKeyboardButton("📈 涨幅阈值", callback_data="edit_threshold"),
+        )
+        keyboard.add(
+            InlineKeyboardButton("💰 最小市值", callback_data="edit_min_market_cap"),
+            InlineKeyboardButton("📅 最小年龄", callback_data="edit_min_age_days"),
+        )
+        keyboard.add(InlineKeyboardButton("⬅️ 返回主菜单", callback_data="back_to_config"))
+        
+        self.bot.edit_message_text(
+            response,
+            call.message.chat.id,
+            call.message.message_id,
+            parse_mode="HTML",
+            reply_markup=keyboard,
+        )
+        self.bot.answer_callback_query(call.id)
+
+    def handle_capump_config(self, call: CallbackQuery) -> None:
+        """处理Capump配置页面"""
+        config = self.config.capump
+        
+        response = (
+            "🚀 <b>Capump配置</b>\n\n"
+            f"⏱️ 爬取间隔: <code>{config.interval}</code> 秒\n"
+            f"📈 涨幅阈值: <code>{config.threshold * 100:.1f}%</code>\n"
+            f"💰 最小市值: <code>${config.min_market_cap:,.0f}</code>\n"
+            f"📅 代币年龄: <code>{config.min_age_days}</code> 天\n"
+            f"🔔 自动分析: <code>{'✅ 已启用' if config.auto_analysis_enabled else '❌ 已禁用'}</code>\n"
+            f"🔢 批次大小: <code>{config.max_tokens_per_batch}</code> 个代币\n"
+        )
+        
+        keyboard = InlineKeyboardMarkup(row_width=2)
+        keyboard.add(
+            InlineKeyboardButton("⏱️ 爬取间隔", callback_data="edit_capump_interval"),
+            InlineKeyboardButton("📈 涨幅阈值", callback_data="edit_capump_threshold"),
+        )
+        keyboard.add(
+            InlineKeyboardButton("💰 最小市值", callback_data="edit_capump_min_market_cap"),
+            InlineKeyboardButton("📅 代币年龄", callback_data="edit_capump_min_age_days"),
+        )
+        keyboard.add(
+            InlineKeyboardButton("🔢 批次大小", callback_data="edit_capump_max_tokens_per_batch"),
+            InlineKeyboardButton(
+                f"🔔 自动分析 {'✅' if config.auto_analysis_enabled else '❌'}", 
+                callback_data="toggle_capump_auto_analysis"
+            ),
+        )
+        keyboard.add(InlineKeyboardButton("⬅️ 返回主菜单", callback_data="back_to_config"))
+        
+        self.bot.edit_message_text(
+            response,
+            call.message.chat.id,
+            call.message.message_id,
+            parse_mode="HTML",
+            reply_markup=keyboard,
+        )
+        self.bot.answer_callback_query(call.id)
+
+    def handle_edit_capump_config(self, call: CallbackQuery) -> None:
+        """处理Capump配置项编辑"""
+        key = call.data.replace("edit_capump_", "")
+        
+        config_map = {
+            "interval": "爬取间隔（秒）",
+            "threshold": "涨幅阈值（例如0.10表示10%）",
+            "min_market_cap": "最小市值（美元）",
+            "min_age_days": "代币年龄（天）",
+            "max_tokens_per_batch": "批次大小（个代币）",
+        }
+        
+        if key in config_map:
+            description = config_map[key]
+            msg = self.bot.send_message(
+                call.message.chat.id, 
+                f"请输入新的 <b>{description}</b>：", 
+                parse_mode="HTML"
+            )
+            self.bot.register_next_step_handler(
+                msg, lambda m: self._save_capump_config_value(m, key)
+            )
+        
+        self.bot.answer_callback_query(call.id)
+
+    def handle_toggle_capump_auto_analysis(self, call: CallbackQuery) -> None:
+        """切换Capump自动分析状态"""
+        current_status = self.config.capump.auto_analysis_enabled
+        self.config.update_config("capump", auto_analysis_enabled=not current_status)
+        
+        # 刷新页面
+        self.handle_capump_config(call)
+
+    def _save_capump_config_value(self, message: Message, key: str) -> None:
+        """保存Capump配置值"""
+        try:
+            value = message.text.strip()
+            
+            # 类型转换
+            if key in ["interval", "min_age_days", "max_tokens_per_batch"]:
+                value = int(value)
+            elif key in ["threshold", "min_market_cap"]:
+                value = float(value)
+            
+            # 更新配置
+            self.config.update_config("capump", **{key: value})
+            
+            success_msg = self.formatter.format_success_message(f"Capump配置已更新: {key} = {value}")
+            self.bot.reply_to(message, success_msg, parse_mode="HTML")
+            
+        except ValueError:
+            error_msg = self.formatter.format_error_message("❌ 输入格式错误，请输入有效的数值")
+            self.bot.reply_to(message, error_msg, parse_mode="HTML")
+        except Exception as e:
+            error_msg = self.formatter.format_error_message(f"❌ 保存配置失败: {str(e)}")
+            self.bot.reply_to(message, error_msg, parse_mode="HTML")
+
     def handle_back_to_config(self, call: CallbackQuery) -> None:
         """返回配置菜单"""
         config_msg = self.formatter.format_config_message(self.config)
@@ -225,3 +361,19 @@ class ConfigCommandHandler:
         @self.bot.callback_query_handler(func=lambda call: call.data == "back_to_config")
         def back_to_config_handler(call):
             self.handle_back_to_config(call)
+
+        @self.bot.callback_query_handler(func=lambda call: call.data == "config_auto_alert")
+        def auto_alert_config_handler(call):
+            self.handle_auto_alert_config(call)
+
+        @self.bot.callback_query_handler(func=lambda call: call.data == "config_capump")
+        def capump_config_handler(call):
+            self.handle_capump_config(call)
+
+        @self.bot.callback_query_handler(func=lambda call: call.data.startswith("edit_capump_"))
+        def edit_capump_config_handler(call):
+            self.handle_edit_capump_config(call)
+
+        @self.bot.callback_query_handler(func=lambda call: call.data == "toggle_capump_auto_analysis")
+        def toggle_capump_auto_analysis_handler(call):
+            self.handle_toggle_capump_auto_analysis(call)

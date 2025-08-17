@@ -43,6 +43,20 @@ class ProxyConfig:
     enabled: bool = True
 
 
+@dataclass
+class CapumpConfig:
+    """Capump分析配置"""
+    
+    interval: int = 120
+    threshold: float = 0.10
+    min_market_cap: float = 50000
+    min_age_days: int = 1
+    auto_analysis_enabled: bool = False
+    max_tokens_per_batch: int = 10
+    analysis_timeout: int = 180
+    notification_enabled: bool = True
+
+
 class ConfigManager:
     """配置管理器"""
 
@@ -51,6 +65,7 @@ class ConfigManager:
         self._bot_config = None
         self._analysis_config = None
         self._proxy_config = None
+        self._capump_config = None
         self._ca1_allowed_groups = []
         self.load_config()
 
@@ -94,6 +109,17 @@ class ConfigManager:
             enabled=os.getenv("PROXY_ENABLED", "true").lower() == "true",
         )
 
+        self._capump_config = CapumpConfig(
+            interval=int(os.getenv("CAPUMP_INTERVAL", 120)),
+            threshold=float(os.getenv("CAPUMP_THRESHOLD", 0.10)),
+            min_market_cap=float(os.getenv("CAPUMP_MIN_MARKET_CAP", 50000)),
+            min_age_days=int(os.getenv("CAPUMP_MIN_AGE_DAYS", 1)),
+            auto_analysis_enabled=os.getenv("CAPUMP_AUTO_ANALYSIS", "false").lower() == "true",
+            max_tokens_per_batch=int(os.getenv("CAPUMP_MAX_TOKENS_PER_BATCH", 10)),
+            analysis_timeout=int(os.getenv("CAPUMP_ANALYSIS_TIMEOUT", 180)),
+            notification_enabled=os.getenv("CAPUMP_NOTIFICATION", "true").lower() == "true",
+        )
+
     def _load_from_file(self):
         """从文件加载配置"""
         try:
@@ -115,6 +141,14 @@ class ConfigManager:
                     for key, value in analysis_data.items():
                         if hasattr(self._analysis_config, key):
                             setattr(self._analysis_config, key, value)
+            
+            # 更新capump配置
+            if "capump" in config_data:
+                capump_data = config_data["capump"]
+                if hasattr(self._capump_config, "__dict__"):
+                    for key, value in capump_data.items():
+                        if hasattr(self._capump_config, key):
+                            setattr(self._capump_config, key, value)
             
             # 加载ca1允许的群组列表
             if "ca1_allowed_groups" in config_data:
@@ -140,11 +174,15 @@ class ConfigManager:
         if not self._proxy_config:
             self._proxy_config = ProxyConfig()
 
+        if not self._capump_config:
+            self._capump_config = CapumpConfig()
+
     def save_config(self):
         """保存配置到文件"""
         config_data = {
             "bot": self._bot_config.__dict__,
             "analysis": self._analysis_config.__dict__,
+            "capump": self._capump_config.__dict__,
             "ca1_allowed_groups": self._ca1_allowed_groups,
             "proxy": self._proxy_config.__dict__,
         }
@@ -168,6 +206,10 @@ class ConfigManager:
         return self._proxy_config
 
     @property
+    def capump(self) -> CapumpConfig:
+        return self._capump_config
+
+    @property
     def ca1_allowed_groups(self) -> list:
         """获取允许使用 /ca1 命令的群组列表"""
         return self._ca1_allowed_groups
@@ -182,6 +224,10 @@ class ConfigManager:
             for key, value in kwargs.items():
                 if hasattr(self._analysis_config, key):
                     setattr(self._analysis_config, key, value)
+        elif section == "capump":
+            for key, value in kwargs.items():
+                if hasattr(self._capump_config, key):
+                    setattr(self._capump_config, key, value)
         elif section == "proxy":
             for key, value in kwargs.items():
                 if hasattr(self._proxy_config, key):

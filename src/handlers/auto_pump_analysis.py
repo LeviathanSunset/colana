@@ -397,10 +397,9 @@ class AutoPumpAnalysisHandler:
                         # 导入格式化函数
                         from ..services.okx_crawler import format_tokens_table
                         
-                        # 格式化分析结果
+                        # 格式化分析结果 - 传递token_statistics部分而不是整个result
                         table_msg, table_markup = format_tokens_table(
-                            result, 
-                            token_address, 
+                            result["token_statistics"], 
                             sort_by="count"
                         )
                         
