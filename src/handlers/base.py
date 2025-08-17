@@ -36,10 +36,10 @@ class BaseCommandHandler:
 
     def send_to_topic(self, chat_id: str, text: str, thread_id=None, **kwargs):
         """统一的发送方法，确保消息发送到正确的topic"""
+        # 如果指定了 thread_id，使用它（这通常是用户原始消息的 thread_id）
         if thread_id:
             kwargs['message_thread_id'] = thread_id
-        elif self.config.bot.message_thread_id:
-            kwargs['message_thread_id'] = self.config.bot.message_thread_id
+        
         return self.bot.send_message(
             chat_id=chat_id,
             text=text,
