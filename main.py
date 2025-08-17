@@ -22,6 +22,7 @@ from src.services.formatter import MessageFormatter
 from src.handlers.base import BaseCommandHandler
 from src.handlers.config import ConfigCommandHandler
 from src.handlers.holding_analysis import HoldingAnalysisHandler
+from src.handlers.jupiter_analysis import JupiterAnalysisHandler
 from src.models import TokenInfo, PriceChangeResult
 from src.utils import format_number, format_percentage, chunk_list
 
@@ -46,6 +47,7 @@ class TokenAnalysisBot:
         self.base_handler = BaseCommandHandler(self.bot)
         self.config_handler = ConfigCommandHandler(self.bot)
         self.holding_handler = HoldingAnalysisHandler(self.bot)
+        self.jupiter_handler = JupiterAnalysisHandler(self.bot)
         
         # 注册处理器
         self._register_handlers()
@@ -57,6 +59,7 @@ class TokenAnalysisBot:
         self.base_handler.register_handlers()
         self.config_handler.register_handlers()
         self.holding_handler.register_handlers()
+        self.jupiter_handler.register_handlers()
         
         # 测试命令
         @self.bot.message_handler(commands=['testtopic'])

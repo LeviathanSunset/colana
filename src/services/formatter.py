@@ -19,11 +19,20 @@ class MessageFormatter:
 
 <b>📋 主要功能:</b>
 • 代币大户分析 - /ca1 &lt;代币地址&gt;
+• Jupiter热门分析 - /cajup [数量]
+• 自动pump分析 - /capump on(off)
 • 价格变动监控 - 自动推送涨幅预警
 • 黑名单管理 - /config 配置
 
 <b>🔍 使用示例:</b>
 <code>/ca1 FbGsCHv8qPvUdmomVAiG72ET5D5kgBJgGoxxfMZipump</code>
+<code>/cajup</code> - 分析10个Jupiter热门代币
+<code>/cajup 20</code> - 分析20个Jupiter热门代币
+
+<b>🔥 自动pump分析:</b>
+<code>/capump on</code> - 启用自动分析pump异动(>10%)
+<code>/capump off</code> - 关闭自动分析
+<code>/capump</code> - 查看当前状态
 
 <b>⚙️ 配置管理:</b>
 使用 /config 命令进入配置界面
@@ -32,6 +41,7 @@ class MessageFormatter:
 • 分析结果会缓存30分钟
 • 支持地址集群分析
 • 可按不同维度排序
+• 黑名单代币将被跳过分析
 """
 
     @staticmethod
