@@ -23,11 +23,13 @@ except ImportError:
 try:
     from ..services.okx_crawler import (
         OKXCrawlerForBot, 
-        format_tokens_table_for_cajup,
+        format_tokens_table,
         analyze_address_clusters,
         format_cluster_analysis, 
         analyze_target_token_rankings,
-        format_target_token_rankings
+        format_target_token_rankings,
+        analysis_cache,
+        start_cache_cleanup
     )
 except ImportError:
     print("⚠️ 无法导入OKX分析模块")
@@ -42,6 +44,9 @@ class JupiterAnalysisHandler(BaseCommandHandler):
         self.config = get_config()
         self.analysis_threads = {}  # chat_id -> thread
         self.analysis_status = {}   # chat_id -> status info
+        
+        # 启动全局缓存清理（只启动一次）
+        start_cache_cleanup()
     
     def handle_cajup(self, message: Message) -> None:
         """处理 /cajup 命令"""
@@ -356,8 +361,8 @@ class JupiterAnalysisHandler(BaseCommandHandler):
                     'source': 'jupiter'
                 }
                 
-                # 格式化分析结果 - 使用与ca1相同的完整格式，但使用cajup专用的回调前缀
-                table_msg, table_markup = format_tokens_table_for_cajup(
+                # 格式化分析结果 - 使用统一的全局缓存系统
+                table_msg, table_markup = format_tokens_table(
                     result["token_statistics"], 
                     sort_by="count",
                     cache_key=cache_key
@@ -497,11 +502,6 @@ class JupiterAnalysisHandler(BaseCommandHandler):
         @self.bot.callback_query_handler(func=lambda call: call.data.startswith("cajup_"))
         def cajup_callback_handler(call):
             self.handle_cajup_callback(call)
-            
-        # 代币详情按钮回调处理（cajup专用）
-        @self.bot.callback_query_handler(func=lambda call: call.data.startswith("cajup_token_detail_"))
-        def cajup_token_detail_handler(call):
-            self.handle_cajup_token_detail(call)
     
     def handle_cajup_callback(self, call):
         """处理cajup回调"""
@@ -548,7 +548,7 @@ class JupiterAnalysisHandler(BaseCommandHandler):
             token_address = cached_data['token_address']
             
             # 重新格式化表格
-            table_msg, table_markup = format_tokens_table_for_cajup(
+            table_msg, table_markup = format_tokens_table(
                 result["token_statistics"],
                 sort_by=sort_type,
                 cache_key=cache_key
@@ -1034,77 +1034,6 @@ class JupiterAnalysisHandler(BaseCommandHandler):
         except Exception as e:
             print(f"❌ 处理cajup排名详情回调失败: {e}")
             self.bot.answer_callback_query(call.id, "❌ 显示详情失败")
-
-    def handle_cajup_token_detail(self, call):
-        """处理cajup代币详情回调"""
-        try:
-            # 解析回调数据: cajup_token_detail_{cache_key}_{token_index}_{sort_by}
-            parts = call.data[len("cajup_token_detail_"):].split("_")
-            if len(parts) < 3:
-                self.bot.answer_callback_query(call.id, "❌ 回调数据格式错误")
-                return
-                
-            # 重建cache_key（可能包含下划线）
-            cache_key = "_".join(parts[:-2])
-            token_index = int(parts[-2])
-            sort_by = parts[-1]
-            
-            # 从缓存获取分析结果
-            from ..services.okx_crawler import analysis_cache, format_token_holders_detail
-            cached_data = analysis_cache.get(cache_key)
-            
-            if not cached_data:
-                self.bot.answer_callback_query(call.id, "❌ 分析结果已过期，请重新分析")
-                return
-                
-            result = cached_data['result']
-            token_address = cached_data['token_address']
-            
-            # 获取代币统计数据
-            token_stats = result["token_statistics"]
-            all_tokens = token_stats["top_tokens_by_value"]
-            
-            # 根据排序方式重新排序
-            if sort_by == "count":
-                sorted_tokens = sorted(all_tokens, key=lambda x: x["holder_count"], reverse=True)
-            else:
-                sorted_tokens = sorted(all_tokens, key=lambda x: x["total_value"], reverse=True)
-            
-            # 检查索引是否有效
-            if token_index >= len(sorted_tokens):
-                self.bot.answer_callback_query(call.id, "❌ 代币索引无效")
-                return
-                
-            selected_token = sorted_tokens[token_index]
-            
-            # 格式化代币大户详情
-            detail_msg = format_token_holders_detail(selected_token, token_stats)
-            
-            # 创建返回按钮
-            from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
-            markup = InlineKeyboardMarkup()
-            markup.add(
-                InlineKeyboardButton(
-                    "⬅️ 返回代币排行",
-                    callback_data=f"cajup_sort_{sort_by}_{cache_key}"
-                )
-            )
-            
-            # 编辑消息显示代币详情
-            self.bot.edit_message_text(
-                detail_msg,
-                call.message.chat.id,
-                call.message.message_id,
-                parse_mode="HTML",
-                reply_markup=markup,
-                disable_web_page_preview=True,
-            )
-            
-            self.bot.answer_callback_query(call.id, f"📊 {selected_token['symbol']} 大户详情")
-            
-        except Exception as e:
-            print(f"❌ 处理cajup代币详情回调失败: {e}")
-            self.bot.answer_callback_query(call.id, "❌ 查看代币详情失败")
 
     def handle_cajup_cluster_page(self, call):
         """处理cajup集群分页回调"""

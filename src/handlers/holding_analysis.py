@@ -20,8 +20,6 @@ class HoldingAnalysisHandler(BaseCommandHandler):
         super().__init__(bot)
         self.config = get_config()
         self.formatter = MessageFormatter()
-        self.analysis_cache = {}  # 缓存分析结果
-        self.cache_ttl = 3600  # 缓存1小时
 
 import time
 import threading
@@ -40,6 +38,9 @@ try:
         format_cluster_analysis,
         analyze_target_token_rankings,
         format_target_token_rankings,
+        analysis_cache,
+        start_cache_cleanup,
+        cleanup_expired_cache
     )
 except ImportError:
     print("⚠️ 无法导入OKX爬虫模块，/ca1功能可能不可用")
@@ -54,11 +55,8 @@ class HoldingAnalysisHandler:
         self.config = get_config()
         self.formatter = MessageFormatter()
 
-        # 全局缓存存储分析结果
-        self.analysis_cache = {}
-
-        # 启动缓存清理线程
-        self._start_cache_cleanup()
+        # 启动全局缓存清理（只启动一次）
+        start_cache_cleanup()
 
     def reply_with_topic(self, message: Message, text: str, **kwargs):
         """统一的回复方法，回复到用户消息所在的topic"""
@@ -76,36 +74,6 @@ class HoldingAnalysisHandler:
         else:
             # 如果不在topic中，使用普通回复
             return self.bot.reply_to(message, text, **kwargs)
-
-    def _start_cache_cleanup(self):
-        """启动缓存清理线程"""
-
-        def cleanup_loop():
-            while True:
-                try:
-                    self._cleanup_expired_cache()
-                    time.sleep(3600)  # 每小时清理一次
-                except Exception as e:
-                    print(f"缓存清理错误: {e}")
-                    time.sleep(600)  # 出错时10分钟后重试
-
-        cleanup_thread = threading.Thread(target=cleanup_loop, daemon=True)
-        cleanup_thread.start()
-
-    def _cleanup_expired_cache(self):
-        """清理过期的缓存条目"""
-        current_time = time.time()
-        expired_keys = []
-
-        for key, data in self.analysis_cache.items():
-            if current_time - data.get("timestamp", 0) > 24 * 3600:  # 24小时过期
-                expired_keys.append(key)
-
-        for key in expired_keys:
-            del self.analysis_cache[key]
-
-        if expired_keys:
-            print(f"清理了 {len(expired_keys)} 个过期缓存")
 
     def handle_ca1(self, message: Message) -> None:
         """处理 /ca1 命令 - OKX大户分析"""
@@ -157,7 +125,7 @@ class HoldingAnalysisHandler:
         """在后台运行分析"""
         try:
             # 清理过期缓存
-            self._cleanup_expired_cache()
+            cleanup_expired_cache()
 
             # 创建OKX爬虫实例
             crawler = OKXCrawlerForBot()
@@ -170,7 +138,7 @@ class HoldingAnalysisHandler:
             if result and result.get("token_statistics"):
                 # 缓存分析结果
                 cache_key = f"{processing_msg.chat.id}_{processing_msg.message_id}"
-                self.analysis_cache[cache_key] = {
+                analysis_cache[cache_key] = {
                     "result": result,
                     "token_address": token_address,
                     "timestamp": time.time(),
@@ -295,11 +263,11 @@ class HoldingAnalysisHandler:
         """处理排序切换逻辑"""
         try:
             # 从缓存中获取分析结果
-            if cache_key not in self.analysis_cache:
+            if cache_key not in analysis_cache:
                 self._show_reanalyze_option(call, cache_key)
                 return
 
-            cached_data = self.analysis_cache[cache_key]
+            cached_data = analysis_cache[cache_key]
             result = cached_data["result"]
 
             # 检查缓存是否过期（24小时）
@@ -432,11 +400,11 @@ class HoldingAnalysisHandler:
         """处理集群分页回调"""
         try:
             # 从缓存中获取分析结果
-            if cache_key not in self.analysis_cache:
+            if cache_key not in analysis_cache:
                 self.bot.answer_callback_query(call.id, "❌ 数据缓存已失效，请重新运行 /ca1 命令")
                 return
 
-            cached_data = self.analysis_cache[cache_key]
+            cached_data = analysis_cache[cache_key]
             result = cached_data["result"]
             token_address = cached_data["token_address"]
 
@@ -447,9 +415,9 @@ class HoldingAnalysisHandler:
 
             # 检查是否已有集群分析结果缓存
             cluster_cache_key = f"{cache_key}_clusters"
-            if cluster_cache_key in self.analysis_cache:
+            if cluster_cache_key in analysis_cache:
                 # 使用缓存的集群分析结果
-                cluster_result = self.analysis_cache[cluster_cache_key]["cluster_result"]
+                cluster_result = analysis_cache[cluster_cache_key]["cluster_result"]
                 self._show_cluster_page(call, cache_key, cluster_result, page)
             else:
                 # 需要重新运行集群分析
@@ -519,11 +487,11 @@ class HoldingAnalysisHandler:
         """处理集群分析逻辑"""
         try:
             # 从缓存中获取分析结果
-            if cache_key not in self.analysis_cache:
+            if cache_key not in analysis_cache:
                 self.bot.answer_callback_query(call.id, "❌ 数据缓存已失效，请重新运行 /ca1 命令")
                 return
 
-            cached_data = self.analysis_cache[cache_key]
+            cached_data = analysis_cache[cache_key]
             result = cached_data["result"]
             token_address = cached_data["token_address"]
 
@@ -573,7 +541,7 @@ class HoldingAnalysisHandler:
             
             # 缓存集群分析结果
             cluster_cache_key = f"{cache_key}_clusters"
-            self.analysis_cache[cluster_cache_key] = {
+            analysis_cache[cluster_cache_key] = {
                 "cluster_result": cluster_result,
                 "timestamp": time.time(),
             }
@@ -674,11 +642,11 @@ class HoldingAnalysisHandler:
         """处理代币详情查看逻辑"""
         try:
             # 从缓存中获取分析结果
-            if cache_key not in self.analysis_cache:
+            if cache_key not in analysis_cache:
                 self._show_reanalyze_option(call, cache_key)
                 return
 
-            cached_data = self.analysis_cache[cache_key]
+            cached_data = analysis_cache[cache_key]
             result = cached_data["result"]
 
             # 检查缓存是否过期
@@ -762,11 +730,11 @@ class HoldingAnalysisHandler:
             print(f"代币排名分析回调: cache_key={cache_key}")
             
             # 从缓存中获取分析结果
-            if cache_key not in self.analysis_cache:
+            if cache_key not in analysis_cache:
                 self.bot.answer_callback_query(call.id, "❌ 数据缓存已失效，请重新运行 /ca1 命令")
                 return
 
-            cached_data = self.analysis_cache[cache_key]
+            cached_data = analysis_cache[cache_key]
             result = cached_data["result"]
             token_address = cached_data["token_address"]
 
@@ -818,7 +786,7 @@ class HoldingAnalysisHandler:
             if ranking_result and ranking_result.get("rankings"):
                 # 缓存排名分析结果
                 ranking_cache_key = f"{cache_key}_rankings"
-                self.analysis_cache[ranking_cache_key] = {
+                analysis_cache[ranking_cache_key] = {
                     "ranking_result": ranking_result,
                     "timestamp": time.time(),
                 }
@@ -945,11 +913,11 @@ class HoldingAnalysisHandler:
             
             # 从缓存中获取排名分析结果
             ranking_cache_key = f"{cache_key}_rankings"
-            if ranking_cache_key not in self.analysis_cache:
+            if ranking_cache_key not in analysis_cache:
                 self.bot.answer_callback_query(call.id, "❌ 排名数据缓存已失效，请重新运行排名分析")
                 return
 
-            cached_data = self.analysis_cache[ranking_cache_key]
+            cached_data = analysis_cache[ranking_cache_key]
             ranking_result = cached_data["ranking_result"]
             
             # 检查缓存是否过期
