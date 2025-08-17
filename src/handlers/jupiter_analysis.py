@@ -102,20 +102,23 @@ class JupiterAnalysisHandler:
         
         processing_msg = self.bot.reply_to(message, start_msg)
         
+        # 保存原始消息的thread_id用于后续回复
+        original_thread_id = message.message_thread_id
+        
         # 启动分析线程
-        self._start_analysis_thread(chat_id, processing_msg, token_count)
+        self._start_analysis_thread(chat_id, processing_msg, token_count, original_thread_id)
     
-    def _start_analysis_thread(self, chat_id: str, processing_msg, token_count: int):
+    def _start_analysis_thread(self, chat_id: str, processing_msg, token_count: int, thread_id=None):
         """启动分析线程"""
         thread = threading.Thread(
             target=self._run_jupiter_analysis,
-            args=(chat_id, processing_msg, token_count),
+            args=(chat_id, processing_msg, token_count, thread_id),
             daemon=True
         )
         thread.start()
         self.analysis_threads[chat_id] = thread
     
-    def _run_jupiter_analysis(self, chat_id: str, processing_msg, token_count: int):
+    def _run_jupiter_analysis(self, chat_id: str, processing_msg, token_count: int, thread_id=None):
         """运行Jupiter分析"""
         try:
             # 初始化状态
@@ -183,7 +186,7 @@ class JupiterAnalysisHandler:
                     
                     # 执行OKX大户分析
                     success = self._analyze_single_token(
-                        chat_id, token_address, i, actual_count
+                        chat_id, token_address, i, actual_count, thread_id
                     )
                     
                     if success:
@@ -318,7 +321,7 @@ class JupiterAnalysisHandler:
             return ""
     
     def _analyze_single_token(self, chat_id: str, token_address: str, 
-                            current: int, total: int) -> bool:
+                            current: int, total: int, thread_id=None) -> bool:
         """分析单个代币"""
         try:
             # 创建OKX爬虫
@@ -331,10 +334,23 @@ class JupiterAnalysisHandler:
             )
             
             if result and result.get("token_statistics"):
-                # 格式化分析结果 - 传递token_statistics部分而不是整个result
+                # 创建cache_key用于生成分析按钮 - 和ca1命令使用相同的格式
+                cache_key = f"cajup_{token_address}_{int(time.time())}"
+                
+                # 存储分析结果到缓存中，以便按钮回调使用
+                from ..services.okx_crawler import analysis_cache
+                analysis_cache[cache_key] = {
+                    'result': result,
+                    'timestamp': time.time(),
+                    'token_address': token_address,
+                    'source': 'jupiter'
+                }
+                
+                # 格式化分析结果 - 传递token_statistics部分和cache_key
                 table_msg, table_markup = format_tokens_table(
                     result["token_statistics"], 
-                    sort_by="count"
+                    sort_by="count",
+                    cache_key=cache_key  # 重要：提供cache_key生成分析按钮
                 )
                 
                 if table_msg:
@@ -353,13 +369,14 @@ class JupiterAnalysisHandler:
                     if cross_holding_info:
                         final_msg += f"\n{cross_holding_info}"
                     
-                    # 发送分析结果
+                    # 发送分析结果到topic（如果有的话）
                     self.bot.send_message(
                         chat_id,
                         final_msg,
                         parse_mode="HTML",
                         reply_markup=table_markup,
-                        disable_web_page_preview=True
+                        disable_web_page_preview=True,
+                        message_thread_id=thread_id  # 重要：使用原始消息的thread_id
                     )
                     
                     return True
