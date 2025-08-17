@@ -57,6 +57,18 @@ class CapumpConfig:
     notification_enabled: bool = True
 
 
+@dataclass  
+class JupiterConfig:
+    """Jupiter分析配置"""
+    
+    max_mcap: int = 1000000
+    min_token_age: int = 3600
+    has_socials: bool = True
+    period: str = "24h"
+    max_tokens_per_analysis: int = 50
+    default_token_count: int = 10
+
+
 class ConfigManager:
     """配置管理器"""
 
@@ -66,6 +78,7 @@ class ConfigManager:
         self._analysis_config = None
         self._proxy_config = None
         self._capump_config = None
+        self._jupiter_config = None
         self._ca1_allowed_groups = []
         self.load_config()
 
@@ -120,6 +133,15 @@ class ConfigManager:
             notification_enabled=os.getenv("CAPUMP_NOTIFICATION", "true").lower() == "true",
         )
 
+        self._jupiter_config = JupiterConfig(
+            max_mcap=int(os.getenv("JUPITER_MAX_MCAP", 1000000)),
+            min_token_age=int(os.getenv("JUPITER_MIN_TOKEN_AGE", 3600)),
+            has_socials=os.getenv("JUPITER_HAS_SOCIALS", "true").lower() == "true",
+            period=os.getenv("JUPITER_PERIOD", "24h"),
+            max_tokens_per_analysis=int(os.getenv("JUPITER_MAX_TOKENS_PER_ANALYSIS", 50)),
+            default_token_count=int(os.getenv("JUPITER_DEFAULT_TOKEN_COUNT", 10)),
+        )
+
     def _load_from_file(self):
         """从文件加载配置"""
         try:
@@ -150,6 +172,14 @@ class ConfigManager:
                         if hasattr(self._capump_config, key):
                             setattr(self._capump_config, key, value)
             
+            # 更新jupiter配置
+            if "jupiter" in config_data:
+                jupiter_data = config_data["jupiter"]
+                if hasattr(self._jupiter_config, "__dict__"):
+                    for key, value in jupiter_data.items():
+                        if hasattr(self._jupiter_config, key):
+                            setattr(self._jupiter_config, key, value)
+            
             # 加载ca1允许的群组列表
             if "ca1_allowed_groups" in config_data:
                 self._ca1_allowed_groups = config_data["ca1_allowed_groups"]
@@ -177,12 +207,16 @@ class ConfigManager:
         if not self._capump_config:
             self._capump_config = CapumpConfig()
 
+        if not self._jupiter_config:
+            self._jupiter_config = JupiterConfig()
+
     def save_config(self):
         """保存配置到文件"""
         config_data = {
             "bot": self._bot_config.__dict__,
             "analysis": self._analysis_config.__dict__,
             "capump": self._capump_config.__dict__,
+            "jupiter": self._jupiter_config.__dict__,
             "ca1_allowed_groups": self._ca1_allowed_groups,
             "proxy": self._proxy_config.__dict__,
         }
@@ -210,6 +244,10 @@ class ConfigManager:
         return self._capump_config
 
     @property
+    def jupiter(self) -> JupiterConfig:
+        return self._jupiter_config
+
+    @property
     def ca1_allowed_groups(self) -> list:
         """获取允许使用 /ca1 命令的群组列表"""
         return self._ca1_allowed_groups
@@ -228,6 +266,10 @@ class ConfigManager:
             for key, value in kwargs.items():
                 if hasattr(self._capump_config, key):
                     setattr(self._capump_config, key, value)
+        elif section == "jupiter":
+            for key, value in kwargs.items():
+                if hasattr(self._jupiter_config, key):
+                    setattr(self._jupiter_config, key, value)
         elif section == "proxy":
             for key, value in kwargs.items():
                 if hasattr(self._proxy_config, key):

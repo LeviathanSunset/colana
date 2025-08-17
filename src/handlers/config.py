@@ -65,15 +65,24 @@ class ConfigCommandHandler:
             "cluster_min_addresses": ("analysis", "集群最小地址数"),
             "cluster_max_addresses": ("analysis", "集群最大地址数"),
             "clusters_per_page": ("analysis", "每页集群数"),
+            "jupiter_max_mcap": ("jupiter", "最大市值（美元）"),
+            "jupiter_min_token_age": ("jupiter", "最小代币年龄（秒）"),
+            "jupiter_default_token_count": ("jupiter", "默认分析数量"),
+            "jupiter_max_tokens_per_analysis": ("jupiter", "最大分析数量"),
         }
 
         if key in config_map:
             section, description = config_map[key]
+            # 处理特殊的Jupiter参数名转换
+            config_key = key
+            if key.startswith("jupiter_"):
+                config_key = key.replace("jupiter_", "")
+            
             msg = self.bot.send_message(
                 call.message.chat.id, f"请输入新的 <b>{description}</b>：", parse_mode="HTML"
             )
             self.bot.register_next_step_handler(
-                msg, lambda m: self._save_config_value(m, section, key)
+                msg, lambda m: self._save_config_value(m, section, config_key)
             )
 
         self.bot.answer_callback_query(call.id)
@@ -94,6 +103,10 @@ class ConfigCommandHandler:
                 "cluster_min_addresses",
                 "cluster_max_addresses",
                 "clusters_per_page",
+                "max_mcap",
+                "min_token_age",
+                "default_token_count",
+                "max_tokens_per_analysis",
             ]:
                 value = int(value)
             elif key in ["threshold", "min_market_cap"]:
@@ -335,18 +348,37 @@ class ConfigCommandHandler:
 
     def handle_jup_analysis_config(self, call: CallbackQuery) -> None:
         """处理Jupiter分析配置页面"""
+        config = self.config.jupiter
+        
         response = (
             "🪐 <b>Jupiter分析配置</b>\n\n"
-            "Jupiter分析功能用于分析DEX交易数据和流动性信息。\n\n"
-            "📊 功能包括:\n"
-            "• 代币交易量分析\n"
-            "• 流动性池信息\n"
-            "• 价格影响计算\n"
-            "• 交易路径优化\n\n"
-            "💡 使用命令 /cajup <code>[代币地址]</code> 进行分析"
+            "Jupiter分析功能用于爬取Jupiter DEX热门代币数据并进行批量分析。\n\n"
+            "📊 <b>当前配置</b>:\n"
+            f"💰 最大市值: <code>${config.max_mcap:,}</code>\n"
+            f"⏰ 最小代币年龄: <code>{config.min_token_age}</code> 秒\n"
+            f"📱 需要社交信息: <code>{'✅ 是' if config.has_socials else '❌ 否'}</code>\n"
+            f"📅 统计周期: <code>{config.period}</code>\n"
+            f"🔢 默认分析数量: <code>{config.default_token_count}</code> 个\n"
+            f"📊 最大分析数量: <code>{config.max_tokens_per_analysis}</code> 个\n\n"
+            "💡 使用命令 /cajup <code>[数量]</code> 进行批量分析"
         )
         
-        keyboard = InlineKeyboardMarkup()
+        keyboard = InlineKeyboardMarkup(row_width=2)
+        keyboard.add(
+            InlineKeyboardButton("💰 最大市值", callback_data="edit_jupiter_max_mcap"),
+            InlineKeyboardButton("⏰ 最小年龄", callback_data="edit_jupiter_min_token_age"),
+        )
+        keyboard.add(
+            InlineKeyboardButton("📅 统计周期", callback_data="edit_jupiter_period"),
+            InlineKeyboardButton("🔢 默认数量", callback_data="edit_jupiter_default_token_count"),
+        )
+        keyboard.add(
+            InlineKeyboardButton("📊 最大数量", callback_data="edit_jupiter_max_tokens_per_analysis"),
+            InlineKeyboardButton(
+                f"📱 社交信息 {'✅' if config.has_socials else '❌'}", 
+                callback_data="toggle_jupiter_has_socials"
+            ),
+        )
         keyboard.add(InlineKeyboardButton("⬅️ 返回主菜单", callback_data="back_to_config"))
         
         self.bot.edit_message_text(
@@ -357,6 +389,44 @@ class ConfigCommandHandler:
             reply_markup=keyboard,
         )
         self.bot.answer_callback_query(call.id)
+
+    def handle_edit_jupiter_period(self, call: CallbackQuery) -> None:
+        """处理Jupiter周期编辑"""
+        periods = ["24h", "7d", "30d"]
+        current_period = self.config.jupiter.period
+        
+        response = f"📅 <b>选择统计周期</b>\n\n当前周期: <code>{current_period}</code>"
+        
+        keyboard = InlineKeyboardMarkup()
+        for period in periods:
+            text = f"{'✅ ' if period == current_period else ''}{period}"
+            keyboard.add(InlineKeyboardButton(text, callback_data=f"set_jupiter_period_{period}"))
+        keyboard.add(InlineKeyboardButton("⬅️ 返回Jupiter配置", callback_data="config_jup_analysis"))
+        
+        self.bot.edit_message_text(
+            response,
+            call.message.chat.id,
+            call.message.message_id,
+            parse_mode="HTML",
+            reply_markup=keyboard,
+        )
+        self.bot.answer_callback_query(call.id)
+
+    def handle_set_jupiter_period(self, call: CallbackQuery) -> None:
+        """设置Jupiter周期"""
+        period = call.data.replace("set_jupiter_period_", "")
+        self.config.update_config("jupiter", period=period)
+        
+        # 返回Jupiter配置页面
+        self.handle_jup_analysis_config(call)
+
+    def handle_toggle_jupiter_has_socials(self, call: CallbackQuery) -> None:
+        """切换Jupiter社交信息要求"""
+        current_status = self.config.jupiter.has_socials
+        self.config.update_config("jupiter", has_socials=not current_status)
+        
+        # 刷新页面
+        self.handle_jup_analysis_config(call)
 
     def handle_capump_config(self, call: CallbackQuery) -> None:
         """处理Capump配置页面"""
@@ -633,6 +703,18 @@ class ConfigCommandHandler:
         @self.bot.callback_query_handler(func=lambda call: call.data == "config_jup_analysis")
         def jup_analysis_config_handler(call):
             self.handle_jup_analysis_config(call)
+
+        @self.bot.callback_query_handler(func=lambda call: call.data == "edit_jupiter_period")
+        def edit_jupiter_period_handler(call):
+            self.handle_edit_jupiter_period(call)
+
+        @self.bot.callback_query_handler(func=lambda call: call.data.startswith("set_jupiter_period_"))
+        def set_jupiter_period_handler(call):
+            self.handle_set_jupiter_period(call)
+
+        @self.bot.callback_query_handler(func=lambda call: call.data == "toggle_jupiter_has_socials")
+        def toggle_jupiter_has_socials_handler(call):
+            self.handle_toggle_jupiter_has_socials(call)
 
         @self.bot.callback_query_handler(func=lambda call: call.data == "config_capump")
         def capump_config_handler(call):
