@@ -23,7 +23,7 @@ except ImportError:
 try:
     from ..services.okx_crawler import (
         OKXCrawlerForBot, 
-        format_tokens_table,
+        format_tokens_table_for_cajup,
         analyze_address_clusters,
         format_cluster_analysis, 
         analyze_target_token_rankings,
@@ -356,8 +356,8 @@ class JupiterAnalysisHandler(BaseCommandHandler):
                     'source': 'jupiter'
                 }
                 
-                # 格式化分析结果 - 使用与ca1相同的完整格式
-                table_msg, table_markup = format_tokens_table(
+                # 格式化分析结果 - 使用与ca1相同的完整格式，但使用cajup专用的回调前缀
+                table_msg, table_markup = format_tokens_table_for_cajup(
                     result["token_statistics"], 
                     sort_by="count",
                     cache_key=cache_key
@@ -498,25 +498,10 @@ class JupiterAnalysisHandler(BaseCommandHandler):
         def cajup_callback_handler(call):
             self.handle_cajup_callback(call)
             
-        # 代币详情按钮回调处理（专门为cajup分析结果生成的token_detail按钮）
-        @self.bot.callback_query_handler(func=lambda call: call.data.startswith("token_detail_") and self._is_cajup_token_detail(call.data))
+        # 代币详情按钮回调处理（cajup专用）
+        @self.bot.callback_query_handler(func=lambda call: call.data.startswith("cajup_token_detail_"))
         def cajup_token_detail_handler(call):
             self.handle_cajup_token_detail(call)
-    
-    def _is_cajup_token_detail(self, callback_data: str) -> bool:
-        """检查是否是cajup分析结果的代币详情按钮"""
-        try:
-            # 提取cache_key并检查是否在cajup的缓存中
-            parts = callback_data[len("token_detail_"):].split("_")
-            if len(parts) < 3:
-                return False
-            cache_key = "_".join(parts[:-2])
-            
-            # 检查cache_key是否存在于analysis_cache中
-            from ..services.okx_crawler import analysis_cache
-            return cache_key in analysis_cache
-        except Exception:
-            return False
     
     def handle_cajup_callback(self, call):
         """处理cajup回调"""
@@ -563,7 +548,7 @@ class JupiterAnalysisHandler(BaseCommandHandler):
             token_address = cached_data['token_address']
             
             # 重新格式化表格
-            table_msg, table_markup = format_tokens_table(
+            table_msg, table_markup = format_tokens_table_for_cajup(
                 result["token_statistics"],
                 sort_by=sort_type,
                 cache_key=cache_key
@@ -1053,8 +1038,8 @@ class JupiterAnalysisHandler(BaseCommandHandler):
     def handle_cajup_token_detail(self, call):
         """处理cajup代币详情回调"""
         try:
-            # 解析回调数据: token_detail_{cache_key}_{token_index}_{sort_by}
-            parts = call.data[len("token_detail_"):].split("_")
+            # 解析回调数据: cajup_token_detail_{cache_key}_{token_index}_{sort_by}
+            parts = call.data[len("cajup_token_detail_"):].split("_")
             if len(parts) < 3:
                 self.bot.answer_callback_query(call.id, "❌ 回调数据格式错误")
                 return

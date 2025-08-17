@@ -1129,6 +1129,133 @@ def analyze_address_clusters(analysis_result: Dict) -> Dict:
     return cluster_result
 
 
+def format_tokens_table_for_cajup(
+    token_stats: Dict, max_tokens: int = None, sort_by: str = "value", cache_key: str = None
+) -> tuple:
+    """
+    专门为cajup格式化代币统计表格，使用cajup专用的回调前缀
+    
+    Args:
+        token_stats: 代币统计数据
+        max_tokens: 显示的最大代币数量 (如果为None，从配置文件读取)
+        sort_by: 排序方式 ('value' 按总价值, 'count' 按持有人数)
+        cache_key: 缓存键，用于生成详情按钮
+
+    Returns:
+        tuple: (消息文本, 按钮markup对象)
+    """
+    # 如果没有提供参数，从配置文件获取
+    if max_tokens is None:
+        try:
+            from ..core.config import get_config
+
+            config = get_config()
+            max_tokens = config.analysis.ranking_size
+        except ImportError:
+            max_tokens = 30  # 回退到默认值
+
+    # 获取详情按钮数量配置
+    detail_buttons_count = max_tokens  # 默认与排行榜大小相同
+    try:
+        from ..core.config import get_config
+
+        config = get_config()
+        detail_buttons_count = config.analysis.detail_buttons_count
+    except ImportError:
+        pass
+    if not token_stats or not token_stats.get("top_tokens_by_value"):
+        return "❌ 未找到代币数据", None
+
+    # 根据排序方式重新排序
+    all_tokens = token_stats["top_tokens_by_value"]
+    if sort_by == "count":
+        sorted_tokens = sorted(all_tokens, key=lambda x: x["holder_count"], reverse=True)
+        sort_desc = "按持有人数排序"
+        sort_icon = "👥"
+    else:
+        sorted_tokens = sorted(all_tokens, key=lambda x: x["total_value"], reverse=True)
+        sort_desc = "按总价值排序"
+        sort_icon = "💰"
+
+    sorted_tokens = sorted_tokens[:max_tokens]
+    total_portfolio_value = token_stats.get("total_portfolio_value", 0)
+    total_unique_tokens = token_stats.get("total_unique_tokens", 0)
+
+    # 构建表格
+    msg = f"🔥 <b>大户热门代币排行榜</b> ({sort_icon} {sort_desc})\n"
+    msg += f"💰 总资产: <b>${total_portfolio_value:,.0f}</b>\n"
+    msg += f"🔢 代币种类: <b>{total_unique_tokens}</b>\n"
+    msg += "─" * 35 + "\n"
+
+    # 创建按钮布局
+    markup = None
+    detail_buttons = []
+
+    # 为前10个代币创建详情按钮
+    if cache_key:
+        try:
+            # 尝试导入telebot
+            from telebot import types
+
+            markup = types.InlineKeyboardMarkup()
+        except ImportError:
+            # 如果telebot不可用，返回None
+            markup = None
+
+    for i, token in enumerate(sorted_tokens, 1):
+        symbol = token["symbol"][:8]  # 限制长度
+        value = token["total_value"]
+        count = token["holder_count"]
+        token_address = token.get("address", "")
+
+        # 格式化价值
+        if value >= 1_000_000:
+            value_str = f"${value/1_000_000:.1f}M"
+        elif value >= 1_000:
+            value_str = f"${value/1_000:.1f}K"
+        else:
+            value_str = f"${value:.0f}"
+
+        # 为代币名称添加超链接
+        if token_address:
+            gmgn_token_link = f"https://gmgn.ai/sol/token/{token_address}"
+            symbol_with_link = f"<a href='{gmgn_token_link}'>{symbol}</a>"
+        else:
+            symbol_with_link = symbol
+
+        if sort_by == "count":
+            # 按持有人数排序时，突出显示人数
+            msg += f"<b>{i:2d}.</b> {symbol_with_link} <b>({count}人)</b> {value_str}\n"
+        else:
+            # 按价值排序时，突出显示价值
+            msg += f"<b>{i:2d}.</b> {symbol_with_link} <b>{value_str}</b> ({count}人)\n"
+
+        # 为代币添加详情按钮 - 使用cajup专用前缀
+        if i <= detail_buttons_count and cache_key and markup:
+            button_text = f"{i}. {symbol}"
+            # 使用cajup专用的回调前缀
+            callback_data = f"cajup_token_detail_{cache_key}_{i-1}_{sort_by}"
+            try:
+                from telebot import types
+
+                detail_buttons.append(
+                    types.InlineKeyboardButton(button_text, callback_data=callback_data)
+                )
+            except ImportError:
+                pass
+
+    # 添加代币详情按钮（每行3个）
+    if detail_buttons and cache_key:
+        msg += f"\n💡 <i>点击下方按钮查看前{min(detail_buttons_count, len(sorted_tokens))}个代币的大户详情</i>\n"
+
+        # 分行添加按钮，每行3个
+        for i in range(0, len(detail_buttons), 3):
+            row_buttons = detail_buttons[i : i + 3]
+            markup.add(*row_buttons)
+
+    return msg, markup
+
+
 def format_tokens_table(
     token_stats: Dict, max_tokens: int = None, sort_by: str = "value", cache_key: str = None
 ) -> tuple:
