@@ -422,6 +422,7 @@ class JupiterAnalysisHandler(BaseCommandHandler):
                     self.send_to_topic(
                         chat_id,
                         final_msg,
+                        thread_id=thread_id,
                         parse_mode="HTML",
                         reply_markup=table_markup,
                         disable_web_page_preview=True
@@ -489,7 +490,7 @@ class JupiterAnalysisHandler(BaseCommandHandler):
     
     def register_handlers(self) -> None:
         """注册处理器"""
-        @self.bot.message_handler(commands=["cajup"])
+        @self.bot.message_handler(commands=["cajup", "jupca"])
         def cajup_handler(message):
             self.handle_cajup(message)
         
@@ -628,21 +629,64 @@ class JupiterAnalysisHandler(BaseCommandHandler):
                 return
                 
             result = cached_data['result']
+            token_address = cached_data['token_address']
+            
+            # 获取目标代币信息
+            target_token_info = None
+            for token in result["token_statistics"]["top_tokens_by_value"]:
+                if token.get("address") == token_address:
+                    target_token_info = token
+                    break
+            
+            target_symbol = target_token_info.get("symbol", "Unknown") if target_token_info else "Unknown"
+
+            # 显示正在分析的消息
+            self.bot.edit_message_text(
+                f"🎯 正在进行地址集群分析...\n代币: <b>{target_symbol}</b> (<code>{token_address}</code>)\n⏳ 分析大户间的共同投资模式...",
+                call.message.chat.id,
+                call.message.message_id,
+                parse_mode="HTML",
+            )
             
             # 执行集群分析
             clusters = analyze_address_clusters(result)
             cluster_msg = format_cluster_analysis(clusters, page=0)
             
             if cluster_msg:
-                self.bot.answer_callback_query(call.id, "🎯 集群分析完成")
-                self.bot.send_message(
-                    call.message.chat.id,
-                    cluster_msg,
-                    parse_mode="HTML",
-                    disable_web_page_preview=True,
-                    message_thread_id=getattr(call.message, "message_thread_id", None)
+                # 创建返回按钮
+                markup = InlineKeyboardMarkup()
+                markup.add(
+                    InlineKeyboardButton("⬅️ 返回代币排行", callback_data=f"cajup_sort_count_{cache_key}"),
+                    InlineKeyboardButton("🔄 重新运行", callback_data=f"cajup_cluster_{cache_key}"),
                 )
+                
+                # 编辑原消息显示集群分析结果
+                self.bot.edit_message_text(
+                    cluster_msg,
+                    call.message.chat.id,
+                    call.message.message_id,
+                    parse_mode="HTML",
+                    reply_markup=markup,
+                    disable_web_page_preview=True,
+                )
+                self.bot.answer_callback_query(call.id, "🎯 集群分析完成")
             else:
+                # 显示未发现集群的消息
+                error_msg = f"❌ 未发现明显的地址集群\n代币: <b>{target_symbol}</b> (<code>{token_address}</code>)\n\n"
+                error_msg += "💡 可能原因:\n• 数据不足以形成集群\n• 地址数据处理错误\n• 配置参数过于严格"
+                
+                markup = InlineKeyboardMarkup()
+                markup.add(
+                    InlineKeyboardButton("⬅️ 返回代币排行", callback_data=f"cajup_sort_count_{cache_key}")
+                )
+                
+                self.bot.edit_message_text(
+                    error_msg,
+                    call.message.chat.id,
+                    call.message.message_id,
+                    parse_mode="HTML",
+                    reply_markup=markup,
+                )
                 self.bot.answer_callback_query(call.id, "❌ 未发现明显的地址集群")
                 
         except Exception as e:
@@ -671,20 +715,66 @@ class JupiterAnalysisHandler(BaseCommandHandler):
             result = cached_data['result']
             token_address = cached_data['token_address']
             
+            # 获取目标代币信息
+            target_token_info = None
+            for token in result["token_statistics"]["top_tokens_by_value"]:
+                if token.get("address") == token_address:
+                    target_token_info = token
+                    break
+            
+            target_symbol = target_token_info.get("symbol", "Unknown") if target_token_info else "Unknown"
+
+            # 显示正在分析的消息
+            self.bot.edit_message_text(
+                f"📊 正在进行代币排名分析...\n代币: <b>{target_symbol}</b> (<code>{token_address}</code>)\n⏳ 分析目标代币在各大户钱包中的排名...",
+                call.message.chat.id,
+                call.message.message_id,
+                parse_mode="HTML",
+            )
+            
             # 执行排名分析
-            rankings = analyze_target_token_rankings(result, token_address)
-            ranking_msg = format_target_token_rankings(rankings, token_address)
+            original_holders = result.get("original_holders_data", [])
+            rankings = analyze_target_token_rankings(result, original_holders)
+            ranking_msg = format_target_token_rankings(rankings)
             
             if ranking_msg:
-                self.bot.answer_callback_query(call.id, "📊 排名分析完成")
-                self.bot.send_message(
-                    call.message.chat.id,
-                    ranking_msg,
-                    parse_mode="HTML",
-                    disable_web_page_preview=True,
-                    message_thread_id=getattr(call.message, "message_thread_id", None)
+                # 创建返回按钮
+                markup = InlineKeyboardMarkup()
+                markup.add(
+                    InlineKeyboardButton("⬅️ 返回代币排行", callback_data=f"cajup_sort_count_{cache_key}"),
+                    InlineKeyboardButton("🎯 地址集群分析", callback_data=f"cajup_cluster_{cache_key}")
                 )
+                markup.add(
+                    InlineKeyboardButton("🔄 重新运行", callback_data=f"cajup_ranking_{cache_key}")
+                )
+                
+                # 编辑原消息显示排名分析结果
+                self.bot.edit_message_text(
+                    ranking_msg,
+                    call.message.chat.id,
+                    call.message.message_id,
+                    parse_mode="HTML",
+                    reply_markup=markup,
+                    disable_web_page_preview=True,
+                )
+                self.bot.answer_callback_query(call.id, "📊 排名分析完成")
             else:
+                # 显示分析失败的消息
+                error_msg = f"❌ 排名分析数据不足\n代币: <b>{target_symbol}</b> (<code>{token_address}</code>)\n\n"
+                error_msg += "💡 可能原因:\n• 没有大户持有目标代币\n• 数据不足以进行排名分析"
+                
+                markup = InlineKeyboardMarkup()
+                markup.add(
+                    InlineKeyboardButton("⬅️ 返回代币排行", callback_data=f"cajup_sort_count_{cache_key}")
+                )
+                
+                self.bot.edit_message_text(
+                    error_msg,
+                    call.message.chat.id,
+                    call.message.message_id,
+                    parse_mode="HTML",
+                    reply_markup=markup,
+                )
                 self.bot.answer_callback_query(call.id, "❌ 排名分析数据不足")
                 
         except Exception as e:

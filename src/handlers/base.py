@@ -34,9 +34,11 @@ class BaseCommandHandler:
             # 如果不在topic中，使用普通回复
             return self.bot.reply_to(message, text, **kwargs)
 
-    def send_to_topic(self, chat_id: str, text: str, **kwargs):
+    def send_to_topic(self, chat_id: str, text: str, thread_id=None, **kwargs):
         """统一的发送方法，确保消息发送到正确的topic"""
-        if self.config.bot.message_thread_id:
+        if thread_id:
+            kwargs['message_thread_id'] = thread_id
+        elif self.config.bot.message_thread_id:
             kwargs['message_thread_id'] = self.config.bot.message_thread_id
         return self.bot.send_message(
             chat_id=chat_id,
