@@ -12,6 +12,7 @@ from typing import List, Dict, Optional, Any
 from datetime import datetime
 from ..models import TokenInfo
 from ..utils import safe_float, safe_int, calculate_age_days
+from ..utils.data_manager import DataManager
 
 
 class BaseCrawler:
@@ -19,6 +20,7 @@ class BaseCrawler:
 
     def __init__(self):
         self.tokens_data: List[Dict[str, Any]] = []
+        self.data_manager = DataManager()
         self.headers = {
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36"
         }
@@ -73,13 +75,13 @@ class BaseCrawler:
             return
 
         if filename is None:
-            os.makedirs("data/snapshots", exist_ok=True)
-            filename = f"data/snapshots/tokens_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
+            filename = f"tokens_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
 
         try:
-            with open(filename, "w", encoding="utf-8") as f:
+            filepath = self.data_manager.get_file_path("csv_data", filename)
+            with open(filepath, "w", encoding="utf-8") as f:
                 json.dump(self.tokens_data, f, ensure_ascii=False, indent=2)
-            print(f"数据已保存到 {filename}")
+            print(f"数据已保存到 {filepath}")
         except Exception as e:
             print(f"保存JSON失败: {e}")
 

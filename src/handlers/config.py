@@ -30,30 +30,21 @@ class ConfigCommandHandler:
         """创建配置键盘"""
         keyboard = InlineKeyboardMarkup(row_width=2)
 
-        # 主要功能设置 - 两个并列按钮
+        # 主要功能模块 - 6个核心功能按钮
         keyboard.add(
-            InlineKeyboardButton("🔍 自动警报配置", callback_data="config_auto_alert"),
-            InlineKeyboardButton("🚀 Capump配置", callback_data="config_capump"),
+            InlineKeyboardButton("� 泵检警报", callback_data="config_pump_alert"),
+            InlineKeyboardButton("🤖 自动泵检分析", callback_data="config_auto_pump_analysis"),
+        )
+        keyboard.add(
+            InlineKeyboardButton("� 持有者分析", callback_data="config_holder_analysis"),
+            InlineKeyboardButton("🪐 Jupiter分析", callback_data="config_jup_analysis"),
         )
 
-        # 监控设置
+        # 存储管理和黑名单管理
         keyboard.add(
-            InlineKeyboardButton("⏱️ 检查间隔", callback_data="edit_interval"),
-            InlineKeyboardButton("📈 涨幅阈值", callback_data="edit_threshold"),
+            InlineKeyboardButton("📁 存储管理", callback_data="storage_management"),
+            InlineKeyboardButton("🚫 黑名单管理", callback_data="blacklist_menu"),
         )
-        keyboard.add(
-            InlineKeyboardButton("💰 最小市值", callback_data="edit_min_market_cap"),
-            InlineKeyboardButton("📅 最小年龄", callback_data="edit_min_age_days"),
-        )
-
-        # 分析设置
-        keyboard.add(
-            InlineKeyboardButton("👥 大户数量", callback_data="edit_top_holders_count"),
-            InlineKeyboardButton("📊 排行榜大小", callback_data="edit_ranking_size"),
-        )
-
-        # 黑名单管理
-        keyboard.add(InlineKeyboardButton("🚫 黑名单管理", callback_data="blacklist_menu"))
 
         return keyboard
 
@@ -70,6 +61,10 @@ class ConfigCommandHandler:
             "top_holders_count": ("analysis", "大户数量"),
             "ranking_size": ("analysis", "排行榜大小"),
             "detail_buttons_count": ("analysis", "详情按钮数"),
+            "cluster_min_common_tokens": ("analysis", "集群最小通用代币数"),
+            "cluster_min_addresses": ("analysis", "集群最小地址数"),
+            "cluster_max_addresses": ("analysis", "集群最大地址数"),
+            "clusters_per_page": ("analysis", "每页集群数"),
         }
 
         if key in config_map:
@@ -95,6 +90,10 @@ class ConfigCommandHandler:
                 "top_holders_count",
                 "ranking_size",
                 "detail_buttons_count",
+                "cluster_min_common_tokens",
+                "cluster_min_addresses",
+                "cluster_max_addresses",
+                "clusters_per_page",
             ]:
                 value = int(value)
             elif key in ["threshold", "min_market_cap"]:
@@ -219,6 +218,146 @@ class ConfigCommandHandler:
         )
         self.bot.answer_callback_query(call.id)
 
+    def handle_pump_alert_config(self, call: CallbackQuery) -> None:
+        """处理泵检警报配置页面"""
+        config = self.config.bot
+        
+        response = (
+            "🔔 <b>泵检警报配置</b>\n\n"
+            f"⏱️ 检查间隔: <code>{config.interval}</code> 秒\n"
+            f"📈 涨幅阈值: <code>{config.threshold * 100:.1f}%</code>\n"
+            f"💰 最小市值: <code>${config.min_market_cap:,.0f}</code>\n"
+            f"📅 最小年龄: <code>{config.min_age_days}</code> 天\n"
+        )
+        
+        keyboard = InlineKeyboardMarkup(row_width=2)
+        keyboard.add(
+            InlineKeyboardButton("⏱️ 检查间隔", callback_data="edit_interval"),
+            InlineKeyboardButton("📈 涨幅阈值", callback_data="edit_threshold"),
+        )
+        keyboard.add(
+            InlineKeyboardButton("💰 最小市值", callback_data="edit_min_market_cap"),
+            InlineKeyboardButton("📅 最小年龄", callback_data="edit_min_age_days"),
+        )
+        keyboard.add(InlineKeyboardButton("⬅️ 返回主菜单", callback_data="back_to_config"))
+        
+        self.bot.edit_message_text(
+            response,
+            call.message.chat.id,
+            call.message.message_id,
+            parse_mode="HTML",
+            reply_markup=keyboard,
+        )
+        self.bot.answer_callback_query(call.id)
+
+    def handle_auto_pump_analysis_config(self, call: CallbackQuery) -> None:
+        """处理自动泵检分析配置页面"""
+        config = self.config.capump
+        
+        response = (
+            "🤖 <b>自动泵检分析配置</b>\n\n"
+            f"⏱️ 爬取间隔: <code>{config.interval}</code> 秒\n"
+            f"📈 涨幅阈值: <code>{config.threshold * 100:.1f}%</code>\n"
+            f"💰 最小市值: <code>${config.min_market_cap:,.0f}</code>\n"
+            f"📅 代币年龄: <code>{config.min_age_days}</code> 天\n"
+            f"🔔 自动分析: <code>{'✅ 已启用' if config.auto_analysis_enabled else '❌ 已禁用'}</code>\n"
+            f"🔢 批次大小: <code>{config.max_tokens_per_batch}</code> 个代币\n"
+        )
+        
+        keyboard = InlineKeyboardMarkup(row_width=2)
+        keyboard.add(
+            InlineKeyboardButton("⏱️ 爬取间隔", callback_data="edit_capump_interval"),
+            InlineKeyboardButton("📈 涨幅阈值", callback_data="edit_capump_threshold"),
+        )
+        keyboard.add(
+            InlineKeyboardButton("💰 最小市值", callback_data="edit_capump_min_market_cap"),
+            InlineKeyboardButton("📅 代币年龄", callback_data="edit_capump_min_age_days"),
+        )
+        keyboard.add(
+            InlineKeyboardButton("🔢 批次大小", callback_data="edit_capump_max_tokens_per_batch"),
+            InlineKeyboardButton(
+                f"🔔 自动分析 {'✅' if config.auto_analysis_enabled else '❌'}", 
+                callback_data="toggle_capump_auto_analysis"
+            ),
+        )
+        keyboard.add(InlineKeyboardButton("⬅️ 返回主菜单", callback_data="back_to_config"))
+        
+        self.bot.edit_message_text(
+            response,
+            call.message.chat.id,
+            call.message.message_id,
+            parse_mode="HTML",
+            reply_markup=keyboard,
+        )
+        self.bot.answer_callback_query(call.id)
+
+    def handle_holder_analysis_config(self, call: CallbackQuery) -> None:
+        """处理持有者分析配置页面"""
+        config = self.config.analysis
+        
+        response = (
+            "👥 <b>持有者分析配置</b>\n\n"
+            f"👥 大户数量: <code>{config.top_holders_count}</code>\n"
+            f"📊 排行榜大小: <code>{config.ranking_size}</code>\n"
+            f"🔘 详情按钮数: <code>{config.detail_buttons_count}</code>\n"
+            f"🔗 集群最小通用代币: <code>{config.cluster_min_common_tokens}</code>\n"
+            f"📊 集群最小地址数: <code>{config.cluster_min_addresses}</code>\n"
+            f"📊 集群最大地址数: <code>{config.cluster_max_addresses}</code>\n"
+            f"📄 每页集群数: <code>{config.clusters_per_page}</code>\n"
+        )
+        
+        keyboard = InlineKeyboardMarkup(row_width=2)
+        keyboard.add(
+            InlineKeyboardButton("👥 大户数量", callback_data="edit_top_holders_count"),
+            InlineKeyboardButton("📊 排行榜大小", callback_data="edit_ranking_size"),
+        )
+        keyboard.add(
+            InlineKeyboardButton("🔘 详情按钮数", callback_data="edit_detail_buttons_count"),
+            InlineKeyboardButton("🔗 集群最小通用代币", callback_data="edit_cluster_min_common_tokens"),
+        )
+        keyboard.add(
+            InlineKeyboardButton("📊 集群最小地址数", callback_data="edit_cluster_min_addresses"),
+            InlineKeyboardButton("📊 集群最大地址数", callback_data="edit_cluster_max_addresses"),
+        )
+        keyboard.add(
+            InlineKeyboardButton("📄 每页集群数", callback_data="edit_clusters_per_page"),
+        )
+        keyboard.add(InlineKeyboardButton("⬅️ 返回主菜单", callback_data="back_to_config"))
+        
+        self.bot.edit_message_text(
+            response,
+            call.message.chat.id,
+            call.message.message_id,
+            parse_mode="HTML",
+            reply_markup=keyboard,
+        )
+        self.bot.answer_callback_query(call.id)
+
+    def handle_jup_analysis_config(self, call: CallbackQuery) -> None:
+        """处理Jupiter分析配置页面"""
+        response = (
+            "🪐 <b>Jupiter分析配置</b>\n\n"
+            "Jupiter分析功能用于分析DEX交易数据和流动性信息。\n\n"
+            "📊 功能包括:\n"
+            "• 代币交易量分析\n"
+            "• 流动性池信息\n"
+            "• 价格影响计算\n"
+            "• 交易路径优化\n\n"
+            "💡 使用命令 /cajup <code>[代币地址]</code> 进行分析"
+        )
+        
+        keyboard = InlineKeyboardMarkup()
+        keyboard.add(InlineKeyboardButton("⬅️ 返回主菜单", callback_data="back_to_config"))
+        
+        self.bot.edit_message_text(
+            response,
+            call.message.chat.id,
+            call.message.message_id,
+            parse_mode="HTML",
+            reply_markup=keyboard,
+        )
+        self.bot.answer_callback_query(call.id)
+
     def handle_capump_config(self, call: CallbackQuery) -> None:
         """处理Capump配置页面"""
         config = self.config.capump
@@ -317,6 +456,119 @@ class ConfigCommandHandler:
             error_msg = self.formatter.format_error_message(f"❌ 保存配置失败: {str(e)}")
             self.bot.reply_to(message, error_msg, parse_mode="HTML")
 
+    def handle_storage_management(self, call: CallbackQuery) -> None:
+        """处理存储管理页面"""
+        try:
+            from ..utils.data_manager import get_storage_status
+            info = get_storage_status()
+            
+            response = "💾 <b>存储管理</b>\n\n"
+            response += f"📊 <b>存储统计</b>\n"
+            response += f"总文件数: <code>{info['total_files']}</code>\n"
+            response += f"总大小: <code>{info['total_size_mb']} MB</code>\n\n"
+            
+            response += "📁 <b>分类详情</b>\n"
+            for file_type, details in info["by_type"].items():
+                if details['count'] > 0:
+                    response += f"• {details['description']}: "
+                    response += f"<code>{details['count']}/{details['max_files']}</code> 个文件, "
+                    response += f"<code>{details['size_mb']} MB</code>\n"
+            
+            keyboard = InlineKeyboardMarkup(row_width=2)
+            keyboard.add(
+                InlineKeyboardButton("🗑️ 立即清理", callback_data="cleanup_storage"),
+                InlineKeyboardButton("📊 刷新状态", callback_data="storage_management"),
+            )
+            keyboard.add(InlineKeyboardButton("⬅️ 返回主菜单", callback_data="back_to_config"))
+            
+            self.bot.edit_message_text(
+                response,
+                call.message.chat.id,
+                call.message.message_id,
+                parse_mode="HTML",
+                reply_markup=keyboard,
+            )
+        except ImportError:
+            response = "❌ 存储管理功能不可用\n\n存储管理模块未正确加载"
+            keyboard = InlineKeyboardMarkup()
+            keyboard.add(InlineKeyboardButton("⬅️ 返回主菜单", callback_data="back_to_config"))
+            
+            self.bot.edit_message_text(
+                response,
+                call.message.chat.id,
+                call.message.message_id,
+                parse_mode="HTML",
+                reply_markup=keyboard,
+            )
+        except Exception as e:
+            response = f"❌ 获取存储信息失败: {str(e)}"
+            keyboard = InlineKeyboardMarkup()
+            keyboard.add(InlineKeyboardButton("⬅️ 返回主菜单", callback_data="back_to_config"))
+            
+            self.bot.edit_message_text(
+                response,
+                call.message.chat.id,
+                call.message.message_id,
+                parse_mode="HTML",
+                reply_markup=keyboard,
+            )
+        
+        self.bot.answer_callback_query(call.id)
+
+    def handle_cleanup_storage(self, call: CallbackQuery) -> None:
+        """处理存储清理"""
+        try:
+            from ..utils.data_manager import cleanup_storage, get_storage_status
+            
+            # 获取清理前状态
+            before_info = get_storage_status()
+            
+            # 执行清理
+            cleanup_storage()
+            
+            # 获取清理后状态
+            after_info = get_storage_status()
+            
+            # 计算清理效果
+            files_removed = before_info['total_files'] - after_info['total_files']
+            space_freed = before_info['total_size_mb'] - after_info['total_size_mb']
+            
+            response = "🗑️ <b>存储清理完成</b>\n\n"
+            response += f"删除文件数: <code>{files_removed}</code>\n"
+            response += f"释放空间: <code>{space_freed:.2f} MB</code>\n\n"
+            response += f"当前状态:\n"
+            response += f"• 总文件数: <code>{after_info['total_files']}</code>\n"
+            response += f"• 总大小: <code>{after_info['total_size_mb']} MB</code>\n"
+            
+            keyboard = InlineKeyboardMarkup(row_width=2)
+            keyboard.add(
+                InlineKeyboardButton("📊 查看详情", callback_data="storage_management"),
+                InlineKeyboardButton("⬅️ 返回主菜单", callback_data="back_to_config"),
+            )
+            
+            self.bot.edit_message_text(
+                response,
+                call.message.chat.id,
+                call.message.message_id,
+                parse_mode="HTML",
+                reply_markup=keyboard,
+            )
+            
+        except Exception as e:
+            response = f"❌ 存储清理失败: {str(e)}"
+            keyboard = InlineKeyboardMarkup()
+            keyboard.add(InlineKeyboardButton("⬅️ 返回主菜单", callback_data="back_to_config"))
+            
+            self.bot.edit_message_text(
+                response,
+                call.message.chat.id,
+                call.message.message_id,
+                parse_mode="HTML",
+                reply_markup=keyboard,
+            )
+            
+        self.bot.answer_callback_query(call.id)
+
     def handle_back_to_config(self, call: CallbackQuery) -> None:
         """返回配置菜单"""
         config_msg = self.formatter.format_config_message(self.config)
@@ -366,6 +618,22 @@ class ConfigCommandHandler:
         def auto_alert_config_handler(call):
             self.handle_auto_alert_config(call)
 
+        @self.bot.callback_query_handler(func=lambda call: call.data == "config_pump_alert")
+        def pump_alert_config_handler(call):
+            self.handle_pump_alert_config(call)
+
+        @self.bot.callback_query_handler(func=lambda call: call.data == "config_auto_pump_analysis")
+        def auto_pump_analysis_config_handler(call):
+            self.handle_auto_pump_analysis_config(call)
+
+        @self.bot.callback_query_handler(func=lambda call: call.data == "config_holder_analysis")
+        def holder_analysis_config_handler(call):
+            self.handle_holder_analysis_config(call)
+
+        @self.bot.callback_query_handler(func=lambda call: call.data == "config_jup_analysis")
+        def jup_analysis_config_handler(call):
+            self.handle_jup_analysis_config(call)
+
         @self.bot.callback_query_handler(func=lambda call: call.data == "config_capump")
         def capump_config_handler(call):
             self.handle_capump_config(call)
@@ -377,3 +645,11 @@ class ConfigCommandHandler:
         @self.bot.callback_query_handler(func=lambda call: call.data == "toggle_capump_auto_analysis")
         def toggle_capump_auto_analysis_handler(call):
             self.handle_toggle_capump_auto_analysis(call)
+
+        @self.bot.callback_query_handler(func=lambda call: call.data == "storage_management")
+        def storage_management_handler(call):
+            self.handle_storage_management(call)
+
+        @self.bot.callback_query_handler(func=lambda call: call.data == "cleanup_storage")
+        def cleanup_storage_handler(call):
+            self.handle_cleanup_storage(call)

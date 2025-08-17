@@ -9,6 +9,7 @@ import json
 import os
 from typing import List, Dict, Optional
 from datetime import datetime
+from ..utils.data_manager import DataManager
 
 
 class JupiterCrawler:
@@ -17,6 +18,7 @@ class JupiterCrawler:
     def __init__(self):
         self.base_url = "https://datapi.jup.ag"
         self.session = requests.Session()
+        self.data_manager = DataManager()
         self.session.headers.update({
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36',
             'Accept': 'application/json',
@@ -215,11 +217,8 @@ class JupiterCrawler:
                 timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
                 filename = f"jupiter_tokens_{timestamp}.json"
             
-            # 确保目录存在
-            data_dir = "data/jupiter"
-            os.makedirs(data_dir, exist_ok=True)
-            
-            filepath = os.path.join(data_dir, filename)
+            # 使用统一存储管理器
+            filepath = self.data_manager.get_file_path("jupiter", filename)
             
             with open(filepath, 'w', encoding='utf-8') as f:
                 json.dump(tokens, f, indent=2, ensure_ascii=False)

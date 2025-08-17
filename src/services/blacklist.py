@@ -6,13 +6,18 @@ import json
 import os
 from typing import List, Set
 from threading import Lock
+from ..utils.data_manager import DataManager
 
 
 class BlacklistManager:
     """黑名单管理器"""
 
-    def __init__(self, blacklist_file: str = "blacklist.json"):
-        self.blacklist_file = blacklist_file
+    def __init__(self, blacklist_file: str = None):
+        self.data_manager = DataManager()
+        if blacklist_file:
+            self.blacklist_file = blacklist_file
+        else:
+            self.blacklist_file = self.data_manager.get_file_path("config", "blacklist.json")
         self._blacklist: Set[str] = set()
         self._lock = Lock()
         self.load_blacklist()

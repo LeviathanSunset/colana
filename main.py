@@ -26,23 +26,21 @@ from src.handlers.jupiter_analysis import JupiterAnalysisHandler
 from src.handlers.auto_pump_analysis import AutoPumpAnalysisHandler
 from src.models import TokenInfo, PriceChangeResult
 from src.utils import format_number, format_percentage, chunk_list
+from src.utils.data_manager import DataManager
+from src.utils.data_manager import DataManager
 
 
 class TokenAnalysisBot:
     """代币分析机器人主类"""
     
     def __init__(self):
-        # 设置代理
+        """初始化分析机器人"""
+        self.config = get_config()
+        self.data_manager = DataManager()
         setup_proxy()
         
-        # 加载配置
-        self.config = get_config()
-        
-        # 初始化bot
+        # 初始化机器人
         self.bot = telebot.TeleBot(self.config.bot.telegram_token)
-        
-        # 初始化服务
-        self.formatter = MessageFormatter()
         
         # 初始化处理器
         self.base_handler = BaseCommandHandler(self.bot)
@@ -53,8 +51,6 @@ class TokenAnalysisBot:
         
         # 注册处理器
         self._register_handlers()
-        
-        print("✅ Bot 初始化完成")
     
     def _register_handlers(self):
         """注册所有处理器"""
@@ -167,26 +163,23 @@ class TokenAnalysisBot:
                 crawler.crawl_all_pages(max_tokens=1000)
                 crawler.deduplicate_by_mint(keep=1000)
                 
-                now_path = 'data/now.csv'
-                pre_path = 'data/pre.csv'
+                now_path = self.data_manager.get_file_path("csv_data", "now.csv")
+                pre_path = self.data_manager.get_file_path("csv_data", "pre.csv")
                 
-                # 确保数据目录存在
-                os.makedirs(os.path.dirname(now_path), exist_ok=True)
-                
-                crawler.save_to_csv(now_path)
+                crawler.save_to_csv(str(now_path))
                 
                 if not os.path.exists(pre_path):
-                    shutil.copy(now_path, pre_path)
+                    shutil.copy(str(now_path), str(pre_path))
                     print("📁 创建初始数据文件")
                 else:
                     # 分析价格变化
-                    results = self.compare_and_filter(pre_path, now_path)
+                    results = self.compare_and_filter(str(pre_path), str(now_path))
                     
                     if results:
                         # 计算时间差
-                        old_ts = datetime.fromtimestamp(os.path.getmtime(pre_path)).strftime('%Y-%m-%d %H:%M:%S')
-                        new_ts = datetime.fromtimestamp(os.path.getmtime(now_path)).strftime('%Y-%m-%d %H:%M:%S')
-                        mins = int((os.path.getmtime(now_path) - os.path.getmtime(pre_path)) / 60)
+                        old_ts = datetime.fromtimestamp(os.path.getmtime(str(pre_path))).strftime('%Y-%m-%d %H:%M:%S')
+                        new_ts = datetime.fromtimestamp(os.path.getmtime(str(now_path))).strftime('%Y-%m-%d %H:%M:%S')
+                        mins = int((os.path.getmtime(str(now_path)) - os.path.getmtime(str(pre_path))) / 60)
                         
                         # 更新时间跨度
                         for result in results:
@@ -196,7 +189,7 @@ class TokenAnalysisBot:
                         self._send_price_alerts(results, mins, old_ts, new_ts)
                     
                     # 更新pre文件
-                    shutil.copy(now_path, pre_path)
+                    shutil.copy(str(now_path), str(pre_path))
                 
                 print(f"😴 等待 {self.config.bot.interval} 秒...")
                 time.sleep(self.config.bot.interval)

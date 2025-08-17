@@ -1,0 +1,102 @@
+[
+  {
+    "mint": "EG6WeiR2DymUVVjNHEU4MEJXmWnzXJhk3JerRy4gpump",
+    "symbol": "snail",
+    "name": "a slow runner",
+    "decimals": 6,
+    "supply": 999976073.646411,
+    "market_cap": 732502.5286541692,
+    "volume_24h": 1883359.5896625933,
+    "price": 0.0007325200551880207,
+    "price_change_24h": -27.544429625066492,
+    "liquidity": 63229.378598022806,
+    "holders": 2353,
+    "created_at": "2025-08-14T03:09:11Z",
+    "socials": {
+      "twitter": "https://x.com/i/communities/1955801761958003017",
+      "website": ""
+    },
+    "source": "jupiter",
+    "fetch_time": "2025-08-17T02:28:02.463030",
+    "pool_id": "5QcEDqaiTMbTmdzhPueEQQE6REomd7efGE4Wd3LsJT8j",
+    "dex": "swap.pump.fun",
+    "launchpad": "pump.fun",
+    "organic_score": 84.41161620604778,
+    "audit": {
+      "mintAuthorityDisabled": true,
+      "freezeAuthorityDisabled": true,
+      "topHoldersPercentage": 17.341307179989585,
+      "devMigrations": 1
+    },
+    "holder_change_24h": -3.168724279835391,
+    "buy_volume_24h": 955233.6202523632,
+    "sell_volume_24h": 965022.002584002
+  },
+  {
+    "mint": "CpdKgsZMtZ54FK5vbyLq5wNyH2uRmSxi8AtEAADipump",
+    "symbol": "It",
+    "name": "It Coin",
+    "decimals": 6,
+    "supply": 999856536.799829,
+    "market_cap": 749133.2574461533,
+    "volume_24h": 1600178.4908712823,
+    "price": 0.0007492407459212617,
+    "price_change_24h": 194.88735959564065,
+    "liquidity": 63332.866195603914,
+    "holders": 2857,
+    "created_at": "2025-08-13T12:22:37Z",
+    "socials": {
+      "twitter": "https://x.com/i/communities/1954207465123491939",
+      "website": ""
+    },
+    "source": "jupiter",
+    "fetch_time": "2025-08-17T02:28:02.463058",
+    "pool_id": "cJgCzQRy5hS9nk2XGWe825eoCgZz5Vbe3zykq2V46xa",
+    "dex": "swap.pump.fun",
+    "launchpad": "pump.fun",
+    "organic_score": 84.2098830963026,
+    "audit": {
+      "mintAuthorityDisabled": true,
+      "freezeAuthorityDisabled": true,
+      "topHoldersPercentage": 16.597742039074138,
+      "devMigrations": 1
+    },
+    "holder_change_24h": 36.30725190839695,
+    "buy_volume_24h": 818102.9002572868,
+    "sell_volume_24h": 790842.0051276808
+  },
+  {
+    "mint": "6qGBJd8TaXP4nzNdCoFfyytM7RZfdwVNRcju6mfuLqpK",
+    "symbol": "fatgirls",
+    "name": "like buying bitcoin in 2009",
+    "decimals": 6,
+    "supply": 999973593.12721,
+    "market_cap": 171791.18486239194,
+    "volume_24h": 1089127.1936914665,
+    "price": 0.00017179572145015412,
+    "price_change_24h": -68.57919593604754,
+    "liquidity": 29985.32542948928,
+    "holders": 2400,
+    "created_at": "2025-08-14T09:16:21Z",
+    "socials": {
+      "twitter": "https://x.com/i/communities/1955915799157457310",
+      "website": ""
+    },
+    "source": "jupiter",
+    "fetch_time": "2025-08-17T02:28:02.463066",
+    "pool_id": "3vu9QTWWxEDNmoqRNEfb9Cvke2xBDJcJ1bdL8coYQSF1",
+    "dex": "swap.pump.fun",
+    "launchpad": "pump.fun",
+    "organic_score": 75,
+    "audit": {
+      "mintAuthorityDisabled": true,
+      "freezeAuthorityDisabled": true,
+      "topHoldersPercentage": 16.631326796742453,
+      "devBalancePercentage": 0.10233434604305801,
+      "devMigrations": 1
+    },
+    "holder_change_24h": -15.492957746478872,
+    "buy_volume_24h": 589042.0698013578,
+    "sell_volume_24h": 618371.9704705292
+  }
+]

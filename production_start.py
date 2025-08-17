@@ -14,24 +14,24 @@ from datetime import datetime
 # 添加src目录到Python路径
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'src'))
 
+from src.utils.data_manager import DataManager
+
 def setup_logging():
     """设置生产环境日志"""
     log_level = os.getenv('LOG_LEVEL', 'INFO').upper()
     
-    # 创建logs目录
-    os.makedirs('logs', exist_ok=True)
+    # 使用统一存储管理器
+    data_manager = DataManager()
+    log_file = data_manager.get_file_path("logs", f"bot_{datetime.now().strftime('%Y%m%d')}.log")
     
-    # 配置日志格式
     logging.basicConfig(
         level=getattr(logging, log_level),
         format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
         handlers=[
-            logging.FileHandler(f'logs/bot_{datetime.now().strftime("%Y%m%d")}.log'),
+            logging.FileHandler(str(log_file)),
             logging.StreamHandler(sys.stdout)
         ]
     )
-    
-    return logging.getLogger(__name__)
 
 def validate_environment():
     """验证环境变量"""

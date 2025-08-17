@@ -11,6 +11,7 @@ import random
 import os
 from datetime import datetime
 from typing import List, Dict, Optional
+from ..utils.data_manager import DataManager
 
 
 class OKXCrawlerForBot:
@@ -44,9 +45,8 @@ class OKXCrawlerForBot:
         }
 
         # 确保日志目录存在
-        self.log_dir = "okx_log"
-        if not os.path.exists(self.log_dir):
-            os.makedirs(self.log_dir)
+        self.data_manager = DataManager()
+        self.log_dir = self.data_manager.get_file_path("logs", "okx_crawler.log").parent
 
     def log_info(self, message):
         """记录信息到日志文件"""
@@ -106,8 +106,8 @@ class OKXCrawlerForBot:
                         # 保存原始的holderRankingList数据到日志文件
                         if data.get("code") == 0:
                             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-                            raw_data_file = os.path.join(
-                                self.log_dir, f"holders_raw_{token_address}_{timestamp}.json"
+                            raw_data_file = self.data_manager.get_file_path(
+                                "holders", f"holders_raw_{token_address}_{timestamp}.json"
                             )
                             with open(raw_data_file, "w", encoding="utf-8") as f:
                                 json.dump(data, f, ensure_ascii=False, indent=2)
@@ -534,7 +534,7 @@ class OKXCrawlerForBot:
 
         # 保存详细日志到文件
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        log_file = os.path.join(self.log_dir, f"analysis_{token_address}_{timestamp}.json")
+        log_file = self.data_manager.get_file_path("analysis", f"analysis_{token_address}_{timestamp}.json")
         with open(log_file, "w", encoding="utf-8") as f:
             json.dump(analysis_result, f, ensure_ascii=False, indent=2)
 

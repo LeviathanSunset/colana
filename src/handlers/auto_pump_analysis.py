@@ -12,6 +12,7 @@ from telebot import TeleBot
 from telebot.types import Message
 from ..core.config import get_config
 from ..services.blacklist import is_blacklisted
+from ..utils.data_manager import DataManager
 
 # 导入OKX相关功能
 try:
@@ -25,9 +26,11 @@ class AutoPumpAnalysisHandler:
     """自动pump分析处理器"""
     
     def __init__(self, bot: TeleBot):
+        """初始化自动分析处理器"""
         self.bot = bot
         self.config = get_config()
-        self.status_file = "data/auto_pump_status.json"
+        self.data_manager = DataManager()
+        self.status_file = self.data_manager.get_file_path("config", "auto_pump_status.json")
         self.analysis_status: Dict[str, bool] = {}  # chat_id -> enabled
         self.analysis_threads: Dict[str, threading.Thread] = {}  # chat_id -> thread
         self.stop_flags: Dict[str, threading.Event] = {}  # chat_id -> stop_event
