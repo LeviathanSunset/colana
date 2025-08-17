@@ -123,6 +123,7 @@ config.json
 blacklist.json
 data/
 logs/
+okx_log/
 *.csv
 *.log
 
