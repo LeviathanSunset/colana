@@ -21,7 +21,14 @@ except ImportError:
 
 # 导入OKX分析功能
 try:
-    from ..services.okx_crawler import OKXCrawlerForBot, format_tokens_table
+    from ..services.okx_crawler import (
+        OKXCrawlerForBot, 
+        format_tokens_table,
+        analyze_address_clusters,
+        format_cluster_analysis, 
+        analyze_target_token_rankings,
+        format_target_token_rankings
+    )
 except ImportError:
     print("⚠️ 无法导入OKX分析模块")
     OKXCrawlerForBot = None
@@ -335,8 +342,10 @@ class JupiterAnalysisHandler(BaseCommandHandler):
             )
             
             if result and result.get("token_statistics"):
-                # 创建cache_key用于生成分析按钮 - 和ca1命令使用相同的格式
-                cache_key = f"cajup_{token_address}_{int(time.time())}"
+                # 创建cache_key用于生成分析按钮 - 使用短格式避免Telegram按钮数据长度限制
+                # 使用代币地址前8位+后6位+时间戳后6位保证唯一性
+                timestamp_suffix = str(int(time.time()))[-6:]
+                cache_key = f"jup_{token_address[:8]}{token_address[-6:]}_{timestamp_suffix}"
                 
                 # 存储分析结果到缓存中，以便按钮回调使用
                 from ..services.okx_crawler import analysis_cache
@@ -347,14 +356,23 @@ class JupiterAnalysisHandler(BaseCommandHandler):
                     'source': 'jupiter'
                 }
                 
-                # 格式化分析结果 - 传递token_statistics部分和cache_key
+                # 格式化分析结果 - 使用与ca1相同的完整格式
                 table_msg, table_markup = format_tokens_table(
                     result["token_statistics"], 
                     sort_by="count",
-                    cache_key=cache_key  # 重要：提供cache_key生成分析按钮
+                    cache_key=cache_key
                 )
                 
                 if table_msg:
+                    # 获取目标代币信息
+                    target_token_info = None
+                    for token in result["token_statistics"]["top_tokens_by_value"]:
+                        if token.get("address") == token_address:
+                            target_token_info = token
+                            break
+                    
+                    target_symbol = target_token_info.get("symbol", "Unknown") if target_token_info else "Unknown"
+                    
                     # 添加Jupiter分析标识
                     jupiter_info = (
                         f"🔥 <b>Jupiter热门代币分析</b> ({current}/{total})\n"
@@ -363,12 +381,42 @@ class JupiterAnalysisHandler(BaseCommandHandler):
                         f"🕐 分析时间: {time.strftime('%H:%M:%S')}\n\n"
                     )
                     
-                    final_msg = jupiter_info + table_msg
+                    # 添加分析统计信息（与ca1一致）
+                    analysis_info = f"\n📊 <b>{target_symbol} 分析统计</b>\n"
+                    analysis_info += f"🕒 分析时间: {result.get('analysis_time', '').split('T')[0]}\n"
+                    analysis_info += f"👥 分析地址: 前{result.get('total_holders_analyzed', 0)} 个\n"
+                    target_holders = result.get("target_token_actual_holders", 0)
+                    if target_holders > 0:
+                        analysis_info += f"🎯 实际持有 {target_symbol}: {target_holders} 人\n"
+                    analysis_info += f"📈 统计范围: 每个地址的前10大持仓\n"
+                    
+                    final_msg = jupiter_info + table_msg + analysis_info
                     
                     # 检查交叉持仓
                     cross_holding_info = self._analyze_cross_holdings(result, token_address)
                     if cross_holding_info:
                         final_msg += f"\n{cross_holding_info}"
+                    
+                    # 添加完整的按钮布局（与ca1一致）
+                    if table_markup:
+                        # 添加排序切换按钮
+                        table_markup.add(
+                            InlineKeyboardButton(
+                                "💰 按价值排序", callback_data=f"cajup_sort_value_{cache_key}"
+                            ),
+                            InlineKeyboardButton(
+                                "👥 按人数排序 ✅", callback_data=f"cajup_sort_count_{cache_key}"
+                            ),
+                        )
+                        # 添加集群分析和排名分析按钮
+                        table_markup.add(
+                            InlineKeyboardButton(
+                                "🎯 地址集群分析", callback_data=f"cajup_cluster_{cache_key}"
+                            ),
+                            InlineKeyboardButton(
+                                "📊 代币排名分析", callback_data=f"cajup_ranking_{cache_key}"
+                            )
+                        )
                     
                     # 发送分析结果到topic（如果有的话）
                     self.send_to_topic(
@@ -456,6 +504,189 @@ class JupiterAnalysisHandler(BaseCommandHandler):
                 self.bot.answer_callback_query(call.id, "🔄 请重新发送 /cajup 命令开始新的分析")
             elif call.data == "cajup_more":
                 self.bot.answer_callback_query(call.id, "📊 请使用 /cajup 30 分析更多代币")
+            elif call.data.startswith("cajup_sort_"):
+                self.handle_cajup_sort(call)
+            elif call.data.startswith("cajup_cluster_"):
+                self.handle_cajup_cluster(call)
+            elif call.data.startswith("cajup_ranking_"):
+                self.handle_cajup_ranking(call)
         except Exception as e:
             print(f"❌ 处理cajup回调失败: {e}")
             self.bot.answer_callback_query(call.id, "❌ 操作失败")
+
+    def handle_cajup_sort(self, call):
+        """处理cajup排序回调"""
+        try:
+            # 解析回调数据
+            parts = call.data.split("_")
+            if len(parts) < 4:
+                self.bot.answer_callback_query(call.id, "❌ 回调数据格式错误")
+                return
+                
+            sort_type = parts[2]  # value 或 count
+            cache_key = "_".join(parts[3:])  # 重建cache_key
+            
+            # 从缓存获取分析结果
+            from ..services.okx_crawler import analysis_cache
+            cached_data = analysis_cache.get(cache_key)
+            
+            if not cached_data:
+                self.bot.answer_callback_query(call.id, "❌ 分析结果已过期，请重新分析")
+                return
+                
+            result = cached_data['result']
+            token_address = cached_data['token_address']
+            
+            # 重新格式化表格
+            table_msg, table_markup = format_tokens_table(
+                result["token_statistics"],
+                sort_by=sort_type,
+                cache_key=cache_key
+            )
+            
+            if table_msg:
+                # 获取目标代币信息
+                target_token_info = None
+                for token in result["token_statistics"]["top_tokens_by_value"]:
+                    if token.get("address") == token_address:
+                        target_token_info = token
+                        break
+                
+                target_symbol = target_token_info.get("symbol", "Unknown") if target_token_info else "Unknown"
+                
+                # 添加Jupiter分析标识
+                jupiter_info = (
+                    f"🔥 <b>Jupiter热门代币分析</b>\n"
+                    f"📊 数据源: Jupiter DEX\n"
+                    f"📍 代币地址: <code>{token_address}</code>\n"
+                    f"🕐 分析时间: {time.strftime('%H:%M:%S')}\n\n"
+                )
+                
+                # 添加分析统计信息
+                analysis_info = f"\n📊 <b>{target_symbol} 分析统计</b>\n"
+                analysis_info += f"🕒 分析时间: {result.get('analysis_time', '').split('T')[0]}\n"
+                analysis_info += f"👥 分析地址: 前{result.get('total_holders_analyzed', 0)} 个\n"
+                target_holders = result.get("target_token_actual_holders", 0)
+                if target_holders > 0:
+                    analysis_info += f"🎯 实际持有 {target_symbol}: {target_holders} 人\n"
+                analysis_info += f"📈 统计范围: 每个地址的前10大持仓\n"
+                
+                final_msg = jupiter_info + table_msg + analysis_info
+                
+                # 添加按钮
+                if table_markup:
+                    # 添加排序切换按钮
+                    value_text = "💰 按价值排序" + (" ✅" if sort_type == "value" else "")
+                    count_text = "👥 按人数排序" + (" ✅" if sort_type == "count" else "")
+                    
+                    table_markup.add(
+                        InlineKeyboardButton(value_text, callback_data=f"cajup_sort_value_{cache_key}"),
+                        InlineKeyboardButton(count_text, callback_data=f"cajup_sort_count_{cache_key}"),
+                    )
+                    # 添加集群分析和排名分析按钮
+                    table_markup.add(
+                        InlineKeyboardButton("🎯 地址集群分析", callback_data=f"cajup_cluster_{cache_key}"),
+                        InlineKeyboardButton("📊 代币排名分析", callback_data=f"cajup_ranking_{cache_key}")
+                    )
+                
+                # 更新消息
+                self.bot.edit_message_text(
+                    final_msg,
+                    call.message.chat.id,
+                    call.message.message_id,
+                    parse_mode="HTML",
+                    reply_markup=table_markup,
+                    disable_web_page_preview=True,
+                )
+                
+                sort_name = "价值" if sort_type == "value" else "人数"
+                self.bot.answer_callback_query(call.id, f"✅ 已按{sort_name}重新排序")
+            else:
+                self.bot.answer_callback_query(call.id, "❌ 格式化失败")
+                
+        except Exception as e:
+            print(f"❌ 处理cajup排序回调失败: {e}")
+            self.bot.answer_callback_query(call.id, "❌ 排序失败")
+
+    def handle_cajup_cluster(self, call):
+        """处理cajup集群分析回调"""
+        try:
+            # 解析回调数据
+            parts = call.data.split("_")
+            if len(parts) < 3:
+                self.bot.answer_callback_query(call.id, "❌ 回调数据格式错误")
+                return
+                
+            cache_key = "_".join(parts[2:])  # 重建cache_key
+            
+            # 从缓存获取分析结果
+            from ..services.okx_crawler import analysis_cache, analyze_address_clusters, format_cluster_analysis
+            cached_data = analysis_cache.get(cache_key)
+            
+            if not cached_data:
+                self.bot.answer_callback_query(call.id, "❌ 分析结果已过期，请重新分析")
+                return
+                
+            result = cached_data['result']
+            
+            # 执行集群分析
+            clusters = analyze_address_clusters(result)
+            cluster_msg = format_cluster_analysis(clusters, page=0)
+            
+            if cluster_msg:
+                self.bot.answer_callback_query(call.id, "🎯 集群分析完成")
+                self.bot.send_message(
+                    call.message.chat.id,
+                    cluster_msg,
+                    parse_mode="HTML",
+                    disable_web_page_preview=True,
+                    message_thread_id=getattr(call.message, "message_thread_id", None)
+                )
+            else:
+                self.bot.answer_callback_query(call.id, "❌ 未发现明显的地址集群")
+                
+        except Exception as e:
+            print(f"❌ 处理cajup集群分析回调失败: {e}")
+            self.bot.answer_callback_query(call.id, "❌ 集群分析失败")
+
+    def handle_cajup_ranking(self, call):
+        """处理cajup排名分析回调"""
+        try:
+            # 解析回调数据
+            parts = call.data.split("_")
+            if len(parts) < 3:
+                self.bot.answer_callback_query(call.id, "❌ 回调数据格式错误")
+                return
+                
+            cache_key = "_".join(parts[2:])  # 重建cache_key
+            
+            # 从缓存获取分析结果
+            from ..services.okx_crawler import analysis_cache, analyze_target_token_rankings, format_target_token_rankings
+            cached_data = analysis_cache.get(cache_key)
+            
+            if not cached_data:
+                self.bot.answer_callback_query(call.id, "❌ 分析结果已过期，请重新分析")
+                return
+                
+            result = cached_data['result']
+            token_address = cached_data['token_address']
+            
+            # 执行排名分析
+            rankings = analyze_target_token_rankings(result, token_address)
+            ranking_msg = format_target_token_rankings(rankings, token_address)
+            
+            if ranking_msg:
+                self.bot.answer_callback_query(call.id, "📊 排名分析完成")
+                self.bot.send_message(
+                    call.message.chat.id,
+                    ranking_msg,
+                    parse_mode="HTML",
+                    disable_web_page_preview=True,
+                    message_thread_id=getattr(call.message, "message_thread_id", None)
+                )
+            else:
+                self.bot.answer_callback_query(call.id, "❌ 排名分析数据不足")
+                
+        except Exception as e:
+            print(f"❌ 处理cajup排名分析回调失败: {e}")
+            self.bot.answer_callback_query(call.id, "❌ 排名分析失败")
