@@ -13,12 +13,13 @@ from telebot.types import Message
 from ..core.config import get_config
 from ..services.blacklist import is_blacklisted
 from ..utils.data_manager import DataManager
+from ..utils.logger import get_logger
 
 # 导入OKX相关功能
 try:
     from ..services.okx_crawler import OKXCrawlerForBot
 except ImportError:
-    print("⚠️ 无法导入OKX爬虫模块，自动pump分析功能可能不可用")
+    get_logger("auto_pump").warning("⚠️ 无法导入OKX爬虫模块，自动pump分析功能可能不可用")
     OKXCrawlerForBot = None
 
 
@@ -30,17 +31,22 @@ class AutoPumpAnalysisHandler:
         self.bot = bot
         self.config = get_config()
         self.data_manager = DataManager()
+        self.logger = get_logger("auto_pump")
         self.status_file = self.data_manager.get_file_path("config", "auto_pump_status.json")
         self.analysis_status: Dict[str, bool] = {}  # chat_id -> enabled
         self.analysis_threads: Dict[str, threading.Thread] = {}  # chat_id -> thread
         self.stop_flags: Dict[str, threading.Event] = {}  # chat_id -> stop_event
         self.analyzed_tokens: Dict[str, Set[str]] = {}  # chat_id -> set of analyzed tokens
         
+        self.logger.info("🔧 AutoPumpAnalysisHandler 初始化开始")
+        
         # 加载保存的状态
         self.load_status()
         
         # 为已启用的群组启动分析线程
         self.restore_analysis_threads()
+        
+        self.logger.info("✅ AutoPumpAnalysisHandler 初始化完成")
     
     def load_status(self):
         """加载自动分析状态"""
@@ -51,8 +57,15 @@ class AutoPumpAnalysisHandler:
                     self.analysis_status = data.get('analysis_status', {})
                     # 重置已分析的代币列表（重启后重新开始）
                     self.analyzed_tokens = {chat_id: set() for chat_id in self.analysis_status.keys()}
+                    self.logger.info(f"📋 自动分析状态加载成功: {len(self.analysis_status)} 个群组")
+                    for chat_id, enabled in self.analysis_status.items():
+                        self.logger.debug(f"   群组 {chat_id}: {'启用' if enabled else '禁用'}")
+            else:
+                self.logger.info("📋 自动分析状态文件不存在，使用默认设置")
+                self.analysis_status = {}
+                self.analyzed_tokens = {}
         except Exception as e:
-            print(f"加载自动pump分析状态失败: {e}")
+            self.logger.exception(f"❌ 加载自动分析状态失败: {e}")
             self.analysis_status = {}
             self.analyzed_tokens = {}
     

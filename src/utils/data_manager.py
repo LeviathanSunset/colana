@@ -9,6 +9,7 @@ import shutil
 from datetime import datetime
 from pathlib import Path
 from typing import List, Dict
+from .logger import get_logger
 
 
 class DataManager:
@@ -21,6 +22,7 @@ class DataManager:
         Args:
             base_dir: 统一存储目录名称
         """
+        self.logger = get_logger("data_manager")
         self.base_dir = Path(base_dir)
         self.max_files = 50  # 最大文件数量
         
@@ -172,9 +174,9 @@ class DataManager:
         for file_path in files_to_delete:
             try:
                 file_path.unlink()
-                print(f"   ✅ 删除: {file_path.name}")
+                self.logger.debug(f"   ✅ 删除: {file_path.name}")
             except Exception as e:
-                print(f"   ❌ 删除失败: {file_path.name} - {e}")
+                self.logger.error(f"   ❌ 删除失败: {file_path.name} - {e}")
     
     def get_storage_info(self) -> Dict:
         """获取存储信息"""
@@ -214,10 +216,10 @@ class DataManager:
         )
         
         if total_files > self.max_files:
-            print(f"📊 存储空间检查: 当前 {total_files} 个文件，超过限制 {self.max_files}")
+            self.logger.info(f"📊 存储空间检查: 当前 {total_files} 个文件，超过限制 {self.max_files}")
             self.cleanup_old_files()
         else:
-            print(f"📊 存储空间检查: 当前 {total_files} 个文件，未超过限制 {self.max_files}")
+            self.logger.debug(f"📊 存储空间检查: 当前 {total_files} 个文件，未超过限制 {self.max_files}")
 
 
 # 全局数据管理器实例

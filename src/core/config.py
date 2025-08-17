@@ -80,7 +80,26 @@ class ConfigManager:
         self._capump_config = None
         self._jupiter_config = None
         self._ca1_allowed_groups = []
+        self._logger = None
         self.load_config()
+    
+    @property
+    def logger(self):
+        """延迟加载logger以避免循环导入"""
+        if self._logger is None:
+            try:
+                from ..utils.logger import get_logger
+                self._logger = get_logger("config")
+            except ImportError:
+                # 如果logger模块不可用，使用print作为后备
+                class SimpleLogger:
+                    def info(self, msg): print(f"INFO: {msg}")
+                    def error(self, msg): print(f"ERROR: {msg}")
+                    def exception(self, msg): print(f"EXCEPTION: {msg}")
+                    def debug(self, msg): print(f"DEBUG: {msg}")
+                    def warning(self, msg): print(f"WARNING: {msg}")
+                self._logger = SimpleLogger()
+        return self._logger
 
     def load_config(self):
         """加载配置"""
@@ -187,7 +206,8 @@ class ConfigManager:
                 self._ca1_allowed_groups = []
 
         except Exception as e:
-            print(f"配置文件加载失败: {e}")
+            self.logger.exception(f"❌ 配置文件加载失败: {e}")
+            self._load_defaults()
 
     def _load_defaults(self):
         """加载默认配置"""
@@ -224,8 +244,9 @@ class ConfigManager:
         try:
             with open(self.config_file, "w", encoding="utf-8") as f:
                 json.dump(config_data, f, indent=2, ensure_ascii=False)
+            self.logger.info(f"💾 配置文件保存成功: {self.config_file}")
         except Exception as e:
-            print(f"配置文件保存失败: {e}")
+            self.logger.exception(f"❌ 配置文件保存失败: {e}")
 
     @property
     def bot(self) -> BotConfig:
@@ -289,15 +310,24 @@ def get_config() -> ConfigManager:
 
 def setup_proxy():
     """设置代理"""
+    try:
+        from ..utils.logger import get_logger
+        logger = get_logger("proxy")
+    except ImportError:
+        # 如果logger模块不可用，使用print作为后备
+        class SimpleLogger:
+            def info(self, msg): print(msg)
+        logger = SimpleLogger()
+    
     proxy_config = config_manager.proxy
     if proxy_config.enabled:
         os.environ["HTTP_PROXY"] = proxy_config.http_proxy
         os.environ["HTTPS_PROXY"] = proxy_config.https_proxy
-        print(f"✅ 代理已启用: {proxy_config.http_proxy}")
+        logger.info(f"✅ 代理已启用: {proxy_config.http_proxy}")
     else:
         # 确保清除代理环境变量
         os.environ.pop("HTTP_PROXY", None)
         os.environ.pop("HTTPS_PROXY", None)
         os.environ.pop("http_proxy", None)
         os.environ.pop("https_proxy", None)
-        print("✅ 代理已禁用")
+        logger.info("✅ 代理已禁用")
