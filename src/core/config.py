@@ -33,6 +33,7 @@ class AnalysisConfig:
     cluster_min_addresses: int = 2
     cluster_max_addresses: int = 50
     clusters_per_page: int = 3
+    max_concurrent_threads: int = 5  # 多线程爬取的最大线程数
     # 已知的池子地址列表（即使OKX检测不到也要识别）
     known_pool_addresses: List[str] = None
     

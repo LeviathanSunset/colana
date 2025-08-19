@@ -15,7 +15,8 @@
     "cluster_min_common_tokens": 2,
     "cluster_min_addresses": 2,
     "cluster_max_addresses": 50,
-    "clusters_per_page": 5
+    "clusters_per_page": 5,
+    "max_concurrent_threads": 5
   },
   "proxy": {
     "http_proxy": "http://127.0.0.1:10808",

@@ -708,7 +708,10 @@ def analyze_target_token_rankings(analysis_result: Dict, original_holders: List[
                 rank_key = ">10名"
             rank_distribution[rank_key] = rank_distribution.get(rank_key, 0) + 1
         
-        # 基础统计（只计算实际持有的地址，排除>10名）
+        # 实际持有者统计（目标代币在钱包中排名≤10的地址）
+        actual_holders_all = [addr for addr in address_rankings if addr["target_token_rank"] <= 10]
+        
+        # 基础统计（只计算前10名的地址，用于平均排名和中位数计算）
         actual_ranks = [r for r in ranks if r <= 10]
         if actual_ranks:
             avg_rank = sum(actual_ranks) / len(actual_ranks)
@@ -725,9 +728,12 @@ def analyze_target_token_rankings(analysis_result: Dict, original_holders: List[
         # 智能分析
         analysis_text = _generate_ranking_analysis(address_rankings, avg_rank, rank_distribution)
         
+        # 计算原始目标代币持有者数量（有流通量占比的地址）
+        original_target_holders_count = len([addr for addr in address_rankings if addr.get("target_supply_percentage", 0) > 0])
+        
         statistics = {
-            "total_addresses": len(address_rankings),
-            "actual_holders": len(actual_ranks),  # 实际持有目标代币的地址数
+            "total_addresses": original_target_holders_count,  # 原始目标代币持有者数量
+            "actual_holders": len(actual_holders_all),  # 目标代币在钱包中排名≤10的地址数
             "conspiracy_wallets": conspiracy_count,  # 阴谋钱包数量
             "conspiracy_total_value": conspiracy_total_value,  # 阴谋钱包总价值
             "average_rank": avg_rank,
@@ -1397,13 +1403,15 @@ def format_target_token_rankings(ranking_result: Dict) -> str:
     # 计算阴谋钱包流通量占比（需要在前面计算，因为后面会用到）
     conspiracy_supply_percentage = sum(r.get("target_supply_percentage", 0) for r in rankings if r.get("is_conspiracy_wallet", False))
     
-    # 计算分析地址占总持有者的百分比 - 这里应该是 total_addresses / total_possible_addresses * 100
-    # 暂时使用合理的百分比计算，或者可以从外部传入
-    analysis_percentage = min(100.0, (total_addresses / max(total_addresses, actual_holders) * 100))
+    # 计算分析地址流通量占比（只计算原始目标代币持有者，即有target_supply_percentage的地址）
+    all_analysis_percentage = sum(r.get("target_supply_percentage", 0) for r in rankings if r.get("target_supply_percentage", 0) > 0)
+    
+    # 计算实际持有地址流通量占比（目标代币在钱包中排名≤10的地址）
+    actual_holders_supply_percentage = sum(r.get("target_supply_percentage", 0) for r in rankings if r["target_token_rank"] <= 10)
     
     msg = f"📊 <b>{symbol} 价值排名分析</b>\n"
-    msg += f"🎯 分析地址: <b>{total_addresses}</b> 个大户（xxx%）\n"
-    msg += f"💎 实际持有: <b>{actual_holders}</b> 个 ({(actual_holders/total_addresses)*100:.1f}%)\n"
+    msg += f"🎯 分析地址: <b>{total_addresses}</b> 个大户（{all_analysis_percentage:.1f}%）\n"
+    msg += f"💎 实际持有: <b>{actual_holders}</b> 个 ({actual_holders_supply_percentage:.1f}%)\n"
     
     # 阴谋钱包信息
     if conspiracy_count > 0:

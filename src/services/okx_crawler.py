@@ -9,6 +9,8 @@ import json
 import time
 import random
 import os
+import threading
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime
 from typing import List, Dict, Optional
 from ..utils.data_manager import DataManager
@@ -346,6 +348,95 @@ class OKXCrawlerForBot:
 
         return {}
 
+    def get_wallet_assets_threaded(self, wallet_addresses: List[str], max_workers: int = 10) -> Dict[str, Dict]:
+        """
+        使用多线程并发获取多个钱包的资产组合信息
+        
+        Args:
+            wallet_addresses: 钱包地址列表
+            max_workers: 最大线程数，默认10个
+            
+        Returns:
+            Dict: {wallet_address: assets_data} 格式的结果字典
+        """
+        results = {}
+        results_lock = threading.Lock()
+        request_semaphore = threading.Semaphore(max_workers)  # 控制并发请求数
+        
+        def fetch_single_wallet(wallet_address: str) -> tuple:
+            """获取单个钱包资产的线程函数"""
+            max_retries = 3
+            for attempt in range(max_retries):
+                with request_semaphore:  # 限制并发数
+                    try:
+                        # 添加随机延迟避免过于频繁的请求
+                        time.sleep(random.uniform(0.5, 1.5))
+                        assets_data = self.get_wallet_assets(wallet_address)
+                        
+                        # 如果成功获取数据，直接返回
+                        if assets_data:
+                            return wallet_address, assets_data
+                        elif attempt < max_retries - 1:
+                            # 如果失败但还有重试机会，等待更长时间
+                            time.sleep(random.uniform(2, 5))
+                            
+                    except Exception as e:
+                        if "429" in str(e) and attempt < max_retries - 1:
+                            # 遇到429错误，等待更长时间后重试
+                            wait_time = (attempt + 1) * 5 + random.uniform(0, 5)
+                            self.log_info(f"钱包 {wallet_address[:8]}...{wallet_address[-6:]} 遇到频率限制，等待 {wait_time:.1f}s 后重试")
+                            time.sleep(wait_time)
+                            continue
+                        else:
+                            self.log_info(f"线程获取钱包 {wallet_address[:8]}...{wallet_address[-6:]} 资产失败: {str(e)}")
+                            break
+            
+            return wallet_address, {}
+        
+        self.log_info(f"开始多线程获取 {len(wallet_addresses)} 个钱包资产 (使用 {max_workers} 个线程)")
+        start_time = time.time()
+        
+        # 调整线程数：如果钱包数量少于设定的线程数，减少线程数避免过度并发
+        actual_workers = min(max_workers, len(wallet_addresses), 5)  # 最多5个线程避免频率限制
+        self.log_info(f"实际使用 {actual_workers} 个线程（避免频率限制）")
+        
+        # 使用线程池执行器
+        with ThreadPoolExecutor(max_workers=actual_workers) as executor:
+            # 提交所有任务
+            future_to_address = {
+                executor.submit(fetch_single_wallet, addr): addr 
+                for addr in wallet_addresses
+            }
+            
+            # 收集结果
+            completed_count = 0
+            for future in as_completed(future_to_address):
+                try:
+                    wallet_address, assets_data = future.result(timeout=120)  # 120秒超时
+                    
+                    with results_lock:
+                        results[wallet_address] = assets_data
+                        completed_count += 1
+                        
+                    if completed_count % 10 == 0:  # 每完成10个打印一次进度
+                        elapsed = time.time() - start_time
+                        rate = completed_count / elapsed if elapsed > 0 else 0
+                        remaining = len(wallet_addresses) - completed_count
+                        eta = remaining / rate if rate > 0 else 0
+                        self.log_info(f"已完成 {completed_count}/{len(wallet_addresses)} 个钱包 (速度: {rate:.1f}/s, 预计剩余: {eta:.0f}s)")
+                        
+                except Exception as e:
+                    self.log_info(f"获取钱包资产时出现异常: {str(e)}")
+        
+        elapsed_time = time.time() - start_time
+        successful_count = len([data for data in results.values() if data])
+        average_rate = len(wallet_addresses) / elapsed_time if elapsed_time > 0 else 0
+        
+        self.log_info(f"多线程资产获取完成: 成功 {successful_count}/{len(wallet_addresses)} 个钱包")
+        self.log_info(f"总耗时: {elapsed_time:.1f}s, 平均速度: {average_rate:.1f} 钱包/秒")
+        
+        return results
+
     def extract_top_tokens(self, assets_data: Dict) -> List[Dict]:
         """
         从资产数据中提取有价值的代币
@@ -446,10 +537,15 @@ class OKXCrawlerForBot:
         
         return False
 
-    def analyze_token_holders(self, token_address: str, top_holders_count: int = None) -> Dict:
+    def analyze_token_holders(self, token_address: str, top_holders_count: int = None, use_threading: bool = True) -> Dict:
         """
         分析代币大户并返回代币统计信息
         专门为Bot优化，只返回必要的信息
+        
+        Args:
+            token_address: 代币合约地址
+            top_holders_count: 分析的前N名大户数量
+            use_threading: 是否使用多线程加速资产获取，默认True
         """
         # 如果没有提供参数，从配置文件获取
         if top_holders_count is None:
@@ -490,50 +586,118 @@ class OKXCrawlerForBot:
             self.log_info("过滤后没有可分析的持有者")
             return {}
 
-        # 2. 分析每个大户的资产
+        # 2. 分析每个大户的资产 - 根据参数选择单线程或多线程
         holder_analysis = []
 
-        # 使用过滤后的持有者列表，取前N名
-        for i, holder in enumerate(filtered_holders[:top_holders_count], 1):
-            # 从explorerUrl中提取钱包地址，或直接使用holderWalletAddress
-            explorer_url = holder.get("explorerUrl", "")
-            if "solscan.io/account/" in explorer_url:
-                wallet_address = explorer_url.split("solscan.io/account/")[-1]
-            else:
-                wallet_address = holder.get("holderWalletAddress", "") or holder.get("holderAddress", "")
-
-            if not wallet_address:
-                self.log_info(f"大户 #{i} 无法获取钱包地址")
-                continue
-
-            self.log_info(f"分析大户 #{i}: {wallet_address[:8]}...{wallet_address[-6:]}")
-
-            # 获取钱包资产
-            assets_data = self.get_wallet_assets(wallet_address)
-
-            if assets_data:
-                # 提取所有有价值的代币
-                top_tokens = self.extract_top_tokens(assets_data)
-
-                # 只有当成功提取到代币时才添加到分析结果
-                if top_tokens:
-                    holder_info = {
-                        "rank": i,
-                        "address": wallet_address,
-                        "hold_amount": holder.get("holdAmount", "0"),
-                        "hold_percentage": holder.get("holdAmountPercentage", "0"),
-                        "top_tokens": top_tokens,
-                    }
-
-                    holder_analysis.append(holder_info)
-                    self.log_info(f"大户 #{i} 分析完成，发现 {len(top_tokens)} 个有价值代币")
+        if use_threading:
+            # 多线程模式：准备钱包地址列表
+            wallet_addresses = []
+            wallet_to_holder_info = {}  # 保存钱包地址到持有者信息的映射
+            
+            # 使用过滤后的持有者列表，取前N名
+            for i, holder in enumerate(filtered_holders[:top_holders_count], 1):
+                # 从explorerUrl中提取钱包地址，或直接使用holderWalletAddress
+                explorer_url = holder.get("explorerUrl", "")
+                if "solscan.io/account/" in explorer_url:
+                    wallet_address = explorer_url.split("solscan.io/account/")[-1]
                 else:
-                    self.log_info(f"大户 #{i} 没有发现有价值的代币")
-            else:
-                self.log_info(f"大户 #{i} 获取资产失败")
+                    wallet_address = holder.get("holderWalletAddress", "") or holder.get("holderAddress", "")
 
-            # 添加延迟避免频率限制
-            time.sleep(1)
+                if not wallet_address:
+                    self.log_info(f"大户 #{i} 无法获取钱包地址")
+                    continue
+
+                wallet_addresses.append(wallet_address)
+                wallet_to_holder_info[wallet_address] = {
+                    "rank": i,
+                    "holder_data": holder
+                }
+
+            if not wallet_addresses:
+                self.log_info("没有可分析的钱包地址")
+                return {}
+
+            # 使用多线程获取所有钱包资产
+            try:
+                from ..core.config import get_config
+                config = get_config()
+                max_workers = getattr(config.analysis, 'max_concurrent_threads', 10)
+            except (ImportError, AttributeError):
+                max_workers = 10
+                
+            assets_results = self.get_wallet_assets_threaded(wallet_addresses, max_workers)
+
+            # 处理获取到的资产数据
+            for wallet_address, assets_data in assets_results.items():
+                if wallet_address not in wallet_to_holder_info:
+                    continue
+                    
+                holder_info_map = wallet_to_holder_info[wallet_address]
+                rank = holder_info_map["rank"]
+                holder = holder_info_map["holder_data"]
+                
+                if assets_data:
+                    # 提取所有有价值的代币
+                    top_tokens = self.extract_top_tokens(assets_data)
+
+                    # 只有当成功提取到代币时才添加到分析结果
+                    if top_tokens:
+                        holder_info = {
+                            "rank": rank,
+                            "address": wallet_address,
+                            "hold_amount": holder.get("holdAmount", "0"),
+                            "hold_percentage": holder.get("holdAmountPercentage", "0"),
+                            "top_tokens": top_tokens,
+                        }
+
+                        holder_analysis.append(holder_info)
+                        self.log_info(f"大户 #{rank} 分析完成，发现 {len(top_tokens)} 个有价值代币")
+                    else:
+                        self.log_info(f"大户 #{rank} 没有发现有价值的代币")
+                else:
+                    self.log_info(f"大户 #{rank} 获取资产失败")
+        else:
+            # 单线程模式：保持原来的逻辑
+            for i, holder in enumerate(filtered_holders[:top_holders_count], 1):
+                # 从explorerUrl中提取钱包地址，或直接使用holderWalletAddress
+                explorer_url = holder.get("explorerUrl", "")
+                if "solscan.io/account/" in explorer_url:
+                    wallet_address = explorer_url.split("solscan.io/account/")[-1]
+                else:
+                    wallet_address = holder.get("holderWalletAddress", "") or holder.get("holderAddress", "")
+
+                if not wallet_address:
+                    self.log_info(f"大户 #{i} 无法获取钱包地址")
+                    continue
+
+                self.log_info(f"分析大户 #{i}: {wallet_address[:8]}...{wallet_address[-6:]}")
+
+                # 获取钱包资产
+                assets_data = self.get_wallet_assets(wallet_address)
+
+                if assets_data:
+                    # 提取所有有价值的代币
+                    top_tokens = self.extract_top_tokens(assets_data)
+
+                    # 只有当成功提取到代币时才添加到分析结果
+                    if top_tokens:
+                        holder_info = {
+                            "rank": i,
+                            "address": wallet_address,
+                            "hold_amount": holder.get("holdAmount", "0"),
+                            "hold_percentage": holder.get("holdAmountPercentage", "0"),
+                            "top_tokens": top_tokens,
+                        }
+
+                        holder_analysis.append(holder_info)
+                        self.log_info(f"大户 #{i} 分析完成，发现 {len(top_tokens)} 个有价值代币")
+                    else:
+                        self.log_info(f"大户 #{i} 没有发现有价值的代币")
+                else:
+                    self.log_info(f"大户 #{i} 获取资产失败")
+
+                # 添加延迟避免频率限制
+                time.sleep(1)
 
         # 3. 统计所有大户持有的代币，每个大户每个代币只计算一次
         all_tokens = {}
@@ -804,7 +968,10 @@ def analyze_target_token_rankings(analysis_result: Dict, original_holders: List[
                 rank_key = ">10名"
             rank_distribution[rank_key] = rank_distribution.get(rank_key, 0) + 1
         
-        # 基础统计（只计算实际持有的地址，排除>10名）
+        # 实际持有者统计（目标代币在钱包中排名≤10的地址）
+        actual_holders_all = [addr for addr in address_rankings if addr["target_token_rank"] <= 10]
+        
+        # 基础统计（只计算前10名的地址，用于平均排名和中位数计算）
         actual_ranks = [r for r in ranks if r <= 10]
         if actual_ranks:
             avg_rank = sum(actual_ranks) / len(actual_ranks)
@@ -821,9 +988,12 @@ def analyze_target_token_rankings(analysis_result: Dict, original_holders: List[
         # 智能分析
         analysis_text = _generate_ranking_analysis(address_rankings, avg_rank, rank_distribution)
         
+        # 计算原始目标代币持有者数量（有流通量占比的地址）
+        original_target_holders_count = len([addr for addr in address_rankings if addr.get("target_supply_percentage", 0) > 0])
+        
         statistics = {
-            "total_addresses": len(address_rankings),
-            "actual_holders": len(actual_ranks),  # 实际持有目标代币的地址数
+            "total_addresses": original_target_holders_count,  # 原始目标代币持有者数量
+            "actual_holders": len(actual_holders_all),  # 目标代币在钱包中排名≤10的地址数
             "conspiracy_wallets": conspiracy_count,  # 阴谋钱包数量
             "conspiracy_total_value": conspiracy_total_value,  # 阴谋钱包总价值
             "average_rank": avg_rank,
@@ -1575,15 +1745,18 @@ def format_target_token_rankings(ranking_result: Dict) -> str:
     distribution = statistics.get("rank_distribution", {})
     analysis = statistics.get("analysis", "")
     
-    # 计算阴谋钱包流通量占比（需要在前面计算，因为后面会用到）
+    # 计算阴谋钱包流通量占比
     conspiracy_supply_percentage = sum(r.get("target_supply_percentage", 0) for r in rankings if r.get("is_conspiracy_wallet", False))
     
-    # 计算分析地址流通量占比
-    analysis_percentage = sum(r.get("target_supply_percentage", 0) for r in rankings)
+    # 计算分析地址流通量占比（只计算原始目标代币持有者，即有target_supply_percentage的地址）
+    all_analysis_percentage = sum(r.get("target_supply_percentage", 0) for r in rankings if r.get("target_supply_percentage", 0) > 0)
+    
+    # 计算实际持有地址流通量占比（目标代币在钱包中排名≤10的地址）
+    actual_holders_supply_percentage = sum(r.get("target_supply_percentage", 0) for r in rankings if r["target_token_rank"] <= 10)
     
     msg = f"📊 <b>{symbol} 价值排名分析</b>\n"
-    msg += f"🎯 分析地址: <b>{total_addresses}</b> 个大户（{analysis_percentage:.1f}%）\n"
-    msg += f"💎 实际持有: <b>{actual_holders}</b> 个 ({(actual_holders/total_addresses)*100:.1f}%)\n"
+    msg += f"🎯 分析地址: <b>{total_addresses}</b> 个大户（{all_analysis_percentage:.1f}%）\n"
+    msg += f"💎 实际持有: <b>{actual_holders}</b> 个 ({actual_holders_supply_percentage:.1f}%)\n"
     
     # 阴谋钱包信息
     if conspiracy_count > 0:
