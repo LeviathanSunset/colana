@@ -361,23 +361,24 @@ class JupiterAnalysisHandler(BaseCommandHandler):
                     'source': 'jupiter'
                 }
                 
+                # 获取目标代币信息
+                target_token_info = None
+                for token in result["token_statistics"]["top_tokens_by_value"]:
+                    if token.get("address") == token_address:
+                        target_token_info = token
+                        break
+                
+                target_symbol = target_token_info.get("symbol", "Unknown") if target_token_info else "Unknown"
+                
                 # 格式化分析结果 - 使用统一的全局缓存系统
                 table_msg, table_markup = format_tokens_table(
                     result["token_statistics"], 
                     sort_by="count",
-                    cache_key=cache_key
+                    cache_key=cache_key,
+                    target_token_symbol=target_symbol
                 )
                 
                 if table_msg:
-                    # 获取目标代币信息
-                    target_token_info = None
-                    for token in result["token_statistics"]["top_tokens_by_value"]:
-                        if token.get("address") == token_address:
-                            target_token_info = token
-                            break
-                    
-                    target_symbol = target_token_info.get("symbol", "Unknown") if target_token_info else "Unknown"
-                    
                     # 添加Jupiter分析标识
                     jupiter_info = (
                         f"🔥 <b>Jupiter热门代币分析</b> ({current}/{total})\n"
@@ -547,20 +548,24 @@ class JupiterAnalysisHandler(BaseCommandHandler):
             result = cached_data['result']
             token_address = cached_data['token_address']
             
+            # 获取目标代币信息
+            target_token_info = None
+            for token in result["token_statistics"]["top_tokens_by_value"]:
+                if token.get("address") == token_address:
+                    target_token_info = token
+                    break
+            
+            target_symbol = target_token_info.get("symbol", "Unknown") if target_token_info else "Unknown"
+            
             # 重新格式化表格
             table_msg, table_markup = format_tokens_table(
                 result["token_statistics"],
                 sort_by=sort_type,
-                cache_key=cache_key
+                cache_key=cache_key,
+                target_token_symbol=target_symbol
             )
             
             if table_msg:
-                # 获取目标代币信息
-                target_token_info = None
-                for token in result["token_statistics"]["top_tokens_by_value"]:
-                    if token.get("address") == token_address:
-                        target_token_info = token
-                        break
                 
                 target_symbol = target_token_info.get("symbol", "Unknown") if target_token_info else "Unknown"
                 

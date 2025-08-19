@@ -1398,7 +1398,7 @@ def analyze_address_clusters(analysis_result: Dict) -> Dict:
 
 
 def format_tokens_table(
-    token_stats: Dict, max_tokens: int = None, sort_by: str = "value", cache_key: str = None
+    token_stats: Dict, max_tokens: int = None, sort_by: str = "value", cache_key: str = None, target_token_symbol: str = None
 ) -> tuple:
     """
     格式化代币统计表格，专门为Telegram消息优化
@@ -1408,6 +1408,7 @@ def format_tokens_table(
         max_tokens: 显示的最大代币数量 (如果为None，从配置文件读取)
         sort_by: 排序方式 ('value' 按总价值, 'count' 按持有人数)
         cache_key: 缓存键，用于生成详情按钮
+        target_token_symbol: 目标代币的符号，用于显示在标题中
 
     Returns:
         tuple: (消息文本, 按钮markup对象)
@@ -1449,8 +1450,13 @@ def format_tokens_table(
     total_portfolio_value = token_stats.get("total_portfolio_value", 0)
     total_unique_tokens = token_stats.get("total_unique_tokens", 0)
 
-    # 构建表格
-    msg = f"🔥 <b>大户热门代币排行榜</b> ({sort_icon} {sort_desc})\n"
+    # 构建表格标题
+    if target_token_symbol:
+        title = f"🔥 <b>{target_token_symbol}大户主要持仓</b> ({sort_icon} {sort_desc})"
+    else:
+        title = f"🔥 <b>大户热门代币排行榜</b> ({sort_icon} {sort_desc})"
+    
+    msg = f"{title}\n"
     msg += f"💰 总资产: <b>${total_portfolio_value:,.0f}</b>\n"
     msg += f"🔢 代币种类: <b>{total_unique_tokens}</b>\n"
     msg += "─" * 35 + "\n"

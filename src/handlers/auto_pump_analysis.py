@@ -454,10 +454,20 @@ class AutoPumpAnalysisHandler:
                         # 导入格式化函数
                         from ..services.okx_crawler import format_tokens_table
                         
+                        # 获取目标代币信息
+                        target_token_info = None
+                        for token in result["token_statistics"]["top_tokens_by_value"]:
+                            if token.get("address") == token_address:
+                                target_token_info = token
+                                break
+                        
+                        target_symbol = target_token_info.get("symbol", token_data.get("symbol", "Unknown")) if target_token_info else token_data.get("symbol", "Unknown")
+                        
                         # 格式化分析结果 - 传递token_statistics部分而不是整个result
                         table_msg, table_markup = format_tokens_table(
                             result["token_statistics"], 
-                            sort_by="count"
+                            sort_by="count",
+                            target_token_symbol=target_symbol
                         )
                         
                         if table_msg:

@@ -182,14 +182,6 @@ class HoldingAnalysisHandler(BaseCommandHandler):
 
                 print(f"缓存分析结果: cache_key={cache_key}")
 
-                # 格式化表格消息（默认按人数排序）
-                table_msg, table_markup = format_tokens_table(
-                    result["token_statistics"],
-                    max_tokens=self.config.analysis.ranking_size,
-                    sort_by="count",
-                    cache_key=cache_key,
-                )
-
                 # 获取目标代币信息
                 target_token_info = None
                 for token in result["token_statistics"]["top_tokens_by_value"]:
@@ -198,6 +190,15 @@ class HoldingAnalysisHandler(BaseCommandHandler):
                         break
                 
                 target_symbol = target_token_info.get("symbol", "Unknown") if target_token_info else "Unknown"
+
+                # 格式化表格消息（默认按人数排序）
+                table_msg, table_markup = format_tokens_table(
+                    result["token_statistics"],
+                    max_tokens=self.config.analysis.ranking_size,
+                    sort_by="count",
+                    cache_key=cache_key,
+                    target_token_symbol=target_symbol,
+                )
                 
                 # 添加分析信息
                 analysis_info = f"\n📊 <b>{target_symbol} 分析统计</b>\n"
@@ -390,12 +391,23 @@ class HoldingAnalysisHandler(BaseCommandHandler):
                 self._show_expired_data_option(call, cached_data["token_address"])
                 return
 
+            # 获取目标代币信息
+            target_token_address = result.get("token_address", "")
+            target_token_info = None
+            for token in result["token_statistics"]["top_tokens_by_value"]:
+                if token.get("address") == target_token_address:
+                    target_token_info = token
+                    break
+            
+            target_symbol = target_token_info.get("symbol", "Unknown") if target_token_info else "Unknown"
+
             # 重新格式化表格
             table_msg, table_markup = format_tokens_table(
                 result["token_statistics"],
                 max_tokens=self.config.analysis.ranking_size,
                 sort_by=sort_by,
                 cache_key=cache_key,
+                target_token_symbol=target_symbol,
             )
 
             if not table_msg:

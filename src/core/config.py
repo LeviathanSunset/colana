@@ -50,7 +50,7 @@ class ProxyConfig:
 
     http_proxy: str = "http://127.0.0.1:10808"
     https_proxy: str = "http://127.0.0.1:10808"
-    enabled: bool = True
+    enabled: bool = False
 
 
 @dataclass
