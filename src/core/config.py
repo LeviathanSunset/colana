@@ -5,6 +5,7 @@
 
 import os
 from dataclasses import dataclass
+from typing import List
 import json
 
 
@@ -32,6 +33,14 @@ class AnalysisConfig:
     cluster_min_addresses: int = 2
     cluster_max_addresses: int = 50
     clusters_per_page: int = 3
+    # 已知的池子地址列表（即使OKX检测不到也要识别）
+    known_pool_addresses: List[str] = None
+    
+    def __post_init__(self):
+        if self.known_pool_addresses is None:
+            self.known_pool_addresses = [
+                "5Q544fKrFoe6tsEbD7S8EmxGTJYAKtTVhAW5Q5pge4j1"  # 已知池子地址
+            ]
 
 
 @dataclass
@@ -133,6 +142,7 @@ class ConfigManager:
             cluster_min_addresses=int(os.getenv("CLUSTER_MIN_ADDRESSES", 2)),
             cluster_max_addresses=int(os.getenv("CLUSTER_MAX_ADDRESSES", 50)),
             clusters_per_page=int(os.getenv("CLUSTERS_PER_PAGE", 3)),
+            known_pool_addresses=["5Q544fKrFoe6tsEbD7S8EmxGTJYAKtTVhAW5Q5pge4j1"],  # 默认已知池子地址
         )
 
         self._proxy_config = ProxyConfig(
@@ -198,6 +208,14 @@ class ConfigManager:
                     for key, value in jupiter_data.items():
                         if hasattr(self._jupiter_config, key):
                             setattr(self._jupiter_config, key, value)
+            
+            # 更新proxy配置
+            if "proxy" in config_data:
+                proxy_data = config_data["proxy"]
+                if hasattr(self._proxy_config, "__dict__"):
+                    for key, value in proxy_data.items():
+                        if hasattr(self._proxy_config, key):
+                            setattr(self._proxy_config, key, value)
             
             # 加载ca1允许的群组列表
             if "ca1_allowed_groups" in config_data:
@@ -297,6 +315,28 @@ class ConfigManager:
                     setattr(self._proxy_config, key, value)
 
         self.save_config()
+
+    def add_known_pool_address(self, address: str):
+        """添加已知的池子地址"""
+        if address not in self._analysis_config.known_pool_addresses:
+            self._analysis_config.known_pool_addresses.append(address)
+            self.save_config()
+            self.logger.info(f"✅ 已添加池子地址: {address}")
+            return True
+        else:
+            self.logger.info(f"⚠️ 池子地址已存在: {address}")
+            return False
+    
+    def remove_known_pool_address(self, address: str):
+        """移除已知的池子地址"""
+        if address in self._analysis_config.known_pool_addresses:
+            self._analysis_config.known_pool_addresses.remove(address)
+            self.save_config()
+            self.logger.info(f"✅ 已移除池子地址: {address}")
+            return True
+        else:
+            self.logger.info(f"⚠️ 池子地址不存在: {address}")
+            return False
 
 
 # 全局配置实例

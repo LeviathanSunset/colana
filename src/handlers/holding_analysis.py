@@ -8,25 +8,8 @@ import threading
 from telebot import TeleBot
 from telebot.types import Message, CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton
 from ..core.config import get_config
-from ..services.okx_crawler import OKXCrawlerForBot, format_tokens_table
 from ..services.formatter import MessageFormatter
 from ..handlers.base import BaseCommandHandler
-
-
-class HoldingAnalysisHandler(BaseCommandHandler):
-    """持仓分析处理器"""
-
-    def __init__(self, bot: TeleBot):
-        super().__init__(bot)
-        self.config = get_config()
-        self.formatter = MessageFormatter()
-
-import time
-import threading
-from telebot import TeleBot
-from telebot.types import Message, CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton
-from ..services.formatter import MessageFormatter
-from ..core.config import get_config
 
 # 导入OKX相关功能
 try:
@@ -47,83 +30,136 @@ except ImportError:
     OKXCrawlerForBot = None
 
 
-class HoldingAnalysisHandler:
+class HoldingAnalysisHandler(BaseCommandHandler):
     """持仓分析处理器"""
 
     def __init__(self, bot: TeleBot):
-        self.bot = bot
+        super().__init__(bot)
         self.config = get_config()
         self.formatter = MessageFormatter()
+        
+        # 添加logger
+        try:
+            from ..utils.logger import get_logger
+            self.logger = get_logger("holding_analysis")
+        except ImportError:
+            # 如果logger模块不可用，使用print作为后备
+            class SimpleLogger:
+                def info(self, msg): print(f"INFO: {msg}")
+                def error(self, msg): print(f"ERROR: {msg}")
+                def warning(self, msg): print(f"WARNING: {msg}")
+                def debug(self, msg): print(f"DEBUG: {msg}")
+                def log_performance(self, *args, **kwargs): pass
+                def error_with_solution(self, e, msg): 
+                    print(f"ERROR: {msg}: {e}")
+                    return {"error": str(e)}
+            self.logger = SimpleLogger()
 
         # 启动全局缓存清理（只启动一次）
         start_cache_cleanup()
 
-    def reply_with_topic(self, message: Message, text: str, **kwargs):
-        """统一的回复方法，回复到用户消息所在的topic"""
-        # 获取用户消息所在的topic ID
-        user_topic_id = getattr(message, "message_thread_id", None)
-        
-        if user_topic_id:
-            # 如果用户在某个topic中发送消息，回复到同一个topic
-            kwargs['message_thread_id'] = user_topic_id
-            return self.bot.send_message(
-                chat_id=message.chat.id,
-                text=text,
-                **kwargs
-            )
-        else:
-            # 如果不在topic中，使用普通回复
-            return self.bot.reply_to(message, text, **kwargs)
-
     def handle_ca1(self, message: Message) -> None:
         """处理 /ca1 命令 - OKX大户分析"""
-        if not OKXCrawlerForBot:
-            self.reply_with_topic(message, "❌ OKX分析功能暂时不可用\n请检查依赖模块是否正确安装")
-            return
+        try:
+            if not OKXCrawlerForBot:
+                error_msg = (
+                    "❌ OKX分析功能暂时不可用\n\n"
+                    "🔧 可能的解决方案:\n"
+                    "• 检查网络连接和代理设置\n"
+                    "• 确认OKX API服务正常\n"
+                    "• 重启Bot服务\n"
+                    "• 联系管理员检查依赖模块"
+                )
+                self.reply_with_topic(message, error_msg)
+                self.logger.error("OKX分析模块未加载，功能不可用")
+                return
 
-        # 检查群组权限
-        chat_id = str(message.chat.id)
-        allowed_groups = self.config.ca1_allowed_groups
-        
-        if allowed_groups and chat_id not in allowed_groups:
-            self.reply_with_topic(
-                message, 
-                "❌ 此功能仅在特定群组中可用\n如需使用，请联系管理员"
+            # 检查群组权限
+            chat_id = str(message.chat.id)
+            allowed_groups = self.config.ca1_allowed_groups
+            
+            if allowed_groups and chat_id not in allowed_groups:
+                self.reply_with_topic(
+                    message, 
+                    "❌ 此功能仅在特定群组中可用\n如需使用，请联系管理员"
+                )
+                self.logger.warning(f"未授权群组 {chat_id} 尝试使用ca1功能")
+                return
+
+            # 提取代币地址参数
+            parts = message.text.split(maxsplit=1)
+            if len(parts) < 2:
+                help_msg = (
+                    "❌ 请提供代币地址\n\n"
+                    "📋 使用方法:\n"
+                    "<code>/ca1 &lt;代币合约地址&gt;</code>\n\n"
+                    "📝 示例:\n"
+                    "<code>/ca1 FbGsCHv8qPvUdmomVAiG72ET5D5kgBJgGoxxfMZipump</code>\n\n"
+                    "💡 提示: 代币地址可从GMGN等平台复制"
+                )
+                self.reply_with_topic(message, help_msg, parse_mode="HTML")
+                return
+
+            token_address = parts[1].strip()
+
+            # 验证代币地址
+            if not token_address:
+                error_msg = (
+                    "❌ 代币地址不能为空\n\n"
+                    "📋 正确格式:\n"
+                    "<code>/ca1 FbGsCHv8qPvUdmomVAiG72ET5D5kgBJgGoxxfMZipump</code>"
+                )
+                self.reply_with_topic(message, error_msg, parse_mode="HTML")
+                return
+
+            if len(token_address) < 20:  # 简单验证地址长度
+                error_msg = (
+                    "❌ 代币地址格式不正确\n\n"
+                    "🔍 要求:\n"
+                    "• 地址长度至少20个字符\n"
+                    "• 使用有效的Solana代币合约地址\n\n"
+                    "💡 提示: 可从DEX平台或区块链浏览器获取正确地址"
+                )
+                self.reply_with_topic(message, error_msg, parse_mode="HTML")
+                return
+
+            self.logger.info(f"开始分析代币: {token_address}, 用户: {message.from_user.username}")
+
+            # 发送开始分析的消息
+            processing_msg = self.reply_with_topic(
+                message,
+                f"🔍 正在分析代币大户持仓...\n"
+                f"代币地址: `{token_address}`\n"
+                f"⏳ 预计需要1-2分钟，请稍候...\n"
+                f"📊 将分析前100名大户的持仓情况",
+                parse_mode="Markdown",
             )
-            return
 
-        # 提取代币地址参数
-        parts = message.text.split(maxsplit=1)
-        if len(parts) < 2:
-            self.reply_with_topic(message, "❌ 请提供代币地址\n用法: /ca1 <token_address>")
-            return
-
-        token_address = parts[1].strip()
-
-        if not token_address:
-            self.reply_with_topic(message, "❌ 请提供代币地址\n用法: /ca1 <token_address>")
-            return
-
-        if len(token_address) < 20:  # 简单验证地址长度
-            self.reply_with_topic(message, "❌ 请输入有效的代币地址")
-            return
-
-        # 发送开始分析的消息
-        processing_msg = self.reply_with_topic(
-            message,
-            f"🔍 正在分析代币大户持仓...\n代币地址: `{token_address}`\n⏳ 预计需要1-2分钟，请稍候...",
-            parse_mode="Markdown",
-        )
-
-        # 在后台线程中运行分析
-        analysis_thread = threading.Thread(
-            target=self._run_analysis, args=(processing_msg, token_address), daemon=True
-        )
-        analysis_thread.start()
+            # 在后台线程中运行分析
+            analysis_thread = threading.Thread(
+                target=self._run_analysis, 
+                args=(processing_msg, token_address), 
+                daemon=True
+            )
+            analysis_thread.start()
+            
+        except Exception as e:
+            self.logger.error_with_solution(e, f"ca1命令处理失败 - 用户: {message.from_user.username}")
+            error_msg = (
+                "❌ 命令处理失败\n\n"
+                "🔧 请尝试:\n"
+                "• 检查代币地址格式\n"
+                "• 稍后重试\n"
+                "• 使用 /help 查看使用说明"
+            )
+            self.reply_with_topic(message, error_msg)
 
     def _run_analysis(self, processing_msg, token_address: str):
         """在后台运行分析"""
+        start_time = time.time()
         try:
+            self.logger.info(f"后台分析开始: {token_address}")
+            
             # 清理过期缓存
             cleanup_expired_cache()
 
@@ -224,17 +260,96 @@ class HoldingAnalysisHandler:
                     reply_markup=markup,
                     disable_web_page_preview=True,
                 )
+                
+                # 记录成功的性能数据
+                analysis_duration = time.time() - start_time
+                self.logger.log_performance(
+                    f"代币分析-{token_address}", 
+                    analysis_duration,
+                    {
+                        "token_count": len(result.get("token_statistics", {}).get("top_tokens_by_value", [])),
+                        "holders_analyzed": result.get('total_holders_analyzed', 0),
+                        "target_holders": result.get("target_token_actual_holders", 0)
+                    }
+                )
+                self.logger.info(f"分析完成: {token_address}, 耗时: {analysis_duration:.2f}s")
+                
             else:
+                analysis_duration = time.time() - start_time
+                error_msg = (
+                    f"❌ 分析失败\n"
+                    f"代币地址: `{token_address}`\n\n"
+                    f"🔧 可能原因和解决方案:\n"
+                    f"• 🔍 代币地址无效 → 请检查地址格式\n"
+                    f"• 🌐 网络连接问题 → 检查网络和代理设置\n"
+                    f"• ⚡ API服务限制 → 稍后重试\n"
+                    f"• 📊 数据源异常 → 联系管理员\n\n"
+                    f"💡 建议:\n"
+                    f"• 确认代币在Solana链上\n"
+                    f"• 检查代币是否为新创建的代币\n"
+                    f"• 尝试使用其他代币地址测试\n\n"
+                    f"🕒 分析耗时: {analysis_duration:.1f}秒"
+                )
+                
                 self.bot.edit_message_text(
-                    f"❌ 分析失败\n代币地址: `{token_address}`\n\n可能原因:\n• 代币地址无效\n• 网络连接问题\n• API限制\n\n详细日志请查看 logs/okx_analysis/ 目录",
+                    error_msg,
                     processing_msg.chat.id,
                     processing_msg.message_id,
                     parse_mode="Markdown",
                 )
+                
+                self.logger.warning(f"分析失败但无异常: {token_address}, 耗时: {analysis_duration:.2f}s")
 
         except Exception as e:
+            analysis_duration = time.time() - start_time
+            
+            # 使用增强的错误处理
+            error_info = self.logger.error_with_solution(e, f"代币分析失败 - {token_address}")
+            
+            # 根据错误类型提供不同的用户消息
+            if "timeout" in str(e).lower():
+                user_error_msg = (
+                    f"❌ 分析超时\n"
+                    f"代币地址: `{token_address}`\n\n"
+                    f"🔧 解决方案:\n"
+                    f"• ⏰ 稍后重试（建议等待2-3分钟）\n"
+                    f"• 🌐 检查网络连接稳定性\n"
+                    f"• 📊 该代币可能持有者过多，处理时间较长\n\n"
+                    f"🕒 已分析: {analysis_duration:.1f}秒"
+                )
+            elif "connection" in str(e).lower():
+                user_error_msg = (
+                    f"❌ 网络连接失败\n"
+                    f"代币地址: `{token_address}`\n\n"
+                    f"🔧 解决方案:\n"
+                    f"• 🌐 检查网络连接\n"
+                    f"• 🔄 检查代理设置\n"
+                    f"• ⏰ 稍后重试\n\n"
+                    f"💡 提示: 网络不稳定时可能影响分析效果"
+                )
+            elif "rate limit" in str(e).lower():
+                user_error_msg = (
+                    f"❌ API调用频率限制\n"
+                    f"代币地址: `{token_address}`\n\n"
+                    f"🔧 解决方案:\n"
+                    f"• ⏰ 等待5-10分钟后重试\n"
+                    f"• 📈 避免短时间内多次分析\n"
+                    f"• 🎯 优先分析重要代币\n\n"
+                    f"💡 提示: API限流是为了保护服务稳定性"
+                )
+            else:
+                user_error_msg = (
+                    f"❌ 分析过程中发生错误\n"
+                    f"代币地址: `{token_address}`\n"
+                    f"错误类型: {error_info['category']}\n\n"
+                    f"🔧 建议解决方案:\n"
+                )
+                for i, solution in enumerate(error_info['solutions'][:3], 1):
+                    user_error_msg += f"• {solution}\n"
+                user_error_msg += f"\n🕒 分析耗时: {analysis_duration:.1f}秒"
+                
             self.bot.edit_message_text(
-                f"❌ 分析过程中发生错误\n代币地址: `{token_address}`\n错误信息: {str(e)}\n\n详细日志请查看 logs/okx_analysis/ 目录",
+                user_error_msg,
                 processing_msg.chat.id,
                 processing_msg.message_id,
                 parse_mode="Markdown",

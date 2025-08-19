@@ -1,10 +1,10 @@
 {
   "bot": {
-    "telegram_token": "7962867262:AAGg0abpPE3nr4spCrFklnewq5gMFJWNqgY",
-    "telegram_chat_id": "-1002760368002",
-    "message_thread_id": "40517",
+    "telegram_token": "YOUR_BOT_TOKEN_HERE",
+    "telegram_chat_id": "YOUR_CHAT_ID_HERE",
+    "message_thread_id": "YOUR_THREAD_ID_HERE",
     "interval": 58,
-    "threshold": 0.05,
+    "threshold": 0.1,
     "min_market_cap": 0,
     "min_age_days": 10
   },
@@ -14,11 +14,36 @@
     "detail_buttons_count": 30,
     "cluster_min_common_tokens": 2,
     "cluster_min_addresses": 2,
-    "cluster_max_addresses": 50
+    "cluster_max_addresses": 50,
+    "clusters_per_page": 5
   },
   "proxy": {
     "http_proxy": "http://127.0.0.1:10808",
     "https_proxy": "http://127.0.0.1:10808",
-    "enabled": true
+    "enabled": false
+  },
+  "capump": {
+    "interval": 58,
+    "threshold": 0.1,
+    "min_market_cap": 0,
+    "min_age_days": 3,
+    "max_tokens_per_batch": 10,
+    "auto_analysis_enabled": false
+  },
+  "jupiter": {
+    "max_mcap": 1000000,
+    "min_token_age": 3600,
+    "period": "24h",
+    "default_token_count": 10,
+    "max_tokens_per_analysis": 50
+  },
+  "ca1_allowed_groups": [
+    "YOUR_ALLOWED_GROUP_ID_1",
+    "YOUR_ALLOWED_GROUP_ID_2"
+  ],
+  "health_check": {
+    "enabled": true,
+    "port": 8080,
+    "host": "0.0.0.0"
   }
 }

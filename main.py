@@ -14,8 +14,9 @@ from datetime import datetime
 # 添加src目录到Python路径
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'src'))
 
-# 导入日志模块
+# 导入日志模块和健康检查
 from src.utils.logger import get_logger
+from src.utils.health_check import get_health_status, update_service_status, increment_stat
 
 import telebot
 from src.core.config import get_config, setup_proxy
@@ -39,10 +40,12 @@ class TokenAnalysisBot:
         """初始化分析机器人"""
         # 初始化日志器
         self.logger = get_logger("main")
+        self.health_status = get_health_status()
         self.logger.info("🚀 初始化代币分析机器人...")
         
         try:
             self.config = get_config()
+            update_service_status("telegram_bot", "initializing")
             
             # Bot重启时清空所有存储文件
             self.logger.info("🗑️ Bot重启，清空所有存储文件...")
@@ -54,6 +57,7 @@ class TokenAnalysisBot:
             # 初始化机器人
             self.bot = telebot.TeleBot(self.config.bot.telegram_token)
             self.logger.info("✅ Telegram Bot 初始化成功")
+            update_service_status("telegram_bot", "healthy")
             
             # 初始化消息格式化器
             self.formatter = MessageFormatter()
@@ -67,7 +71,8 @@ class TokenAnalysisBot:
             self.logger.info("✅ 所有处理器初始化成功")
             
         except Exception as e:
-            self.logger.exception(f"❌ 初始化失败: {e}")
+            update_service_status("telegram_bot", "error", str(e))
+            self.logger.error_with_solution(e, "Bot初始化失败")
             raise
         
         # 注册处理器
@@ -353,21 +358,38 @@ class TokenAnalysisBot:
         """启动机器人"""
         self.logger.info("🤖 启动代币分析Bot...")
         
-        # 启动爬虫线程
-        self.logger.info("🎯 启动爬虫线程...")
-        crawler_thread = threading.Thread(target=self.crawler_loop, daemon=True)
-        crawler_thread.start()
-        self.logger.info("✅ 爬虫线程启动成功")
-        
-        # 启动bot轮询
-        while True:
-            try:
-                self.logger.info("👂 开始监听Telegram消息...")
-                self.bot.polling(none_stop=True, interval=3, timeout=30)
-            except Exception as e:
-                self.logger.exception(f"❌ Bot轮询发生错误: {e}")
-                self.logger.info("⏳ 等待3秒后重新开始轮询...")
-                time.sleep(3)
+        try:
+            # 启动爬虫线程
+            self.logger.info("🎯 启动爬虫线程...")
+            crawler_thread = threading.Thread(target=self.crawler_loop, daemon=True)
+            crawler_thread.start()
+            self.logger.info("✅ 爬虫线程启动成功")
+            update_service_status("crawler", "healthy")
+            
+            # 更新统计信息
+            increment_stat("requests_total", 0)  # 初始化统计
+            
+            # 启动bot轮询
+            while True:
+                try:
+                    self.logger.info("👂 开始监听Telegram消息...")
+                    self.health_status.update_heartbeat()
+                    self.bot.polling(none_stop=True, interval=3, timeout=30)
+                except Exception as e:
+                    increment_stat("errors_total")
+                    update_service_status("telegram_bot", "error", str(e))
+                    self.logger.error_with_solution(e, "Bot轮询错误")
+                    self.logger.info("⏳ 等待5秒后重新开始轮询...")
+                    time.sleep(5)
+                    
+        except Exception as e:
+            update_service_status("telegram_bot", "error", str(e))
+            self.logger.error_with_solution(e, "Bot启动失败")
+            raise
+
+    def run(self):
+        """运行机器人（兼容性方法）"""
+        self.start()
 
 
 def main():

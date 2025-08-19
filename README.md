@@ -71,26 +71,82 @@
 - **多线程处理**: 每个群组独立的分析线程
 - **错误恢复**: 网络错误自动重试
 - **数据持久化**: 重启后自动恢复分析状态
+- **健康监控**: HTTP健康检查接口
+- **智能日志**: 详细错误分析和解决方案
 
 ## 安装和配置
 
 1. 克隆项目
 2. 安装依赖：`pip install -r requirements.txt`
-3. 配置 `config/config.json`
-4. 运行：`python main.py`
+3. 配置 `config/config.json`（参考 `config/config.example.json`）
+4. 运行：`python main.py` 或 `python production_start.py`
 
 详细配置说明请参考 `config/config.example.json`。
+
+## 健康检查和监控
+
+### 启用健康检查
+设置环境变量：`ENABLE_HEALTH_CHECK=true`
+
+### 监控端点
+- **基础检查**: `http://localhost:8080/health`
+- **详细状态**: `http://localhost:8080/status`
+- **系统指标**: `http://localhost:8080/metrics`
+
+### 日志系统
+- **主日志**: `storage/logs/模块名_YYYYMMDD.log`
+- **错误日志**: `storage/logs/模块名_error_YYYYMMDD.log`
+- **解决方案**: `storage/logs/模块名_solutions_YYYYMMDD.log`
+
+### 功能演示
+运行演示脚本查看增强功能：
+```bash
+python demo_enhanced_features.py
+```
+
+## 故障排除
+
+### 常见问题和解决方案
+
+**Bot无法启动**
+- 检查Telegram Token是否正确
+- 确认网络连接正常
+- 查看错误日志获取详细信息
+
+**分析功能不可用**
+- 检查API服务状态
+- 确认代理设置正确
+- 验证代币地址格式
+
+**性能问题**
+- 调整并发数量
+- 检查网络延迟
+- 监控系统资源使用
+
+**权限错误**
+- 检查文件和目录权限
+- 确认Bot在授权群组中
+- 验证管理员权限
 
 ## 注意事项
 
 - 自动分析功能会消耗一定的API资源
 - 建议合理使用黑名单功能
-- 数据文件存储在 `data/` 目录
-- 分析状态保存在 `data/auto_pump_status.json`
+- 数据文件存储在 `storage/` 目录
+- 分析状态保存在 `storage/config/auto_pump_status.json`
+- 定期检查日志文件以监控系统状态
 
 ## 更新日志
 
-### v2.0.0 (最新)
+### v2.1.0 (最新)
+- 🏥 新增健康检查系统
+- 📖 完善帮助和文档系统
+- 🔧 增强错误处理和解决方案
+- 📊 改进日志系统和监控
+- 🛡️ 增强异常恢复机制
+- 📈 添加性能监控和API调用跟踪
+
+### v2.0.0
 - 新增自动pump分析功能 (`/capump`)
 - 支持多群组独立分析
 - 增强错误处理和恢复机制

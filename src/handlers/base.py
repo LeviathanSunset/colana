@@ -53,7 +53,7 @@ class BaseCommandHandler:
 
     def handle_help(self, message: Message) -> None:
         """处理 /help 命令"""
-        help_msg = self.formatter.format_welcome_message()
+        help_msg = self.formatter.format_help_message()
         self.reply_with_topic(message, help_msg, parse_mode="HTML")
 
     def handle_topicid(self, message: Message) -> None:

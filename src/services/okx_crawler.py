@@ -405,6 +405,24 @@ class OKXCrawlerForBot:
         """
         判断持有者是否应该被排除（流动性池、交易所等）
         """
+        # 获取钱包地址
+        wallet_address = holder.get("holderWalletAddress", "")
+        
+        # 检查是否为已知的池子地址（即使OKX没有标记也要排除）
+        try:
+            from ..core.config import get_config
+            config = get_config()
+            known_pools = getattr(config.analysis, 'known_pool_addresses', [])
+            if wallet_address in known_pools:
+                self.log_info(f"识别到已知池子地址: {wallet_address[:8]}...{wallet_address[-6:]}")
+                return True
+        except (ImportError, AttributeError):
+            # 回退到硬编码的已知池子地址
+            known_pools = ["5Q544fKrFoe6tsEbD7S8EmxGTJYAKtTVhAW5Q5pge4j1"]
+            if wallet_address in known_pools:
+                self.log_info(f"识别到已知池子地址: {wallet_address[:8]}...{wallet_address[-6:]}")
+                return True
+        
         # 检查 holderTagVO
         holder_tag_vo = holder.get("holderTagVO", {})
         if holder_tag_vo:
@@ -1560,22 +1578,18 @@ def format_target_token_rankings(ranking_result: Dict) -> str:
     # 计算阴谋钱包流通量占比（需要在前面计算，因为后面会用到）
     conspiracy_supply_percentage = sum(r.get("target_supply_percentage", 0) for r in rankings if r.get("is_conspiracy_wallet", False))
     
+    # 计算分析地址流通量占比
+    analysis_percentage = sum(r.get("target_supply_percentage", 0) for r in rankings)
+    
     msg = f"📊 <b>{symbol} 价值排名分析</b>\n"
-    msg += f"🎯 分析地址: <b>{total_addresses}</b> 个大户\n"
+    msg += f"🎯 分析地址: <b>{total_addresses}</b> 个大户（{analysis_percentage:.1f}%）\n"
     msg += f"💎 实际持有: <b>{actual_holders}</b> 个 ({(actual_holders/total_addresses)*100:.1f}%)\n"
     
     # 阴谋钱包信息
     if conspiracy_count > 0:
-        conspiracy_percentage = (conspiracy_count / total_addresses) * 100
-        if conspiracy_total_value >= 1_000_000:
-            conspiracy_value_str = f"${conspiracy_total_value/1_000_000:.2f}M"
-        elif conspiracy_total_value >= 1_000:
-            conspiracy_value_str = f"${conspiracy_total_value/1_000:.2f}K"
-        else:
-            conspiracy_value_str = f"${conspiracy_total_value:.0f}"
-        msg += f"🔴 阴谋钱包: <b>{conspiracy_count}</b> 个 ({conspiracy_supply_percentage:.1f}%) | 总值: {conspiracy_value_str}\n"
+        msg += f"🔴 阴谋钱包: <b>{conspiracy_count}</b> 个 ({conspiracy_supply_percentage:.1f}%)\n"
     
-    msg += "─" * 35 + "\n\n"
+    msg += "───────────────────────────────────\n\n"
     
     # 统计信息
     if avg_rank > 0:
@@ -1604,7 +1618,7 @@ def format_target_token_rankings(ranking_result: Dict) -> str:
         rank_supply_percentages[rank_key] = rank_supply_percentages.get(rank_key, 0) + supply_percentage
     
     # 排名分布（显示占流通量比例）
-    msg += f"📊 <b>排名分布</b> (占流通量比例)\n"
+    msg += f"📊 <b>排名分布</b>  | 均值 | 总值 | 占流通量\n\n"
     
     # 定义排名区间和对应emoji
     rank_ranges = [
@@ -1632,58 +1646,57 @@ def format_target_token_rankings(ranking_result: Dict) -> str:
         if count > 0:
             supply_percentage = rank_supply_percentages.get(rank_key, 0)
             value = rank_values.get(rank_key, 0)
+            
+            # 计算均值
+            avg_value = value / count if count > 0 else 0
+            
+            # 格式化总值
             if value >= 1_000_000:
-                value_str = f"${value/1_000_000:.2f}M"
+                value_str = f"${value/1_000_000:.1f}M"
             elif value >= 1_000:
-                value_str = f"${value/1_000:.2f}K"
+                value_str = f"${value/1_000:.1f}K"
             else:
                 value_str = f"${value:.0f}"
-            msg += f"{emoji} {rank_key}: <b>{count}</b> 人 ({value_str}) {supply_percentage:.2f}%\n"
+            
+            # 格式化均值
+            if avg_value >= 1_000_000:
+                avg_value_str = f"${avg_value/1_000_000:.1f}M"
+            elif avg_value >= 1_000:
+                avg_value_str = f"${avg_value/1_000:.1f}K"
+            else:
+                avg_value_str = f"${avg_value:.0f}"
+            
+            msg += f"{emoji} {rank_key}: <b>{count}</b> 人 | {avg_value_str} | {value_str} | {supply_percentage:.2f}%\n"
     
     # 添加>10名统计
     if over_10_count > 0:
         supply_percentage = rank_supply_percentages.get(">10名", 0)
         value = rank_values.get(">10名", 0)
-        if value >= 1_000_000:
-            value_str = f"${value/1_000_000:.2f}M"
-        elif value >= 1_000:
-            value_str = f"${value/1_000:.2f}K"
-        else:
-            value_str = f"${value:.0f}"
+        
         # 计算>10名地址的平均持仓价值
         avg_value = value / over_10_count if over_10_count > 0 else 0
-        if avg_value >= 1000:
-            avg_value_str = f"${avg_value/1000:.1f}K"
+        
+        # 格式化总值
+        if value >= 1_000_000:
+            value_str = f"${value/1_000_000:.1f}M"
+        elif value >= 1_000:
+            value_str = f"${value/1_000:.1f}K"
+        else:
+            value_str = f"${value:.0f}"
+        
+        # 格式化均值
+        if avg_value >= 1_000_000:
+            avg_value_str = f"${avg_value/1_000_000:.1f}M"
+        elif avg_value >= 1_000:
+            avg_value_str = f"${avg_value/1_000:.1f}K"
         else:
             avg_value_str = f"${avg_value:.0f}"
-        msg += f"📉 >10名: <b>{over_10_count}</b> 人 ({value_str}, 均值: {avg_value_str}) {supply_percentage:.2f}%\n"
+        
+        msg += f"📉 >10名: <b>{over_10_count}</b> 人 | {avg_value_str} | {value_str} | {supply_percentage:.2f}%\n"
     
-    # Top排名统计 - 计算流通量占比
-    top3_count = statistics.get("top3_count", 0)
-    top5_count = statistics.get("top5_count", 0) 
-    top10_count = statistics.get("top10_count", 0)
+    msg += "\n───────────────────────────────────\n\n"
     
-    # 计算各层级的流通量占比
-    top3_supply_percentage = sum(r.get("target_supply_percentage", 0) for r in rankings if r["target_token_rank"] <= 3)
-    top5_supply_percentage = sum(r.get("target_supply_percentage", 0) for r in rankings if r["target_token_rank"] <= 5)
-    top10_supply_percentage = sum(r.get("target_supply_percentage", 0) for r in rankings if r["target_token_rank"] <= 10)
-    
-    msg += f"\n🎯 <b>重点统计</b>\n"
-    msg += f"🔥 前3名: <b>{top3_count}</b> 人 ({top3_supply_percentage:.2f}%)\n"
-    msg += f"⭐ 前5名: <b>{top5_count}</b> 人 ({top5_supply_percentage:.2f}%)\n"
-    msg += f"📈 前10名: <b>{top10_count}</b> 人 ({top10_supply_percentage:.2f}%)\n"
-    
-    # 阴谋钱包统计
-    if conspiracy_count > 0:
-        msg += f"🔴 阴谋钱包: <b>{conspiracy_count}</b> 人 ({conspiracy_supply_percentage:.2f}%) | 持仓占比>50%\n"
-    
-    msg += "\n"
-    
-    # 智能分析
-    msg += f"🧠 <b>智能分析</b>\n"
-    msg += f"{analysis}\n\n"
-    
-    msg += f"⭐ <i>点击下方按钮查看对应排名的地址详情</i>\n"
+    msg += f"⭐️ <i>点击下方按钮查看对应排名的地址详情</i>\n"
     msg += f"📊 <i>所有百分比均为占代币流通量的比例</i>\n"
     
     return msg
