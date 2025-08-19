@@ -12,6 +12,9 @@ import os
 from datetime import datetime
 from typing import List, Dict, Optional
 
+# SOL原生代币的合约地址
+SOL_TOKEN_ADDRESS = "So11111111111111111111111111111111111111111"
+
 
 class OKXCrawlerForBot:
     """
@@ -289,9 +292,7 @@ class OKXCrawlerForBot:
                 if balance_details and len(balance_details) > 0:
                     address = balance_details[0].get("address", "")
 
-                # 过滤掉SOL代币（原生代币，不需要分析）
-                if symbol == "SOL":
-                    continue
+                # 注意：SOL代币现在包含在代币表中，但不参与地址集群分析
 
                 # 数值字段转换
                 try:
@@ -311,7 +312,7 @@ class OKXCrawlerForBot:
                     "price_usd": price_usd,
                 }
 
-                # 只添加有价值的代币（排除SOL后）
+                # 只添加有价值的代币（现在包括SOL）
                 if token_info["value_usd"] > 0:
                     all_tokens.append(token_info)
 
@@ -509,8 +510,8 @@ class OKXCrawlerForBot:
                 }
                 all_tokens[token_addr]["holders_details"].append(holder_detail)
 
-        # 过滤总价值大于20U的代币，然后按总价值排序
-        filtered_tokens = [token for token in all_tokens.values() if token["total_value"] >= 20]
+        # 过滤：持有人数>=5 且 总价值>=50U 的代币，然后按总价值排序
+        filtered_tokens = [token for token in all_tokens.values() if token["total_value"] >= 50 and token["holder_count"] >= 5]
         sorted_tokens = sorted(filtered_tokens, key=lambda x: x["total_value"], reverse=True)
 
         analysis_result = {
@@ -541,7 +542,7 @@ class OKXCrawlerForBot:
         self.log_info(f"分析完成，结果已保存到: {log_file}")
         self.log_info(f"过滤统计: 原始 {len(holders)} 个持有者，排除 {excluded_count} 个流动性池/交易所，分析 {len(holder_analysis)} 个真实投资者")
         self.log_info(
-            f"发现 {len(all_tokens)} 种代币，过滤后 {len(filtered_tokens)} 种代币(≥$20)，总价值 ${sum(token['total_value'] for token in sorted_tokens):,.2f}"
+            f"发现 {len(all_tokens)} 种代币，过滤后 {len(filtered_tokens)} 种代币(≥5人持有且≥$50价值)，总价值 ${sum(token['total_value'] for token in sorted_tokens):,.2f}"
         )
 
         return analysis_result
@@ -881,13 +882,17 @@ def analyze_address_clusters(analysis_result: Dict) -> Dict:
     if not all_tokens:
         return {"clusters": []}
 
-    # 1. 构建地址-代币映射
+    # 1. 构建地址-代币映射 (排除SOL代币，因为SOL不参与集群分析)
     address_tokens = {}  # {address: set(token_addresses)}
     token_holders = {}  # {token_address: set(addresses)}
 
     for token in all_tokens:
         token_address = token["address"]
         holders_details = token.get("holders_details", [])
+
+        # 排除SOL代币参与地址集群分析（使用合约地址判断更准确）
+        if token_address == SOL_TOKEN_ADDRESS:
+            continue
 
         if not token_address or not holders_details:
             continue
