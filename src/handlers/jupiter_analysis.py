@@ -311,9 +311,17 @@ class JupiterAnalysisHandler(BaseCommandHandler):
                 name = token_info['name']
                 holder_count = token_info['holder_count']
                 
+                # 清理名称中的链标识
+                clean_name = name
+                if clean_name:
+                    # 移除常见的链标识后缀
+                    clean_name = clean_name.replace(' (Solana)', '').replace('(Solana)', '')
+                    clean_name = clean_name.replace(' (SOL)', '').replace('(SOL)', '')
+                    clean_name = clean_name.strip()
+                
                 cross_info += f"{i}. <b>{symbol}</b>"
-                if name and name != symbol:
-                    cross_info += f" ({name})"
+                if clean_name and clean_name != symbol:
+                    cross_info += f" ({clean_name})"
                 cross_info += f"\n"
                 cross_info += f"   📊 交叉大户: {holder_count} 个\n"
                 cross_info += f"   📍 <code>{token_addr}</code>\n"
@@ -460,6 +468,12 @@ class JupiterAnalysisHandler(BaseCommandHandler):
         """生成值得关注的代币消息"""
         try:
             if chat_id not in self.token_messages:
+                print(f"⚠️ chat_id {chat_id} 的token_messages数据不存在")
+                return
+            
+            # 检查token_messages数据是否为空
+            if not self.token_messages[chat_id]:
+                print(f"⚠️ chat_id {chat_id} 的token_messages数据为空")
                 return
             
             # 定义排除的代币地址
@@ -551,22 +565,48 @@ class JupiterAnalysisHandler(BaseCommandHandler):
                 click_link = f"https://t.me/c/{chat_id_str}/{message_id}"
                 
                 msg += f"{i}. <a href=\"{click_link}\"><b>{target_symbol}</b></a>\n"
-                msg += f"   🎯 大户持有 <b>{worthy_count}</b> 个优质代币:\n"
                 
-                # 显示前3个最优质的持仓
-                for j, holding in enumerate(sorted(worthy_holdings, key=lambda x: (x['holder_count'], x['total_value']), reverse=True)[:3], 1):
+                # 计算过滤后的优质代币数量（排除SOL、USDC、USDT）
+                filtered_count = 0
+                for holding in worthy_holdings:
+                    symbol = holding.get('symbol', '').upper()
+                    if symbol not in ['SOL', 'USDC', 'USDT']:
+                        filtered_count += 1
+                
+                msg += f"   🎯 大户持有 <b>{filtered_count}</b> 个优质代币:\n"
+                
+                # 显示前3个最优质的持仓（排除SOL、USDC、USDT）
+                filtered_holdings = []
+                for holding in worthy_holdings:
+                    # 检查是否为排除的代币（通过符号匹配）
+                    symbol = holding.get('symbol', '').upper()
+                    if symbol not in ['SOL', 'USDC', 'USDT']:
+                        filtered_holdings.append(holding)
+                
+                # 对过滤后的代币按持仓人数和总价值排序
+                sorted_filtered_holdings = sorted(filtered_holdings, key=lambda x: (x['holder_count'], x['total_value']), reverse=True)
+                
+                for j, holding in enumerate(sorted_filtered_holdings[:3], 1):
                     symbol = holding['symbol']
                     name = holding['name']
                     holder_count = holding['holder_count']
                     total_value = holding['total_value']
                     
+                    # 清理名称中的链标识
+                    clean_name = name
+                    if clean_name:
+                        # 移除常见的链标识后缀
+                        clean_name = clean_name.replace(' (Solana)', '').replace('(Solana)', '')
+                        clean_name = clean_name.replace(' (SOL)', '').replace('(SOL)', '')
+                        clean_name = clean_name.strip()
+                    
                     msg += f"      • <b>{symbol}</b>"
-                    if name and name != symbol:
-                        msg += f" ({name})"
+                    if clean_name and clean_name != symbol:
+                        msg += f" ({clean_name})"
                     msg += f": {holder_count}人 ${total_value:,.0f}\n"
                 
-                if len(worthy_holdings) > 3:
-                    msg += f"      • ... 还有 {len(worthy_holdings) - 3} 个优质代币\n"
+                if len(sorted_filtered_holdings) > 3:
+                    msg += f"      • ... 还有 {len(sorted_filtered_holdings) - 3} 个优质代币\n"
                 
                 msg += "\n"
             
@@ -588,7 +628,7 @@ class JupiterAnalysisHandler(BaseCommandHandler):
                     markup.row(*buttons)
                 
                 # 页码信息
-                markup.row(InlineKeyboardButton(f"� {page}/{total_pages} (共{total_tokens}个)", callback_data="dummy"))
+                markup.row(InlineKeyboardButton(f"📄 {page}/{total_pages} (共{total_tokens}个)", callback_data="dummy"))
             
             # 发送消息
             self.send_to_topic(
@@ -663,9 +703,18 @@ class JupiterAnalysisHandler(BaseCommandHandler):
         except Exception as e:
             print(f"❌ 发送分析总结失败: {e}")
         finally:
-            # 清理token_messages缓存
-            if chat_id in self.token_messages:
-                del self.token_messages[chat_id]
+            # 延迟清理token_messages缓存，给用户时间使用翻页功能
+            def delayed_cleanup():
+                import time
+                time.sleep(1800)  # 30分钟后清理
+                if chat_id in self.token_messages:
+                    del self.token_messages[chat_id]
+                    print(f"🧹 已清理chat_id {chat_id}的token_messages缓存")
+            
+            # 启动延迟清理线程
+            import threading
+            cleanup_thread = threading.Thread(target=delayed_cleanup, daemon=True)
+            cleanup_thread.start()
     
     def register_handlers(self) -> None:
         """注册处理器"""
@@ -713,6 +762,11 @@ class JupiterAnalysisHandler(BaseCommandHandler):
             
             chat_id = parts[2]
             page = int(parts[3])
+            
+            # 检查token_messages数据是否还存在
+            if chat_id not in self.token_messages:
+                self.bot.answer_callback_query(call.id, "❌ 分析数据已过期，请重新运行 /cajup 分析")
+                return
             
             # 获取消息的thread_id
             thread_id = getattr(call.message, 'message_thread_id', None)
