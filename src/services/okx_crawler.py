@@ -1243,6 +1243,7 @@ def analyze_address_clusters(analysis_result: Dict) -> Dict:
 
         # 排除SOL代币参与地址集群分析（使用合约地址判断更准确）
         if token_address == SOL_TOKEN_ADDRESS:
+            logger.info(f"过滤SOL代币，地址: {token_address}")
             continue
 
         if not token_address or not holders_details:

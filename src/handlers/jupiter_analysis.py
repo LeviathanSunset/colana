@@ -44,6 +44,7 @@ class JupiterAnalysisHandler(BaseCommandHandler):
         self.config = get_config()
         self.analysis_threads = {}  # chat_id -> thread
         self.analysis_status = {}   # chat_id -> status info
+        self.token_messages = {}    # chat_id -> {token_address: message_id} 保存代币分析消息ID
         
         # 启动全局缓存清理（只启动一次）
         start_cache_cleanup()
@@ -77,10 +78,12 @@ class JupiterAnalysisHandler(BaseCommandHandler):
             
             self.reply_with_topic(
                 message,
-                f"⏳ Jupiter分析正在进行中...\n\n"
-                f"📊 进度: {current}/{total}\n"
-                f"🕐 开始时间: {status.get('start_time', '未知')}\n\n"
-                f"请等待当前分析完成后再开始新的分析"
+                f"📊 <b>热门代币榜单分析进行中...</b>\n\n"
+                f"🔍 当前分析: <b>{current}/{total}</b>\n"
+                f"🕐 开始时间: {status.get('start_time', '未知')}\n"
+                f"⏳ 正在获取前100大户数据...\n\n"
+                f"请等待当前分析完成后再开始新的分析",
+                parse_mode='HTML'
             )
             return
         
@@ -164,11 +167,13 @@ class JupiterAnalysisHandler(BaseCommandHandler):
             self.analysis_status[chat_id]['total'] = actual_count
             
             self.bot.edit_message_text(
-                f"✅ 获取到 {actual_count} 个热门代币\n\n"
-                f"🔍 开始逐个分析大户持仓...\n"
-                f"📊 进度: 0/{actual_count}",
+                f"✅ 获取到 <b>{actual_count}</b> 个热门代币\n\n"
+                f"� <b>热门代币榜单分析进行中...</b>\n"
+                f"� 当前分析: <b>0/{actual_count}</b>\n"
+                f"⏳ 准备开始分析...",
                 processing_msg.chat.id,
-                processing_msg.message_id
+                processing_msg.message_id,
+                parse_mode='HTML'
             )
             
             # 逐个分析代币
@@ -188,10 +193,10 @@ class JupiterAnalysisHandler(BaseCommandHandler):
                     
                     # 更新进度
                     self.bot.edit_message_text(
-                        f"📊 Jupiter代币分析进行中...\n\n"
-                        f"🔍 当前分析: {i}/{actual_count}\n"
+                        f"📊 <b>热门代币榜单分析进行中...</b>\n\n"
+                        f"🔍 当前分析: <b>{i}/{actual_count}</b>\n"
                         f"📍 代币地址: <code>{token_address}</code>\n"
-                        f"⏳ 正在获取大户数据...",
+                        f"⏳ 正在获取前100大户数据...",
                         processing_msg.chat.id,
                         processing_msg.message_id,
                         parse_mode='HTML'
@@ -425,7 +430,7 @@ class JupiterAnalysisHandler(BaseCommandHandler):
                         )
                     
                     # 发送分析结果到topic（如果有的话）
-                    self.send_to_topic(
+                    sent_message = self.send_to_topic(
                         chat_id,
                         final_msg,
                         thread_id=thread_id,
@@ -434,6 +439,15 @@ class JupiterAnalysisHandler(BaseCommandHandler):
                         disable_web_page_preview=True
                     )
                     
+                    # 保存消息ID用于后续的"值得关注代币"汇总
+                    if chat_id not in self.token_messages:
+                        self.token_messages[chat_id] = {}
+                    self.token_messages[chat_id][token_address] = {
+                        'message_id': sent_message.message_id,
+                        'symbol': target_symbol,
+                        'result': result
+                    }
+                    
                     return True
             
             return False
@@ -441,6 +455,153 @@ class JupiterAnalysisHandler(BaseCommandHandler):
         except Exception as e:
             print(f"❌ 单个代币分析失败 {token_address}: {e}")
             return False
+
+    def _generate_worthy_tokens_message(self, chat_id: str, thread_id=None, page=1, page_size=10):
+        """生成值得关注的代币消息"""
+        try:
+            if chat_id not in self.token_messages:
+                return
+            
+            # 定义排除的代币地址
+            excluded_tokens = {
+                'So11111111111111111111111111111111111111111',  # SOL
+                'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v',  # USDC
+                'Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB',   # USDT
+            }
+            
+            worthy_target_tokens = []
+            
+            # 遍历所有分析的目标代币
+            for target_token_address, token_data in self.token_messages[chat_id].items():
+                result = token_data['result']
+                token_stats = result.get('token_statistics', {})
+                top_tokens = token_stats.get('top_tokens_by_value', [])
+                
+                # 检查该目标代币的大户持有的其他代币是否有符合条件的
+                has_worthy_holdings = False
+                worthy_holdings_details = []
+                
+                for token_info in top_tokens:
+                    token_addr = token_info.get('address', '')
+                    
+                    # 跳过目标代币本身和排除列表中的代币
+                    if token_addr == target_token_address or token_addr in excluded_tokens:
+                        continue
+                    
+                    holder_count = token_info.get('holder_count', 0)
+                    total_value = token_info.get('total_value', 0)
+                    
+                    # 检查是否符合条件：共同持仓人数>=8且总价值>10k
+                    if holder_count >= 8 and total_value > 10000:
+                        has_worthy_holdings = True
+                        worthy_holdings_details.append({
+                            'symbol': token_info.get('symbol', 'Unknown'),
+                            'name': token_info.get('name', ''),
+                            'holder_count': holder_count,
+                            'total_value': total_value
+                        })
+                
+                # 如果该目标代币的大户持有符合条件的代币，则该目标代币值得关注
+                if has_worthy_holdings:
+                    worthy_target_tokens.append({
+                        'target_symbol': token_data['symbol'],
+                        'target_address': target_token_address,
+                        'message_id': token_data['message_id'],
+                        'worthy_holdings': worthy_holdings_details,
+                        'worthy_count': len(worthy_holdings_details),
+                        'max_holder_count': max(h['holder_count'] for h in worthy_holdings_details),
+                        'total_worthy_value': sum(h['total_value'] for h in worthy_holdings_details)
+                    })
+            
+            if not worthy_target_tokens:
+                return
+            
+            # 按worthy_count和max_holder_count排序
+            sorted_tokens = sorted(
+                worthy_target_tokens, 
+                key=lambda x: (x['worthy_count'], x['max_holder_count'], x['total_worthy_value']), 
+                reverse=True
+            )
+            
+            # 分页计算
+            total_tokens = len(sorted_tokens)
+            total_pages = (total_tokens + page_size - 1) // page_size
+            start_idx = (page - 1) * page_size
+            end_idx = min(start_idx + page_size, total_tokens)
+            page_tokens = sorted_tokens[start_idx:end_idx]
+            
+            # 构建消息
+            msg = "🎯 <b>值得关注的代币</b>"
+            if total_pages > 1:
+                msg += f" (第{page}/{total_pages}页)"
+            msg += "\n\n"
+            msg += "📋 <i>筛选条件：大户持有其他代币中有共同持仓人数≥8且总价值>$10K的</i>\n"
+            msg += "🚫 <i>已排除：SOL、USDC、USDT</i>\n\n"
+            
+            # 生成可点击的目标代币列表
+            for i, target_token in enumerate(page_tokens, start_idx + 1):
+                target_symbol = target_token['target_symbol']
+                message_id = target_token['message_id']
+                worthy_holdings = target_token['worthy_holdings']
+                worthy_count = target_token['worthy_count']
+                
+                # 创建可点击的链接，点击后跳转到对应的分析消息
+                # 使用 t.me 链接格式
+                chat_id_str = chat_id.replace('-100', '')  # 移除群组ID前缀
+                click_link = f"https://t.me/c/{chat_id_str}/{message_id}"
+                
+                msg += f"{i}. <a href=\"{click_link}\"><b>{target_symbol}</b></a>\n"
+                msg += f"   🎯 大户持有 <b>{worthy_count}</b> 个优质代币:\n"
+                
+                # 显示前3个最优质的持仓
+                for j, holding in enumerate(sorted(worthy_holdings, key=lambda x: (x['holder_count'], x['total_value']), reverse=True)[:3], 1):
+                    symbol = holding['symbol']
+                    name = holding['name']
+                    holder_count = holding['holder_count']
+                    total_value = holding['total_value']
+                    
+                    msg += f"      • <b>{symbol}</b>"
+                    if name and name != symbol:
+                        msg += f" ({name})"
+                    msg += f": {holder_count}人 ${total_value:,.0f}\n"
+                
+                if len(worthy_holdings) > 3:
+                    msg += f"      • ... 还有 {len(worthy_holdings) - 3} 个优质代币\n"
+                
+                msg += "\n"
+            
+            msg += "💡 <i>点击代币名称可跳转到对应的详细分析</i>"
+            
+            # 创建分页按钮
+            markup = None
+            if total_pages > 1:
+                from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
+                markup = InlineKeyboardMarkup()
+                
+                buttons = []
+                if page > 1:
+                    buttons.append(InlineKeyboardButton("⬅️ 上一页", callback_data=f"worthy_tokens_{chat_id}_{page-1}"))
+                if page < total_pages:
+                    buttons.append(InlineKeyboardButton("➡️ 下一页", callback_data=f"worthy_tokens_{chat_id}_{page+1}"))
+                
+                if buttons:
+                    markup.row(*buttons)
+                
+                # 页码信息
+                markup.row(InlineKeyboardButton(f"� {page}/{total_pages} (共{total_tokens}个)", callback_data="dummy"))
+            
+            # 发送消息
+            self.send_to_topic(
+                chat_id,
+                msg,
+                thread_id=thread_id,
+                parse_mode="HTML",
+                disable_web_page_preview=True,
+                reply_markup=markup
+            )
+            
+        except Exception as e:
+            print(f"❌ 生成值得关注代币消息失败: {e}")
     
     def _send_analysis_summary(self, chat_id: str, processing_msg):
         """发送分析总结"""
@@ -451,6 +612,14 @@ class JupiterAnalysisHandler(BaseCommandHandler):
             total = status.get('total', 0)
             start_time = status.get('start_time', '未知')
             end_time = time.strftime('%H:%M:%S')
+            
+            # 获取原始thread_id（从processing_msg或analysis_status中）
+            thread_id = getattr(processing_msg, 'message_thread_id', None)
+            
+            # 先发送"值得关注的代币"消息
+            if len(analyzed) > 0:  # 只有成功分析了代币才发送
+                self._generate_worthy_tokens_message(chat_id, thread_id)
+                time.sleep(1)  # 稍微延迟一下再发送总结
             
             summary_msg = (
                 f"✅ <b>Jupiter代币分析完成</b>\n\n"
@@ -493,6 +662,10 @@ class JupiterAnalysisHandler(BaseCommandHandler):
             
         except Exception as e:
             print(f"❌ 发送分析总结失败: {e}")
+        finally:
+            # 清理token_messages缓存
+            if chat_id in self.token_messages:
+                del self.token_messages[chat_id]
     
     def register_handlers(self) -> None:
         """注册处理器"""
@@ -503,6 +676,10 @@ class JupiterAnalysisHandler(BaseCommandHandler):
         @self.bot.callback_query_handler(func=lambda call: call.data.startswith("cajup_"))
         def cajup_callback_handler(call):
             self.handle_cajup_callback(call)
+        
+        @self.bot.callback_query_handler(func=lambda call: call.data.startswith("worthy_tokens_"))
+        def worthy_tokens_callback_handler(call):
+            self.handle_worthy_tokens_callback(call)
     
     def handle_cajup_callback(self, call):
         """处理cajup回调"""
@@ -524,6 +701,36 @@ class JupiterAnalysisHandler(BaseCommandHandler):
         except Exception as e:
             print(f"❌ 处理cajup回调失败: {e}")
             self.bot.answer_callback_query(call.id, "❌ 操作失败")
+
+    def handle_worthy_tokens_callback(self, call):
+        """处理值得关注代币分页回调"""
+        try:
+            # 解析回调数据：worthy_tokens_{chat_id}_{page}
+            parts = call.data.split("_")
+            if len(parts) != 4 or parts[0] != "worthy" or parts[1] != "tokens":
+                self.bot.answer_callback_query(call.id, "❌ 回调数据格式错误")
+                return
+            
+            chat_id = parts[2]
+            page = int(parts[3])
+            
+            # 获取消息的thread_id
+            thread_id = getattr(call.message, 'message_thread_id', None)
+            
+            # 删除当前消息
+            try:
+                self.bot.delete_message(call.message.chat.id, call.message.message_id)
+            except:
+                pass
+            
+            # 重新生成指定页的消息
+            self._generate_worthy_tokens_message(chat_id, thread_id, page)
+            
+            self.bot.answer_callback_query(call.id, f"📄 已切换到第{page}页")
+            
+        except Exception as e:
+            print(f"❌ 处理值得关注代币分页回调失败: {e}")
+            self.bot.answer_callback_query(call.id, "❌ 分页操作失败")
 
     def handle_cajup_sort(self, call):
         """处理cajup排序回调"""
