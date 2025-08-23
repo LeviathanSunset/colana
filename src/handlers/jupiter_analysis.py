@@ -89,20 +89,21 @@ class JupiterAnalysisHandler(BaseCommandHandler):
         
         # 解析参数
         parts = message.text.split()
-        token_count = 10  # 默认分析10个代币
+        token_count = self.config.jupiter.default_token_count  # 使用配置的默认值
         
         if len(parts) > 1:
             try:
                 token_count = int(parts[1])
-                token_count = max(1, min(token_count, 50))  # 限制在1-50之间
+                # 使用配置的最大限制
+                token_count = max(1, min(token_count, self.config.jupiter.max_tokens_per_analysis))
             except ValueError:
                 self.reply_with_topic(
                     message,
                     "❌ 参数错误\n\n"
                     "💡 使用方法:\n"
-                    "• <code>/cajup</code> - 分析10个热门代币\n"
-                    "• <code>/cajup 20</code> - 分析20个热门代币\n"
-                    "• 最多支持50个代币",
+                    f"• <code>/cajup</code> - 分析{self.config.jupiter.default_token_count}个热门代币\n"
+                    f"• <code>/cajup 20</code> - 分析指定数量的热门代币\n"
+                    f"• 最多支持{self.config.jupiter.max_tokens_per_analysis}个代币",
                     parse_mode='HTML'
                 )
                 return

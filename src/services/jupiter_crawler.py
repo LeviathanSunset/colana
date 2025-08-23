@@ -10,6 +10,7 @@ import os
 from typing import List, Dict, Optional
 from datetime import datetime
 from ..utils.data_manager import DataManager
+from ..core.config import get_config
 
 
 class JupiterCrawler:
@@ -19,6 +20,7 @@ class JupiterCrawler:
         self.base_url = "https://datapi.jup.ag"
         self.session = requests.Session()
         self.data_manager = DataManager()
+        self.config = get_config()
         self.session.headers.update({
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36',
             'Accept': 'application/json',
@@ -30,33 +32,41 @@ class JupiterCrawler:
             'Sec-Fetch-Site': 'same-site'
         })
         
-        # 默认参数
+        # 从配置系统获取默认参数
+        jupiter_config = self.config.jupiter
         self.default_params = {
             'mintAuthorityDisabled': 'true',
             'freezeAuthorityDisabled': 'true',
-            'maxMcap': '1000000',
-            'hasSocials': 'true',
-            'minTokenAge': '3600'
+            'maxMcap': str(jupiter_config.max_mcap),
+            'hasSocials': str(jupiter_config.has_socials).lower(),
+            'minTokenAge': str(jupiter_config.min_token_age)
         }
     
     def fetch_top_traded_tokens(self, 
-                               period: str = "24h", 
-                               max_mcap: int = 1000000,
-                               min_token_age: int = 3600,
-                               has_socials: bool = True) -> List[Dict]:
+                               period: str = None, 
+                               max_mcap: int = None,
+                               min_token_age: int = None,
+                               has_socials: bool = None) -> List[Dict]:
         """
         获取热门交易代币
         
         Args:
-            period: 时间周期 (24h, 7d, 30d)
-            max_mcap: 最大市值
-            min_token_age: 最小代币年龄（秒）
-            has_socials: 是否需要社交媒体信息
+            period: 时间周期 (24h, 7d, 30d)，默认使用配置值
+            max_mcap: 最大市值，默认使用配置值
+            min_token_age: 最小代币年龄（秒），默认使用配置值
+            has_socials: 是否需要社交媒体信息，默认使用配置值
             
         Returns:
             代币列表
         """
         try:
+            # 使用配置值作为默认值
+            jupiter_config = self.config.jupiter
+            period = period if period is not None else jupiter_config.period
+            max_mcap = max_mcap if max_mcap is not None else jupiter_config.max_mcap
+            min_token_age = min_token_age if min_token_age is not None else jupiter_config.min_token_age
+            has_socials = has_socials if has_socials is not None else jupiter_config.has_socials
+            
             url = f"{self.base_url}/v1/pools/toptraded/{period}"
             
             params = {
@@ -68,7 +78,7 @@ class JupiterCrawler:
             }
             
             print(f"🔍 正在获取Jupiter热门代币数据...")
-            print(f"📊 参数: 周期={period}, 最大市值=${max_mcap:,}, 最小年龄={min_token_age}秒")
+            print(f"📊 参数: 周期={period}, 最大市值=${max_mcap:,}, 最小年龄={min_token_age}秒, 需要社交={has_socials}")
             
             response = self.session.get(url, params=params, timeout=30)
             response.raise_for_status()
@@ -271,18 +281,26 @@ class JupiterAnalyzer:
     
     def __init__(self):
         self.crawler = JupiterCrawler()
+        self.config = self.crawler.config
     
-    def analyze_trending_tokens(self, limit: int = 20) -> List[Dict]:
+    def analyze_trending_tokens(self, limit: int = None) -> List[Dict]:
         """
         分析热门代币
         
         Args:
-            limit: 限制分析数量
+            limit: 限制分析数量，默认使用配置值
             
         Returns:
             分析结果列表
         """
         try:
+            # 使用配置的默认值
+            if limit is None:
+                limit = self.config.jupiter.default_token_count
+            
+            # 确保不超过最大限制
+            limit = min(limit, self.config.jupiter.max_tokens_per_analysis)
+            
             # 获取热门代币
             raw_tokens = self.crawler.fetch_top_traded_tokens()
             
@@ -307,17 +325,21 @@ class JupiterAnalyzer:
             print(f"❌ 分析热门代币失败: {e}")
             return []
     
-    def get_tokens_for_analysis(self, count: int = 10) -> List[str]:
+    def get_tokens_for_analysis(self, count: int = None) -> List[str]:
         """
         获取需要分析的代币地址列表
         
         Args:
-            count: 代币数量
+            count: 代币数量，默认使用配置值
             
         Returns:
             代币地址列表
         """
         try:
+            # 使用配置的默认值
+            if count is None:
+                count = self.config.jupiter.default_token_count
+            
             tokens = self.analyze_trending_tokens(limit=count)
             addresses = [token['mint'] for token in tokens if token.get('mint')]
             
