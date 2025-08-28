@@ -570,3 +570,19 @@ class AutoPumpAnalysisHandler:
         @self.bot.message_handler(commands=["capump"])
         def capump_handler(message):
             self.handle_capump(message)
+
+    def cleanup(self):
+        """清理资源"""
+        self.logger.info("🧹 正在清理AutoPumpAnalysis资源...")
+        
+        try:
+            # 停止所有分析线程
+            for chat_id in list(self.analysis_threads.keys()):
+                self.stop_analysis_for_group(chat_id)
+            
+            # 保存状态
+            self.save_status()
+            
+            self.logger.info("✅ AutoPumpAnalysis资源清理完成")
+        except Exception as e:
+            self.logger.exception(f"❌ AutoPumpAnalysis资源清理失败: {e}")

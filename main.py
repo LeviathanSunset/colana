@@ -27,6 +27,7 @@ from src.handlers.base import BaseCommandHandler
 from src.handlers.config import ConfigCommandHandler
 from src.handlers.holding_analysis import HoldingAnalysisHandler
 from src.handlers.jupiter_analysis import JupiterAnalysisHandler
+from src.handlers.jupiter_monitor import JupiterMonitorHandler
 from src.handlers.auto_pump_analysis import AutoPumpAnalysisHandler
 from src.models import TokenInfo, PriceChangeResult
 from src.utils import format_number, format_percentage, chunk_list
@@ -67,6 +68,7 @@ class TokenAnalysisBot:
             self.config_handler = ConfigCommandHandler(self.bot)
             self.holding_handler = HoldingAnalysisHandler(self.bot)
             self.jupiter_handler = JupiterAnalysisHandler(self.bot)
+            self.jupiter_monitor_handler = JupiterMonitorHandler(self.bot)
             self.auto_pump_handler = AutoPumpAnalysisHandler(self.bot)
             self.logger.info("✅ 所有处理器初始化成功")
             
@@ -86,6 +88,7 @@ class TokenAnalysisBot:
             self.config_handler.register_handlers()
             self.holding_handler.register_handlers()
             self.jupiter_handler.register_handlers()
+            self.jupiter_monitor_handler.register_handlers()
             self.auto_pump_handler.register_handlers()
             self.logger.info("✅ 所有处理器注册成功")
             
@@ -387,6 +390,23 @@ class TokenAnalysisBot:
             self.logger.error_with_solution(e, "Bot启动失败")
             raise
 
+    def cleanup(self):
+        """清理资源"""
+        self.logger.info("🧹 正在清理资源...")
+        
+        try:
+            # 清理Jupiter监控处理器
+            if hasattr(self, 'jupiter_monitor_handler'):
+                self.jupiter_monitor_handler.cleanup()
+            
+            # 清理自动pump分析处理器
+            if hasattr(self, 'auto_pump_handler'):
+                self.auto_pump_handler.cleanup()
+            
+            self.logger.info("✅ 资源清理完成")
+        except Exception as e:
+            self.logger.exception(f"❌ 资源清理失败: {e}")
+
     def run(self):
         """运行机器人（兼容性方法）"""
         self.start()
@@ -395,6 +415,7 @@ class TokenAnalysisBot:
 def main():
     """主函数"""
     logger = get_logger("startup")
+    bot = None
     
     try:
         logger.info("🚀 启动代币分析Bot程序...")
@@ -402,9 +423,16 @@ def main():
         bot.start()
     except KeyboardInterrupt:
         logger.info("\n👋 程序被用户中断")
+        if bot:
+            bot.cleanup()
     except Exception as e:
         logger.exception(f"❌ 程序启动失败: {e}")
+        if bot:
+            bot.cleanup()
         sys.exit(1)
+    finally:
+        if bot:
+            bot.cleanup()
 
 
 if __name__ == "__main__":

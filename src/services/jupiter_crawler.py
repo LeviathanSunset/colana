@@ -46,15 +46,19 @@ class JupiterCrawler:
                                period: str = None, 
                                max_mcap: int = None,
                                min_token_age: int = None,
-                               has_socials: bool = None) -> List[Dict]:
+                               has_socials: bool = None,
+                               min_net_volume_24h: int = None,
+                               min_net_volume_5m: int = None) -> List[Dict]:
         """
         获取热门交易代币
         
         Args:
-            period: 时间周期 (24h, 7d, 30d)，默认使用配置值
+            period: 时间周期 (5min, 24h, 7d, 30d)，默认使用配置值
             max_mcap: 最大市值，默认使用配置值
             min_token_age: 最小代币年龄（秒），默认使用配置值
             has_socials: 是否需要社交媒体信息，默认使用配置值
+            min_net_volume_24h: 最小24小时净交易量，默认不限制
+            min_net_volume_5m: 最小5分钟净交易量，默认不限制
             
         Returns:
             代币列表
@@ -77,8 +81,18 @@ class JupiterCrawler:
                 'minTokenAge': str(min_token_age)
             }
             
+            # 添加最小净交易量参数（根据周期选择正确的参数名）
+            if period == '5m' and min_net_volume_5m is not None:
+                params['minNetVolume5m'] = str(min_net_volume_5m)
+            elif min_net_volume_24h is not None:
+                params['minNetVolume24h'] = str(min_net_volume_24h)
+            
             print(f"🔍 正在获取Jupiter热门代币数据...")
             print(f"📊 参数: 周期={period}, 最大市值=${max_mcap:,}, 最小年龄={min_token_age}秒, 需要社交={has_socials}")
+            if period == '5m' and min_net_volume_5m:
+                print(f"📊 最小5min净交易量: ${min_net_volume_5m:,}")
+            elif min_net_volume_24h:
+                print(f"📊 最小24h净交易量: ${min_net_volume_24h:,}")
             
             response = self.session.get(url, params=params, timeout=30)
             response.raise_for_status()
