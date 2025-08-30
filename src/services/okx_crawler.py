@@ -278,7 +278,7 @@ class OKXCrawlerForBot:
             "address": wallet_address,
             "forceRefresh": True,
             "page": 1,
-            "limit": 10,
+            "limit": 15,
             "chainIndexes": [],
         }
 
@@ -872,7 +872,7 @@ def analyze_target_token_rankings(analysis_result: Dict, original_holders: List[
     
     # 遍历所有分析的大户地址
     for holder_address in all_analyzed_addresses:
-        # 收集该地址持有的所有代币价值（前10大持仓）
+        # 收集该地址持有的所有代币价值（前15大持仓）
         holder_tokens = []
         
         for token in all_tokens:
@@ -925,8 +925,8 @@ def analyze_target_token_rankings(analysis_result: Dict, original_holders: List[
         # 计算目标代币价值占比，判断是否为阴谋钱包
         portfolio_total_value = sum(token["value_usd"] for token in holder_tokens)
         
-        # 如果目标代币不在前10名，需要加上目标代币价值到总价值中
-        if target_rank > 10 and target_value > 0:
+        # 如果目标代币不在前15名，需要加上目标代币价值到总价值中
+        if target_rank > 15 and target_value > 0:
             portfolio_total_value += target_value
         
         target_percentage = 0
@@ -968,11 +968,11 @@ def analyze_target_token_rankings(analysis_result: Dict, original_holders: List[
                 rank_key = ">10名"
             rank_distribution[rank_key] = rank_distribution.get(rank_key, 0) + 1
         
-        # 实际持有者统计（目标代币在钱包中排名≤10的地址）
-        actual_holders_all = [addr for addr in address_rankings if addr["target_token_rank"] <= 10]
+        # 实际持有者统计（目标代币在钱包中排名≤15的地址）
+        actual_holders_all = [addr for addr in address_rankings if addr["target_token_rank"] <= 15]
         
-        # 基础统计（只计算前10名的地址，用于平均排名和中位数计算）
-        actual_ranks = [r for r in ranks if r <= 10]
+        # 基础统计（只计算前15名的地址，用于平均排名和中位数计算）
+        actual_ranks = [r for r in ranks if r <= 15]
         if actual_ranks:
             avg_rank = sum(actual_ranks) / len(actual_ranks)
             median_rank = sorted(actual_ranks)[len(actual_ranks) // 2]
@@ -1001,8 +1001,8 @@ def analyze_target_token_rankings(analysis_result: Dict, original_holders: List[
             "rank_distribution": rank_distribution,
             "top3_count": len([r for r in ranks if r <= 3]),
             "top5_count": len([r for r in ranks if r <= 5]),
-            "top10_count": len([r for r in ranks if r <= 10]),
-            "over10_count": len([r for r in ranks if r > 10]),
+            "top15_count": len([r for r in ranks if r <= 15]),
+            "over15_count": len([r for r in ranks if r > 15]),
             "analysis": analysis_text
         }
     else:
@@ -1065,12 +1065,12 @@ def _calculate_analysis_metrics(rankings: List[Dict]) -> Dict:
     # 排名分布统计
     top3_count = len([r for r in rankings if r["target_token_rank"] <= 3])
     top5_count = len([r for r in rankings if r["target_token_rank"] <= 5])
-    top10_count = len([r for r in rankings if r["target_token_rank"] <= 10])
+    top15_count = len([r for r in rankings if r["target_token_rank"] <= 15])
     
     # 百分比计算
     top3_pct = (top3_count / total_addresses) * 100 if total_addresses > 0 else 0
     top5_pct = (top5_count / total_addresses) * 100 if total_addresses > 0 else 0
-    top10_pct = (top10_count / total_addresses) * 100 if total_addresses > 0 else 0
+    top15_pct = (top15_count / total_addresses) * 100 if total_addresses > 0 else 0
     
     # 总流通量
     total_supply = sum(r.get("target_supply_percentage", 0) for r in rankings)
@@ -1083,10 +1083,10 @@ def _calculate_analysis_metrics(rankings: List[Dict]) -> Dict:
         "conspiracy_risk_ratio": conspiracy_risk_ratio,
         "top3_count": top3_count,
         "top5_count": top5_count,
-        "top10_count": top10_count,
+        "top15_count": top15_count,
         "top3_pct": top3_pct,
         "top5_pct": top5_pct,
-        "top10_pct": top10_pct,
+        "top15_pct": top15_pct,
         "total_supply": total_supply
     }
 
@@ -1127,14 +1127,14 @@ def _analyze_distribution_confidence(metrics: Dict) -> str:
     """分析大户分布信心"""
     top3_pct = metrics["top3_pct"]
     top5_pct = metrics["top5_pct"]
-    top10_pct = metrics["top10_pct"]
+    top15_pct = metrics["top15_pct"]
     
     if top3_pct >= 50:
         return f"💪 {top3_pct:.1f}%大户将其列为前3重仓，信心度极高"
     elif top5_pct >= 50:
         return f"⭐ {top5_pct:.1f}%大户将其列为前5配置，认可度较高"
-    elif top10_pct >= 50:
-        return f"📊 {top10_pct:.1f}%大户将其列为前10配置，有基础共识"
+    elif top15_pct >= 50:
+        return f"📊 {top15_pct:.1f}%大户将其列为前15配置，有基础共识"
     else:
         return "🔄 多数大户仅试探性配置，整体信心不足"
 
@@ -1192,13 +1192,13 @@ def _evaluate_holder_confidence(avg_rank: float, metrics: Dict) -> str:
     """评估大户信心等级"""
     top3_pct = metrics["top3_pct"]
     top5_pct = metrics["top5_pct"]
-    top10_pct = metrics["top10_pct"]
+    top15_pct = metrics["top15_pct"]
     
     if avg_rank <= 3 and top3_pct >= 20:
         return "极强"
     elif avg_rank <= 5 and top5_pct >= 15:
         return "较强"
-    elif avg_rank <= 8 and top10_pct >= 10:
+    elif avg_rank <= 12 and top15_pct >= 10:
         return "一般"
     else:
         return "偏弱"
@@ -1466,7 +1466,7 @@ def format_tokens_table(
     markup = None
     detail_buttons = []
 
-    # 为前10个代币创建详情按钮
+    # 为前15个代币创建详情按钮
     if cache_key:
         try:
             # 尝试导入telebot
