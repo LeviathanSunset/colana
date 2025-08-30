@@ -1,6 +1,6 @@
 """
 持仓分析命令处理器
-处理 /ca1 命令和相关回调
+处理 /ca 命令和相关回调
 """
 
 import time
@@ -26,7 +26,7 @@ try:
         cleanup_expired_cache
     )
 except ImportError:
-    print("⚠️ 无法导入OKX爬虫模块，/ca1功能可能不可用")
+    print("⚠️ 无法导入OKX爬虫模块，/ca功能可能不可用")
     OKXCrawlerForBot = None
 
 
@@ -58,8 +58,8 @@ class HoldingAnalysisHandler(BaseCommandHandler):
         # 启动全局缓存清理（只启动一次）
         start_cache_cleanup()
 
-    def handle_ca1(self, message: Message) -> None:
-        """处理 /ca1 命令 - OKX大户分析"""
+    def handle_ca(self, message: Message) -> None:
+        """处理 /ca 命令 - OKX大户分析"""
         try:
             if not OKXCrawlerForBot:
                 error_msg = (
@@ -76,14 +76,14 @@ class HoldingAnalysisHandler(BaseCommandHandler):
 
             # 检查群组权限
             chat_id = message.chat.id  # 保持为整数类型
-            allowed_groups = self.config.ca1_allowed_groups
+            allowed_groups = self.config.ca_allowed_groups
             
             if allowed_groups and chat_id not in allowed_groups:
                 self.reply_with_topic(
                     message, 
                     "❌ 此功能仅在特定群组中可用\n如需使用，请联系管理员"
                 )
-                self.logger.warning(f"未授权群组 {chat_id} 尝试使用ca1功能")
+                self.logger.warning(f"未授权群组 {chat_id} 尝试使用ca功能")
                 return
 
             # 提取代币地址参数
@@ -92,9 +92,9 @@ class HoldingAnalysisHandler(BaseCommandHandler):
                 help_msg = (
                     "❌ 请提供代币地址\n\n"
                     "📋 使用方法:\n"
-                    "<code>/ca1 &lt;代币合约地址&gt;</code>\n\n"
+                    "<code>/ca &lt;代币合约地址&gt;</code>\n\n"
                     "📝 示例:\n"
-                    "<code>/ca1 FbGsCHv8qPvUdmomVAiG72ET5D5kgBJgGoxxfMZipump</code>\n\n"
+                    "<code>/ca FbGsCHv8qPvUdmomVAiG72ET5D5kgBJgGoxxfMZipump</code>\n\n"
                     "💡 提示: 代币地址可从GMGN等平台复制"
                 )
                 self.reply_with_topic(message, help_msg, parse_mode="HTML")
@@ -107,7 +107,7 @@ class HoldingAnalysisHandler(BaseCommandHandler):
                 error_msg = (
                     "❌ 代币地址不能为空\n\n"
                     "📋 正确格式:\n"
-                    "<code>/ca1 FbGsCHv8qPvUdmomVAiG72ET5D5kgBJgGoxxfMZipump</code>"
+                    "<code>/ca FbGsCHv8qPvUdmomVAiG72ET5D5kgBJgGoxxfMZipump</code>"
                 )
                 self.reply_with_topic(message, error_msg, parse_mode="HTML")
                 return
@@ -144,7 +144,7 @@ class HoldingAnalysisHandler(BaseCommandHandler):
             analysis_thread.start()
             
         except Exception as e:
-            self.logger.error_with_solution(e, f"ca1命令处理失败 - 用户: {message.from_user.username}")
+            self.logger.error_with_solution(e, f"ca命令处理失败 - 用户: {message.from_user.username}")
             error_msg = (
                 "❌ 命令处理失败\n\n"
                 "🔧 请尝试:\n"
@@ -216,19 +216,19 @@ class HoldingAnalysisHandler(BaseCommandHandler):
                     # 添加排序切换按钮
                     table_markup.add(
                         InlineKeyboardButton(
-                            "💰 按价值排序", callback_data=f"ca1_sort_value_{cache_key}"
+                            "💰 按价值排序", callback_data=f"ca_sort_value_{cache_key}"
                         ),
                         InlineKeyboardButton(
-                            "👥 按人数排序 ✅", callback_data=f"ca1_sort_count_{cache_key}"
+                            "👥 按人数排序 ✅", callback_data=f"ca_sort_count_{cache_key}"
                         ),
                     )
                     # 添加集群分析和排名分析按钮
                     table_markup.add(
                         InlineKeyboardButton(
-                            "🎯 地址集群分析", callback_data=f"ca1_cluster_{cache_key}"
+                            "🎯 共同持仓分析", callback_data=f"ca_cluster_{cache_key}"
                         ),
                         InlineKeyboardButton(
-                            "📊 代币排名分析", callback_data=f"ca1_ranking_{cache_key}"
+                            "📊 目标代币排名", callback_data=f"ca_ranking_{cache_key}"
                         )
                     )
                     markup = table_markup
@@ -237,18 +237,18 @@ class HoldingAnalysisHandler(BaseCommandHandler):
                     markup = InlineKeyboardMarkup(row_width=2)
                     markup.add(
                         InlineKeyboardButton(
-                            "💰 按价值排序", callback_data=f"ca1_sort_value_{cache_key}"
+                            "💰 按价值排序", callback_data=f"ca_sort_value_{cache_key}"
                         ),
                         InlineKeyboardButton(
-                            "👥 按人数排序 ✅", callback_data=f"ca1_sort_count_{cache_key}"
+                            "👥 按人数排序 ✅", callback_data=f"ca_sort_count_{cache_key}"
                         ),
                     )
                     markup.add(
                         InlineKeyboardButton(
-                            "🎯 地址集群分析", callback_data=f"ca1_cluster_{cache_key}"
+                            "🎯 共同持仓分析", callback_data=f"ca_cluster_{cache_key}"
                         ),
                         InlineKeyboardButton(
-                            "📊 代币排名分析", callback_data=f"ca1_ranking_{cache_key}"
+                            "📊 目标代币排名", callback_data=f"ca_ranking_{cache_key}"
                         )
                     )
 
@@ -356,11 +356,11 @@ class HoldingAnalysisHandler(BaseCommandHandler):
                 parse_mode="Markdown",
             )
 
-    def handle_ca1_sort(self, call: CallbackQuery) -> None:
+    def handle_ca_sort(self, call: CallbackQuery) -> None:
         """处理排序切换回调"""
         try:
-            # 解析回调数据: ca1_sort_{sort_by}_{cache_key}
-            callback_data = call.data[len("ca1_sort_") :]
+            # 解析回调数据: ca_sort_{sort_by}_{cache_key}
+            callback_data = call.data[len("ca_sort_") :]
             parts = callback_data.split("_", 1)
 
             if len(parts) >= 2:
@@ -428,28 +428,28 @@ class HoldingAnalysisHandler(BaseCommandHandler):
                 if sort_by == "value":
                     table_markup.add(
                         InlineKeyboardButton(
-                            "💰 按价值排序 ✅", callback_data=f"ca1_sort_value_{cache_key}"
+                            "💰 按价值排序 ✅", callback_data=f"ca_sort_value_{cache_key}"
                         ),
                         InlineKeyboardButton(
-                            "👥 按人数排序", callback_data=f"ca1_sort_count_{cache_key}"
+                            "👥 按人数排序", callback_data=f"ca_sort_count_{cache_key}"
                         ),
                     )
                 else:
                     table_markup.add(
                         InlineKeyboardButton(
-                            "💰 按价值排序", callback_data=f"ca1_sort_value_{cache_key}"
+                            "💰 按价值排序", callback_data=f"ca_sort_value_{cache_key}"
                         ),
                         InlineKeyboardButton(
-                            "👥 按人数排序 ✅", callback_data=f"ca1_sort_count_{cache_key}"
+                            "👥 按人数排序 ✅", callback_data=f"ca_sort_count_{cache_key}"
                         ),
                     )
                 # 添加集群分析和排名分析按钮
                 table_markup.add(
                     InlineKeyboardButton(
-                        "🎯 地址集群分析", callback_data=f"ca1_cluster_{cache_key}"
+                        "🎯 共同持仓分析", callback_data=f"ca_cluster_{cache_key}"
                     ),
                     InlineKeyboardButton(
-                        "📊 代币排名分析", callback_data=f"ca1_ranking_{cache_key}"
+                        "📊 目标代币排名", callback_data=f"ca_ranking_{cache_key}"
                     )
                 )
                 markup = table_markup
@@ -459,27 +459,27 @@ class HoldingAnalysisHandler(BaseCommandHandler):
                 if sort_by == "value":
                     markup.add(
                         InlineKeyboardButton(
-                            "💰 按价值排序 ✅", callback_data=f"ca1_sort_value_{cache_key}"
+                            "💰 按价值排序 ✅", callback_data=f"ca_sort_value_{cache_key}"
                         ),
                         InlineKeyboardButton(
-                            "👥 按人数排序", callback_data=f"ca1_sort_count_{cache_key}"
+                            "👥 按人数排序", callback_data=f"ca_sort_count_{cache_key}"
                         ),
                     )
                 else:
                     markup.add(
                         InlineKeyboardButton(
-                            "💰 按价值排序", callback_data=f"ca1_sort_value_{cache_key}"
+                            "💰 按价值排序", callback_data=f"ca_sort_value_{cache_key}"
                         ),
                         InlineKeyboardButton(
-                            "👥 按人数排序 ✅", callback_data=f"ca1_sort_count_{cache_key}"
+                            "👥 按人数排序 ✅", callback_data=f"ca_sort_count_{cache_key}"
                         ),
                     )
                 markup.add(
                     InlineKeyboardButton(
-                        "🎯 地址集群分析", callback_data=f"ca1_cluster_{cache_key}"
+                        "🎯 共同持仓分析", callback_data=f"ca_cluster_{cache_key}"
                     ),
                     InlineKeyboardButton(
-                        "📊 代币排名分析", callback_data=f"ca1_ranking_{cache_key}"
+                        "📊 目标代币排名", callback_data=f"ca_ranking_{cache_key}"
                     )
                 )
 
@@ -500,13 +500,13 @@ class HoldingAnalysisHandler(BaseCommandHandler):
             print(f"排序切换错误: {str(e)}")
             self.bot.answer_callback_query(call.id, f"❌ 切换排序失败: {str(e)}")
 
-    def handle_ca1_cluster(self, call: CallbackQuery) -> None:
-        """处理地址集群分析回调"""
+    def handle_ca_cluster(self, call: CallbackQuery) -> None:
+        """处理共同持仓分析回调"""
         try:
-            # 解析回调数据: ca1_cluster_{cache_key} 或 ca1_cluster_page_{cache_key}_{page}
-            if call.data.startswith("ca1_cluster_page_"):
+            # 解析回调数据: ca_cluster_{cache_key} 或 ca_cluster_page_{cache_key}_{page}
+            if call.data.startswith("ca_cluster_page_"):
                 # 分页回调
-                parts = call.data[len("ca1_cluster_page_"):].split("_")
+                parts = call.data[len("ca_cluster_page_"):].split("_")
                 if len(parts) >= 2:
                     cache_key = "_".join(parts[:-1])
                     page = int(parts[-1])
@@ -516,7 +516,7 @@ class HoldingAnalysisHandler(BaseCommandHandler):
                     self.bot.answer_callback_query(call.id, "❌ 分页回调数据格式错误")
             else:
                 # 普通集群分析回调
-                cache_key = call.data[len("ca1_cluster_"):]
+                cache_key = call.data[len("ca_cluster_"):]
                 print(f"集群分析回调: cache_key={cache_key}")
                 self._handle_cluster_callback(call, cache_key)
         except Exception as e:
@@ -528,7 +528,7 @@ class HoldingAnalysisHandler(BaseCommandHandler):
         try:
             # 从缓存中获取分析结果
             if cache_key not in analysis_cache:
-                self.bot.answer_callback_query(call.id, "❌ 数据缓存已失效，请重新运行 /ca1 命令")
+                self.bot.answer_callback_query(call.id, "❌ 数据缓存已失效，请重新运行 /ca 命令")
                 return
 
             cached_data = analysis_cache[cache_key]
@@ -573,7 +573,7 @@ class HoldingAnalysisHandler(BaseCommandHandler):
             nav_buttons = []
             if current_page > 1:
                 nav_buttons.append(
-                    InlineKeyboardButton("⬅️ 上一页", callback_data=f"ca1_cluster_page_{cache_key}_{current_page-1}")
+                    InlineKeyboardButton("⬅️ 上一页", callback_data=f"ca_cluster_page_{cache_key}_{current_page-1}")
                 )
             
             nav_buttons.append(
@@ -582,7 +582,7 @@ class HoldingAnalysisHandler(BaseCommandHandler):
             
             if current_page < total_pages:
                 nav_buttons.append(
-                    InlineKeyboardButton("下一页 ➡️", callback_data=f"ca1_cluster_page_{cache_key}_{current_page+1}")
+                    InlineKeyboardButton("下一页 ➡️", callback_data=f"ca_cluster_page_{cache_key}_{current_page+1}")
                 )
             
             if nav_buttons:
@@ -590,8 +590,8 @@ class HoldingAnalysisHandler(BaseCommandHandler):
             
             # 添加功能按钮
             markup.add(
-                InlineKeyboardButton("⬅️ 返回代币排行", callback_data=f"ca1_sort_count_{cache_key}"),
-                InlineKeyboardButton("🔄 重新运行", callback_data=f"ca1_cluster_{cache_key}"),
+                InlineKeyboardButton("⬅️ 返回代币排行", callback_data=f"ca_sort_count_{cache_key}"),
+                InlineKeyboardButton("🔄 重新运行", callback_data=f"ca_cluster_{cache_key}"),
             )
 
             # 更新消息
@@ -615,7 +615,7 @@ class HoldingAnalysisHandler(BaseCommandHandler):
         try:
             # 从缓存中获取分析结果
             if cache_key not in analysis_cache:
-                self.bot.answer_callback_query(call.id, "❌ 数据缓存已失效，请重新运行 /ca1 命令")
+                self.bot.answer_callback_query(call.id, "❌ 数据缓存已失效，请重新运行 /ca 命令")
                 return
 
             cached_data = analysis_cache[cache_key]
@@ -638,7 +638,7 @@ class HoldingAnalysisHandler(BaseCommandHandler):
 
             # 显示正在分析的消息
             self.bot.edit_message_text(
-                f"🎯 正在进行地址集群分析...\n代币: <b>{target_symbol}</b> (<code>{token_address}</code>)\n⏳ 分析大户间的共同投资模式...",
+                f"🎯 正在进行共同持仓分析...\n代币: <b>{target_symbol}</b> (<code>{token_address}</code>)\n⏳ 分析大户间的共同投资模式...",
                 call.message.chat.id,
                 call.message.message_id,
                 parse_mode="HTML",
@@ -688,7 +688,7 @@ class HoldingAnalysisHandler(BaseCommandHandler):
             nav_buttons = []
             if current_page > 1:
                 nav_buttons.append(
-                    InlineKeyboardButton("⬅️ 上一页", callback_data=f"ca1_cluster_page_{cache_key}_{current_page-1}")
+                    InlineKeyboardButton("⬅️ 上一页", callback_data=f"ca_cluster_page_{cache_key}_{current_page-1}")
                 )
             
             nav_buttons.append(
@@ -697,7 +697,7 @@ class HoldingAnalysisHandler(BaseCommandHandler):
             
             if current_page < total_pages:
                 nav_buttons.append(
-                    InlineKeyboardButton("下一页 ➡️", callback_data=f"ca1_cluster_page_{cache_key}_{current_page+1}")
+                    InlineKeyboardButton("下一页 ➡️", callback_data=f"ca_cluster_page_{cache_key}_{current_page+1}")
                 )
             
             if nav_buttons:
@@ -705,8 +705,8 @@ class HoldingAnalysisHandler(BaseCommandHandler):
             
             # 添加功能按钮
             markup.add(
-                InlineKeyboardButton("⬅️ 返回代币排行", callback_data=f"ca1_sort_count_{cache_key}"),
-                InlineKeyboardButton("🔄 重新运行", callback_data=f"ca1_cluster_{cache_key}"),
+                InlineKeyboardButton("⬅️ 返回代币排行", callback_data=f"ca_sort_count_{cache_key}"),
+                InlineKeyboardButton("🔄 重新运行", callback_data=f"ca_cluster_{cache_key}"),
             )
 
             # 更新消息
@@ -727,7 +727,7 @@ class HoldingAnalysisHandler(BaseCommandHandler):
 
             markup = InlineKeyboardMarkup()
             markup.add(
-                InlineKeyboardButton("⬅️ 返回代币排行", callback_data=f"ca1_sort_count_{cache_key}")
+                InlineKeyboardButton("⬅️ 返回代币排行", callback_data=f"ca_sort_count_{cache_key}")
             )
 
             self.bot.edit_message_text(
@@ -817,7 +817,7 @@ class HoldingAnalysisHandler(BaseCommandHandler):
 
             # 创建返回按钮，保持当前排序方式
             markup = InlineKeyboardMarkup()
-            return_callback = f"ca1_sort_{current_sort}_{cache_key}"
+            return_callback = f"ca_sort_{current_sort}_{cache_key}"
             markup.add(InlineKeyboardButton("⬅️ 返回排行榜", callback_data=return_callback))
 
             # 发送详情消息
@@ -840,25 +840,25 @@ class HoldingAnalysisHandler(BaseCommandHandler):
     def _show_reanalyze_option(self, call: CallbackQuery, cache_key: str):
         """显示重新分析选项"""
         markup = InlineKeyboardMarkup()
-        markup.add(InlineKeyboardButton("🔄 重新分析", callback_data=f"ca1_reanalyze_{cache_key}"))
+        markup.add(InlineKeyboardButton("🔄 重新分析", callback_data=f"ca_reanalyze_{cache_key}"))
         self.bot.edit_message_text(
-            "❌ 数据已过期或丢失\n\n请点击下方按钮重新分析，或重新运行 /ca1 命令",
+            "❌ 数据已过期或丢失\n\n请点击下方按钮重新分析，或重新运行 /ca 命令",
             call.message.chat.id,
             call.message.message_id,
             reply_markup=markup,
         )
         self.bot.answer_callback_query(call.id, "❌ 数据已过期，请重新分析")
 
-    def handle_ca1_ranking(self, call: CallbackQuery) -> None:
-        """处理代币排名分析回调"""
+    def handle_ca_ranking(self, call: CallbackQuery) -> None:
+        """处理目标代币排名回调"""
         try:
-            # 解析回调数据: ca1_ranking_{cache_key}
-            cache_key = call.data[len("ca1_ranking_"):]
-            print(f"代币排名分析回调: cache_key={cache_key}")
+            # 解析回调数据: ca_ranking_{cache_key}
+            cache_key = call.data[len("ca_ranking_"):]
+            print(f"目标代币排名回调: cache_key={cache_key}")
             
             # 从缓存中获取分析结果
             if cache_key not in analysis_cache:
-                self.bot.answer_callback_query(call.id, "❌ 数据缓存已失效，请重新运行 /ca1 命令")
+                self.bot.answer_callback_query(call.id, "❌ 数据缓存已失效，请重新运行 /ca 命令")
                 return
 
             cached_data = analysis_cache[cache_key]
@@ -881,7 +881,7 @@ class HoldingAnalysisHandler(BaseCommandHandler):
 
             # 显示正在分析的消息
             self.bot.edit_message_text(
-                f"📊 正在进行代币排名分析...\n代币: <b>{target_symbol}</b> (<code>{token_address}</code>)\n⏳ 分析目标代币在各大户钱包中的排名...",
+                f"📊 正在进行目标代币排名...\n代币: <b>{target_symbol}</b> (<code>{token_address}</code>)\n⏳ 分析目标代币在各大户钱包中的排名...",
                 call.message.chat.id,
                 call.message.message_id,
                 parse_mode="HTML",
@@ -930,7 +930,7 @@ class HoldingAnalysisHandler(BaseCommandHandler):
                     count = sum(1 for r in ranking_result["rankings"] if r["target_token_rank"] == rank)
                     if count > 0:
                         rank_buttons_1.append(
-                            InlineKeyboardButton(f"{rank}名({count})", callback_data=f"ca1_rank_{cache_key}_{rank}")
+                            InlineKeyboardButton(f"{rank}名({count})", callback_data=f"ca_rank_{cache_key}_{rank}")
                         )
                 if rank_buttons_1:
                     markup.row(*rank_buttons_1)
@@ -941,7 +941,7 @@ class HoldingAnalysisHandler(BaseCommandHandler):
                     count = sum(1 for r in ranking_result["rankings"] if r["target_token_rank"] == rank)
                     if count > 0:
                         rank_buttons_2.append(
-                            InlineKeyboardButton(f"{rank}名({count})", callback_data=f"ca1_rank_{cache_key}_{rank}")
+                            InlineKeyboardButton(f"{rank}名({count})", callback_data=f"ca_rank_{cache_key}_{rank}")
                         )
                 if rank_buttons_2:
                     markup.row(*rank_buttons_2)
@@ -951,14 +951,14 @@ class HoldingAnalysisHandler(BaseCommandHandler):
                 over_10_count = sum(1 for r in ranking_result["rankings"] if r["target_token_rank"] > 10)
                 if over_10_count > 0:
                     third_row_buttons.append(
-                        InlineKeyboardButton(f">10名({over_10_count})", callback_data=f"ca1_rank_{cache_key}_over10")
+                        InlineKeyboardButton(f">10名({over_10_count})", callback_data=f"ca_rank_{cache_key}_over10")
                     )
                 
                 # 添加阴谋钱包按钮
                 conspiracy_count = sum(1 for r in ranking_result["rankings"] if r.get("is_conspiracy_wallet", False))
                 if conspiracy_count > 0:
                     third_row_buttons.append(
-                        InlineKeyboardButton(f"🔴阴谋({conspiracy_count})", callback_data=f"ca1_rank_{cache_key}_conspiracy")
+                        InlineKeyboardButton(f"🔴阴谋({conspiracy_count})", callback_data=f"ca_rank_{cache_key}_conspiracy")
                     )
                 
                 if third_row_buttons:
@@ -966,11 +966,11 @@ class HoldingAnalysisHandler(BaseCommandHandler):
                 
                 # 功能按钮
                 markup.add(
-                    InlineKeyboardButton("⬅️ 返回代币排行", callback_data=f"ca1_sort_count_{cache_key}"),
-                    InlineKeyboardButton("🎯 地址集群分析", callback_data=f"ca1_cluster_{cache_key}")
+                    InlineKeyboardButton("⬅️ 返回代币排行", callback_data=f"ca_sort_count_{cache_key}"),
+                    InlineKeyboardButton("🎯 共同持仓分析", callback_data=f"ca_cluster_{cache_key}")
                 )
                 markup.add(
-                    InlineKeyboardButton("🔄 重新运行", callback_data=f"ca1_ranking_{cache_key}")
+                    InlineKeyboardButton("🔄 重新运行", callback_data=f"ca_ranking_{cache_key}")
                 )
 
                 # 更新消息
@@ -990,7 +990,7 @@ class HoldingAnalysisHandler(BaseCommandHandler):
 
                 markup = InlineKeyboardMarkup()
                 markup.add(
-                    InlineKeyboardButton("⬅️ 返回代币排行", callback_data=f"ca1_sort_count_{cache_key}")
+                    InlineKeyboardButton("⬅️ 返回代币排行", callback_data=f"ca_sort_count_{cache_key}")
                 )
 
                 self.bot.edit_message_text(
@@ -1012,7 +1012,7 @@ class HoldingAnalysisHandler(BaseCommandHandler):
 
             markup = InlineKeyboardMarkup()
             markup.add(
-                InlineKeyboardButton("⬅️ 返回代币排行", callback_data=f"ca1_sort_count_{cache_key}")
+                InlineKeyboardButton("⬅️ 返回代币排行", callback_data=f"ca_sort_count_{cache_key}")
             )
 
             self.bot.edit_message_text(
@@ -1024,11 +1024,11 @@ class HoldingAnalysisHandler(BaseCommandHandler):
                 disable_web_page_preview=True,
             )
 
-    def handle_ca1_rank_detail(self, call: CallbackQuery) -> None:
+    def handle_ca_rank_detail(self, call: CallbackQuery) -> None:
         """处理排名详情查看回调"""
         try:
-            # 解析回调数据: ca1_rank_{cache_key}_{rank} 或 ca1_rank_{cache_key}_over10
-            data_parts = call.data[len("ca1_rank_"):].split("_")
+            # 解析回调数据: ca_rank_{cache_key}_{rank} 或 ca_rank_{cache_key}_over10
+            data_parts = call.data[len("ca_rank_"):].split("_")
             if len(data_parts) < 2:
                 self.bot.answer_callback_query(call.id, "❌ 回调数据格式错误")
                 return
@@ -1165,7 +1165,7 @@ class HoldingAnalysisHandler(BaseCommandHandler):
             # 创建返回按钮
             markup = InlineKeyboardMarkup()
             markup.add(
-                InlineKeyboardButton("⬅️ 返回排名分析", callback_data=f"ca1_ranking_{cache_key}")
+                InlineKeyboardButton("⬅️ 返回排名分析", callback_data=f"ca_ranking_{cache_key}")
             )
             
             # 更新消息
@@ -1190,10 +1190,10 @@ class HoldingAnalysisHandler(BaseCommandHandler):
         """显示过期数据选项"""
         markup = InlineKeyboardMarkup()
         markup.add(
-            InlineKeyboardButton("🔄 重新分析", callback_data=f"ca1_reanalyze_{token_address}")
+            InlineKeyboardButton("🔄 重新分析", callback_data=f"ca_reanalyze_{token_address}")
         )
         self.bot.edit_message_text(
-            f"❌ 数据已过期（超过24小时）\n代币: <code>{token_address}</code>\n\n请点击下方按钮重新分析，或重新运行 /ca1 命令",
+            f"❌ 数据已过期（超过24小时）\n代币: <code>{token_address}</code>\n\n请点击下方按钮重新分析，或重新运行 /ca 命令",
             call.message.chat.id,
             call.message.message_id,
             parse_mode="HTML",
@@ -1205,25 +1205,25 @@ class HoldingAnalysisHandler(BaseCommandHandler):
     def register_handlers(self) -> None:
         """注册处理器"""
 
-        @self.bot.message_handler(commands=["ca1"])
-        def ca1_handler(message):
-            self.handle_ca1(message)
+        @self.bot.message_handler(commands=["ca"])
+        def ca_handler(message):
+            self.handle_ca(message)
 
-        @self.bot.callback_query_handler(func=lambda call: call.data.startswith("ca1_sort_"))
-        def ca1_sort_handler(call):
-            self.handle_ca1_sort(call)
+        @self.bot.callback_query_handler(func=lambda call: call.data.startswith("ca_sort_"))
+        def ca_sort_handler(call):
+            self.handle_ca_sort(call)
 
-        @self.bot.callback_query_handler(func=lambda call: call.data.startswith("ca1_cluster_"))
-        def ca1_cluster_handler(call):
-            self.handle_ca1_cluster(call)
+        @self.bot.callback_query_handler(func=lambda call: call.data.startswith("ca_cluster_"))
+        def ca_cluster_handler(call):
+            self.handle_ca_cluster(call)
 
-        @self.bot.callback_query_handler(func=lambda call: call.data.startswith("ca1_ranking_"))
-        def ca1_ranking_handler(call):
-            self.handle_ca1_ranking(call)
+        @self.bot.callback_query_handler(func=lambda call: call.data.startswith("ca_ranking_"))
+        def ca_ranking_handler(call):
+            self.handle_ca_ranking(call)
 
-        @self.bot.callback_query_handler(func=lambda call: call.data.startswith("ca1_rank_"))
-        def ca1_rank_detail_handler(call):
-            self.handle_ca1_rank_detail(call)
+        @self.bot.callback_query_handler(func=lambda call: call.data.startswith("ca_rank_"))
+        def ca_rank_detail_handler(call):
+            self.handle_ca_rank_detail(call)
 
         @self.bot.callback_query_handler(func=lambda call: call.data.startswith("token_detail_"))
         def token_detail_handler(call):

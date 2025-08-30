@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-简化版代币分析Bot - 仅保留 /ca1 功能
+简化版代币分析Bot - 仅保留 /ca 功能
 """
 import os
 import sys
@@ -14,7 +14,7 @@ from src.handlers.holding_analysis import HoldingAnalysisHandler
 
 
 class SimpleTokenBot:
-    """简化版代币分析机器人 - 仅支持 /ca1 命令"""
+    """简化版代币分析机器人 - 仅支持 /ca 命令"""
     
     def __init__(self):
         """初始化机器人"""
@@ -28,10 +28,10 @@ class SimpleTokenBot:
             self.bot = telebot.TeleBot(self.config.bot.telegram_token)
             print("✅ Telegram Bot 初始化成功")
             
-            # 初始化 ca1 处理器
+            # 初始化 ca 处理器
             self.holding_handler = HoldingAnalysisHandler(self.bot)
-            print("✅ CA1 处理器初始化成功")
-            print("✅ CA1 处理器初始化成功")
+            print("✅ CA 处理器初始化成功")
+            print("✅ CA 处理器初始化成功")
             
         except Exception as e:
             print(f"❌ Bot初始化失败: {e}")
@@ -44,7 +44,7 @@ class SimpleTokenBot:
         """注册处理器"""
         print("📝 注册消息处理器...")
         try:
-            # 只注册 ca1 处理器
+            # 只注册 ca 处理器
             self.holding_handler.register_handlers()
             
             # 添加基本的 start 和 help 命令
@@ -53,10 +53,10 @@ class SimpleTokenBot:
                 welcome_msg = (
                     "🤖 <b>代币分析Bot</b>\n\n"
                     "📋 <b>可用命令:</b>\n"
-                    "• <code>/ca1 &lt;代币地址&gt;</code> - 分析代币大户持仓\n"
+                    "• <code>/ca &lt;代币地址&gt;</code> - 分析代币大户持仓\n"
                     "• <code>/help</code> - 显示帮助信息\n\n"
                     "💡 <b>使用示例:</b>\n"
-                    "<code>/ca1 FbGsCHv8qPvUdmomVAiG72ET5D5kgBJgGoxxfMZipump</code>"
+                    "<code>/ca FbGsCHv8qPvUdmomVAiG72ET5D5kgBJgGoxxfMZipump</code>"
                 )
                 self._reply_to_user(message, welcome_msg, parse_mode="HTML")
             
@@ -64,16 +64,16 @@ class SimpleTokenBot:
             def help_handler(message):
                 help_msg = (
                     "📖 <b>帮助文档</b>\n\n"
-                    "🔍 <b>/ca1 命令使用方法:</b>\n"
-                    "• 命令格式: <code>/ca1 &lt;代币合约地址&gt;</code>\n"
+                    "🔍 <b>/ca 命令使用方法:</b>\n"
+                    "• 命令格式: <code>/ca &lt;代币合约地址&gt;</code>\n"
                     "• 功能: 分析指定代币的大户持仓情况\n"
                     "• 分析范围: 前100名大户的持仓分布\n\n"
                     "💡 <b>使用提示:</b>\n"
                     "• 确保代币地址格式正确\n"
                     "• 分析通常需要1-2分钟\n"
                     "• 可从GMGN、DEX等平台获取代币地址\n\n"
-                    "� <b>示例:</b>\n"
-                    "<code>/ca1 FbGsCHv8qPvUdmomVAiG72ET5D5kgBJgGoxxfMZipump</code>"
+                    "📝 <b>示例:</b>\n"
+                    "<code>/ca FbGsCHv8qPvUdmomVAiG72ET5D5kgBJgGoxxfMZipump</code>"
                 )
                 self._reply_to_user(message, help_msg, parse_mode="HTML")
                 

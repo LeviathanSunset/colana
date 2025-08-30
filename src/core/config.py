@@ -45,7 +45,7 @@ class ProxyConfig:
 @dataclass
 class PermissionsConfig:
     """权限控制配置"""
-    ca1_allowed_groups: List[str] = field(default_factory=list)
+    ca_allowed_groups: List[str] = field(default_factory=list)
 
 
 @dataclass
@@ -178,7 +178,7 @@ class ConfigManager:
         # 权限配置
         permissions_data = yaml_data.get('permissions', {})
         self._permissions_config = PermissionsConfig(
-            ca1_allowed_groups=permissions_data.get('ca1_allowed_groups', [])
+            ca_allowed_groups=permissions_data.get('ca_allowed_groups', [])
         )
         
         # 日志配置
@@ -232,7 +232,7 @@ class ConfigManager:
             'analysis': self._analysis_config.__dict__,
             'proxy': self._proxy_config.__dict__,
             'permissions': {
-                'ca1_allowed_groups': self._permissions_config.ca1_allowed_groups
+                'ca_allowed_groups': self._permissions_config.ca_allowed_groups
             },
             'logging': self._logging_config.__dict__
         }
@@ -266,11 +266,10 @@ class ConfigManager:
     def logging(self) -> LoggingConfig:
         return self._logging_config
 
-    # 兼容性属性（保持向后兼容）
     @property
-    def ca1_allowed_groups(self) -> List[str]:
-        """获取允许使用 /ca1 命令的群组列表"""
-        return self._permissions_config.ca1_allowed_groups
+    def ca_allowed_groups(self) -> List[str]:
+        """获取允许使用ca命令的群组ID列表"""
+        return self._permissions_config.ca_allowed_groups
 
     def update_config(self, section: str, **kwargs):
         """更新配置"""

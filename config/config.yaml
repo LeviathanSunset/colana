@@ -24,7 +24,7 @@ logging:
 
 # 权限控制
 permissions:
-  ca1_allowed_groups: [-1003097609656]
+  ca_allowed_groups: [-1003097609656]
 
 # 代理配置（可在.env中覆盖）
 proxy:
