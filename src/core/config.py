@@ -47,43 +47,15 @@ class ProxyConfig:
 
 
 @dataclass
-class CapumpConfig:
-    """Capump分析配置"""
-    interval: int = 120
-    threshold: float = 0.10
-    min_market_cap: float = 50000
-    min_age_days: int = 1
-    auto_analysis_enabled: bool = False
-    max_tokens_per_batch: int = 10
-    analysis_timeout: int = 180
-    notification_enabled: bool = True
-
-
-@dataclass  
-class JupiterConfig:
-    """Jupiter分析配置"""
-    max_mcap: int = 1000000
-    min_token_age: int = 3600
-    has_socials: bool = True
-    period: str = "24h"
-    max_tokens_per_analysis: int = 50
-    default_token_count: int = 10
-
-
-@dataclass
 class PermissionsConfig:
     """权限控制配置"""
     ca1_allowed_groups: List[str] = field(default_factory=list)
-    allowed_users: List[str] = field(default_factory=list)
-    allowed_chats: List[str] = field(default_factory=list)
 
 
 @dataclass
 class LoggingConfig:
     """日志配置"""
     level: str = "INFO"
-    max_file_size: int = 10485760  # 10MB
-    backup_count: int = 5
 
 
 
@@ -106,8 +78,6 @@ class ConfigManager:
         self._bot_config = None
         self._analysis_config = None
         self._proxy_config = None
-        self._capump_config = None
-        self._jupiter_config = None
         self._permissions_config = None
         self._logging_config = None
         self._logger = None
@@ -213,44 +183,16 @@ class ConfigManager:
             https_proxy=proxy_data.get('https_proxy', 'http://127.0.0.1:10808')
         )
         
-        # Capump配置
-        capump_data = yaml_data.get('capump', {})
-        self._capump_config = CapumpConfig(
-            interval=capump_data.get('interval', 120),
-            threshold=capump_data.get('threshold', 0.10),
-            min_market_cap=capump_data.get('min_market_cap', 50000),
-            min_age_days=capump_data.get('min_age_days', 1),
-            auto_analysis_enabled=capump_data.get('auto_analysis_enabled', False),
-            max_tokens_per_batch=capump_data.get('max_tokens_per_batch', 10),
-            analysis_timeout=capump_data.get('analysis_timeout', 180),
-            notification_enabled=capump_data.get('notification_enabled', True)
-        )
-        
-        # Jupiter配置
-        jupiter_data = yaml_data.get('jupiter', {})
-        self._jupiter_config = JupiterConfig(
-            max_mcap=jupiter_data.get('max_mcap', 1000000),
-            min_token_age=jupiter_data.get('min_token_age', 3600),
-            has_socials=jupiter_data.get('has_socials', True),
-            period=jupiter_data.get('period', '24h'),
-            max_tokens_per_analysis=jupiter_data.get('max_tokens_per_analysis', 50),
-            default_token_count=jupiter_data.get('default_token_count', 10)
-        )
-        
         # 权限配置
         permissions_data = yaml_data.get('permissions', {})
         self._permissions_config = PermissionsConfig(
-            ca1_allowed_groups=permissions_data.get('ca1_allowed_groups', []),
-            allowed_users=self._parse_comma_separated(os.getenv('ALLOWED_USERS')) or permissions_data.get('allowed_users', []),
-            allowed_chats=self._parse_comma_separated(os.getenv('ALLOWED_CHATS')) or permissions_data.get('allowed_chats', [])
+            ca1_allowed_groups=permissions_data.get('ca1_allowed_groups', [])
         )
         
         # 日志配置
         logging_data = yaml_data.get('logging', {})
         self._logging_config = LoggingConfig(
-            level=os.getenv('LOG_LEVEL') or logging_data.get('level', 'INFO'),
-            max_file_size=logging_data.get('max_file_size', 10485760),
-            backup_count=logging_data.get('backup_count', 5)
+            level=os.getenv('LOG_LEVEL') or logging_data.get('level', 'INFO')
         )
 
     def _override_with_env(self):
@@ -270,18 +212,6 @@ class ConfigManager:
             self._analysis_config.ranking_size = int(os.getenv('RANKING_SIZE'))
         if os.getenv('DETAIL_BUTTONS_COUNT'):
             self._analysis_config.detail_buttons_count = int(os.getenv('DETAIL_BUTTONS_COUNT'))
-        
-        # 覆盖Capump配置
-        if os.getenv('CAPUMP_AUTO_ANALYSIS'):
-            self._capump_config.auto_analysis_enabled = os.getenv('CAPUMP_AUTO_ANALYSIS', 'false').lower() == 'true'
-        if os.getenv('CAPUMP_MIN_MARKET_CAP'):
-            self._capump_config.min_market_cap = float(os.getenv('CAPUMP_MIN_MARKET_CAP'))
-        
-        # 覆盖Jupiter配置
-        if os.getenv('JUPITER_MAX_MCAP'):
-            self._jupiter_config.max_mcap = int(os.getenv('JUPITER_MAX_MCAP'))
-        if os.getenv('JUPITER_DEFAULT_TOKEN_COUNT'):
-            self._jupiter_config.default_token_count = int(os.getenv('JUPITER_DEFAULT_TOKEN_COUNT'))
 
     def _parse_comma_separated(self, value: str) -> List[str]:
         """解析逗号分隔的字符串为列表"""
@@ -298,8 +228,6 @@ class ConfigManager:
         )
         self._analysis_config = AnalysisConfig()
         self._proxy_config = ProxyConfig()
-        self._capump_config = CapumpConfig()
-        self._jupiter_config = JupiterConfig()
         self._permissions_config = PermissionsConfig()
         self._logging_config = LoggingConfig()
 
@@ -313,13 +241,9 @@ class ConfigManager:
                 'min_age_days': self._bot_config.min_age_days
             },
             'analysis': self._analysis_config.__dict__,
-            'capump': self._capump_config.__dict__,
-            'jupiter': self._jupiter_config.__dict__,
             'proxy': self._proxy_config.__dict__,
             'permissions': {
-                'ca1_allowed_groups': self._permissions_config.ca1_allowed_groups,
-                'allowed_users': [],  # 不保存用户权限到文件
-                'allowed_chats': []   # 不保存聊天权限到文件
+                'ca1_allowed_groups': self._permissions_config.ca1_allowed_groups
             },
             'logging': self._logging_config.__dict__
         }
@@ -346,14 +270,6 @@ class ConfigManager:
         return self._proxy_config
 
     @property
-    def capump(self) -> CapumpConfig:
-        return self._capump_config
-
-    @property
-    def jupiter(self) -> JupiterConfig:
-        return self._jupiter_config
-
-    @property
     def permissions(self) -> PermissionsConfig:
         return self._permissions_config
 
@@ -372,8 +288,6 @@ class ConfigManager:
         config_map = {
             'bot': self._bot_config,
             'analysis': self._analysis_config,
-            'capump': self._capump_config,
-            'jupiter': self._jupiter_config,
             'proxy': self._proxy_config,
             'permissions': self._permissions_config,
             'logging': self._logging_config

@@ -27,7 +27,7 @@ class DataManager:
         
         
         # 基本目录结构
-        self.subdirs = ["analysis", "holders", "jupiter", "logs", "csv_data", "config"]
+        self.subdirs = ["analysis", "holders", "logs", "csv_data", "config"]
         
         # 确保目录存在
         self.base_dir.mkdir(exist_ok=True)
@@ -62,7 +62,7 @@ class DataManager:
         获取指定类型文件的完整路径
         
         Args:
-            file_type: 文件类型 (analysis, holders, jupiter, logs, csv_data, config)
+            file_type: 文件类型 (analysis, holders, logs, csv_data, config)
             filename: 文件名
             
         Returns:
