@@ -75,7 +75,7 @@ class HoldingAnalysisHandler(BaseCommandHandler):
                 return
 
             # 检查群组权限
-            chat_id = str(message.chat.id)
+            chat_id = message.chat.id  # 保持为整数类型
             allowed_groups = self.config.ca1_allowed_groups
             
             if allowed_groups and chat_id not in allowed_groups:
