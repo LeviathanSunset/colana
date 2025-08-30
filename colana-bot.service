@@ -1,0 +1,28 @@
+[Unit]
+Description=Telegram Token Analysis Bot
+After=network.target network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=root
+Group=root
+WorkingDirectory=/home/root/telegram-bot/cocolanababanana
+Environment=PATH=/usr/bin:/usr/local/bin
+Environment=PYTHONPATH=/home/root/telegram-bot/cocolanababanana
+EnvironmentFile=/home/root/telegram-bot/cocolanababanana/config/.env
+ExecStart=/usr/bin/python3 /home/root/telegram-bot/cocolanababanana/main.py
+Restart=always
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=colana-bot
+
+# 安全设置
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=strict
+ReadWritePaths=/home/root/telegram-bot/cocolanababanana/storage
+
+[Install]
+WantedBy=multi-user.target
