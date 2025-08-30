@@ -1679,7 +1679,7 @@ def format_cluster_analysis(cluster_result: Dict, max_clusters: int = 5, page: i
             value_str = f"${total_value:.0f}"
 
         msg += f"🏆 <b>集群 #{cluster_id}</b>\n"
-        msg += f"💰 总价值: <b>{value_str}</b> | 平均: ${avg_value:,.0f}/地址\n"
+        msg += f"💰 共同代币总价值: <b>{value_str}</b> | 平均: ${avg_value:,.0f}/地址\n"
         msg += f"👥 地址数量: <b>{address_count}</b> | 共同代币: <b>{common_tokens_count}</b>\n\n"
 
         # 显示共同持有的代币
@@ -1698,12 +1698,21 @@ def format_cluster_analysis(cluster_result: Dict, max_clusters: int = 5, page: i
             else:
                 token_value_str = f"${cluster_value:.0f}"
 
+            # 计算地址平均价值
+            avg_token_value = cluster_value / address_count
+            if avg_token_value >= 1_000_000:
+                avg_value_str = f"${avg_token_value/1_000_000:.2f}M"
+            elif avg_token_value >= 1_000:
+                avg_value_str = f"${avg_token_value/1_000:.2f}K"
+            else:
+                avg_value_str = f"${avg_token_value:.0f}"
+
             # 添加代币链接
             gmgn_link = f"https://gmgn.ai/sol/token/{token_address}"
             symbol_with_link = f"<a href='{gmgn_link}'>{symbol}</a>"
 
             msg += (
-                f"  <b>{i}.</b> {symbol_with_link} {token_value_str} ({cluster_percentage:.1f}%)\n"
+                f"  <b>{i}.</b> {symbol_with_link} {token_value_str} (平均{avg_value_str}/地址)\n"
             )
 
         if len(common_tokens) > 5:
