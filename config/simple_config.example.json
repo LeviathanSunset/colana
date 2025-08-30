@@ -1,0 +1,19 @@
+{
+  "bot": {
+    "telegram_token": "YOUR_BOT_TOKEN_HERE"
+  },
+  "analysis": {
+    "top_holders_count": 100,
+    "ranking_size": 30,
+    "detail_buttons_count": 30,
+    "cluster_min_common_tokens": 2,
+    "cluster_min_addresses": 2,
+    "cluster_max_addresses": 50,
+    "clusters_per_page": 5,
+    "max_concurrent_threads": 5
+  },
+  "proxy": {
+    "enabled": false
+  },
+  "ca1_allowed_groups": []
+}
