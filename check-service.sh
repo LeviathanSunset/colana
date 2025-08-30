@@ -9,9 +9,9 @@ YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
-SERVICE_NAME="colana-bot"
+SERVICE_NAME="colana-ca1-bot"
 
-echo -e "${BLUE}🤖 Telegram Bot 服务状态${NC}"
+echo -e "${BLUE}🤖 Telegram Bot CA1 简化版服务状态${NC}"
 echo "=========================="
 
 # 检查服务状态

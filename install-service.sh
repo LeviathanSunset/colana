@@ -13,10 +13,10 @@ NC='\033[0m' # No Color
 
 # 项目路径
 PROJECT_DIR="/home/root/telegram-bot/cocolanababanana"
-SERVICE_NAME="colana-bot"
+SERVICE_NAME="colana-ca1-bot"
 SERVICE_FILE="$PROJECT_DIR/$SERVICE_NAME.service"
 
-echo -e "${BLUE}🤖 Telegram Bot 系统服务安装程序${NC}"
+echo -e "${BLUE}🤖 Telegram Bot CA1 简化版系统服务安装程序${NC}"
 echo "========================================"
 
 # 检查是否为root用户

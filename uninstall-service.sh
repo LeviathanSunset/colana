@@ -11,9 +11,9 @@ YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
-SERVICE_NAME="colana-bot"
+SERVICE_NAME="colana-ca1-bot"
 
-echo -e "${BLUE}🗑️ Telegram Bot 系统服务卸载程序${NC}"
+echo -e "${BLUE}🗑️ Telegram Bot CA1 简化版系统服务卸载程序${NC}"
 echo "========================================"
 
 # 检查是否为root用户

@@ -1,5 +1,5 @@
 [Unit]
-Description=Telegram Token Analysis Bot
+Description=Telegram Token Analysis Bot - Simple CA1 Version
 After=network.target network-online.target
 Wants=network-online.target
 
