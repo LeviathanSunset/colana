@@ -1,38 +1,33 @@
 # 代币大户分析Bot - 主配置文件
 # 敏感信息请在 .env 文件中配置
 
-# 机器人基础配置
-bot:
-  interval: 58                    # 监控间隔（秒）
-  threshold: 0.05                # 变化阈值
-  min_market_cap: 0              # 最小市值
-  min_age_days: 10               # 最小代币年龄（天）
+# 机器人基础配置（敏感信息如Token在.env中配置）
+bot: 
+  # Telegram相关配置在.env文件中设置
 
 # 分析相关配置
 analysis:
-  top_holders_count: 100         # 获取前N名持有者
-  ranking_size: 30               # 排行榜显示数量
-  detail_buttons_count: 30       # 详情按钮数量
-  cluster_min_common_tokens: 2   # 聚类最小共同代币数
-  cluster_min_addresses: 2       # 聚类最小地址数
-  cluster_max_addresses: 50      # 聚类最大地址数
-  clusters_per_page: 3           # 每页显示聚类数
-  max_concurrent_threads: 5      # 最大并发线程数
-  # 已知的池子地址列表（即使OKX检测不到也要识别）
+  cluster_max_addresses: 50
+  cluster_min_addresses: 2
+  cluster_min_common_tokens: 2
+  clusters_per_page: 3
+  detail_buttons_count: 30
   known_pool_addresses:
-    - "5Q544fKrFoe6tsEbD7S8EmxGTJYAKtTVhAW5Q5pge4j1"
-
-# 代理配置（可在.env中覆盖）
-proxy:
-  enabled: false                 # 代理开关
-  http_proxy: "http://127.0.0.1:10808"   # HTTP代理地址
-  https_proxy: "http://127.0.0.1:10808"  # HTTPS代理地址
-
-# 权限控制
-permissions:
-  # 允许使用 /ca1 命令的群组ID列表（空表示允许所有群组）
-  ca1_allowed_groups: []
+  - 5Q544fKrFoe6tsEbD7S8EmxGTJYAKtTVhAW5Q5pge4j1
+  max_concurrent_threads: 5
+  ranking_size: 30
+  top_holders_count: 100
 
 # 日志配置
 logging:
-  level: "INFO"                  # 日志级别: DEBUG, INFO, WARNING, ERROR
+  level: INFO
+
+# 权限控制
+permissions:
+  ca1_allowed_groups: []
+
+# 代理配置（可在.env中覆盖）
+proxy:
+  enabled: false
+  http_proxy: http://127.0.0.1:10808
+  https_proxy: http://127.0.0.1:10808

@@ -17,11 +17,7 @@ class BotConfig:
     """机器人基础配置"""
     telegram_token: str
     telegram_chat_id: str
-    message_thread_id: Optional[int] = None
-    interval: int = 58
-    threshold: float = 0.05
-    min_market_cap: float = 0
-    min_age_days: int = 10
+    message_thread_id: int = None
 
 
 @dataclass
@@ -154,11 +150,7 @@ class ConfigManager:
         self._bot_config = BotConfig(
             telegram_token=os.getenv('TELEGRAM_TOKEN', 'YOUR_BOT_TOKEN_HERE'),
             telegram_chat_id=os.getenv('TELEGRAM_CHAT_ID', 'YOUR_CHAT_ID_HERE'),
-            message_thread_id=int(os.getenv('MESSAGE_THREAD_ID')) if os.getenv('MESSAGE_THREAD_ID') else None,
-            interval=bot_data.get('interval', 58),
-            threshold=bot_data.get('threshold', 0.05),
-            min_market_cap=bot_data.get('min_market_cap', 0),
-            min_age_days=bot_data.get('min_age_days', 10)
+            message_thread_id=int(os.getenv('MESSAGE_THREAD_ID')) if os.getenv('MESSAGE_THREAD_ID') else None
         )
         
         # 分析配置
@@ -235,10 +227,7 @@ class ConfigManager:
         """保存配置到YAML文件（不包含敏感信息）"""
         config_data = {
             'bot': {
-                'interval': self._bot_config.interval,
-                'threshold': self._bot_config.threshold,
-                'min_market_cap': self._bot_config.min_market_cap,
-                'min_age_days': self._bot_config.min_age_days
+                # 敏感信息存储在.env文件中，这里只保留注释
             },
             'analysis': self._analysis_config.__dict__,
             'proxy': self._proxy_config.__dict__,
