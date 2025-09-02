@@ -14,9 +14,22 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime
 from typing import List, Dict, Optional
 from ..utils.data_manager import DataManager
+from ..utils.logger import get_logger
 
 # SOL原生代币的合约地址
 SOL_TOKEN_ADDRESS = "So11111111111111111111111111111111111111111"
+
+# 稳定币地址列表（Solana主网）
+STABLECOIN_ADDRESSES = {
+    "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",  # USDC
+    "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB",  # USDT
+    "4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU",  # USDC (old)
+    "7WXaHLjahp8BZq7e9jyshW4Bsg4GnDfLU9aJ7BWPq8YG",  # USD
+    "7dHbWXmci3dT8UFYWYZweBLXgycu7Y3iL6trKn1Y7ARj",  # stSOL (质押SOL)
+}
+
+# SOL和稳定币地址合集
+SOL_AND_STABLECOINS = {SOL_TOKEN_ADDRESS} | STABLECOIN_ADDRESSES
 
 # 全局分析缓存，用于存储分析结果以供按钮回调使用
 analysis_cache = {}
@@ -807,6 +820,205 @@ class OKXCrawlerForBot:
 
         return analysis_result
 
+    def analyze_wallet_group_holdings(self, target_token_address: str, wallet_addresses: list) -> dict:
+        """
+        分析指定钱包组的持仓情况
+        
+        Args:
+            target_token_address: 目标代币地址  
+            wallet_addresses: 要分析的钱包地址列表
+            
+        Returns:
+            dict: 分析结果，格式与analyze_token_holders相同
+        """
+        start_time = time.time()
+        logger = get_logger("crawler")
+        
+        try:
+            logger.info(f"开始钱包组分析: 目标代币={target_token_address}, 钱包数量={len(wallet_addresses)}")
+            
+            # 获取目标代币的持有者信息，用于获取流通量百分比
+            target_token_holders = self.get_token_holders(target_token_address)
+            target_holders_map = {}
+            if target_token_holders:
+                for holder in target_token_holders:
+                    wallet_addr = holder.get("holderWalletAddress", "")
+                    if wallet_addr:
+                        target_holders_map[wallet_addr] = {
+                            "holdAmountPercentage": float(holder.get("holdAmountPercentage", 0)),
+                            "holdAmount": holder.get("holdAmount", "0"),
+                            "holdVolume": float(holder.get("holdVolume", 0))
+                        }
+                logger.info(f"获取到目标代币 {len(target_holders_map)} 个持有者的流通量信息")
+            
+            # 收集所有代币信息
+            all_tokens = []
+            all_addresses = set()
+            
+            # 首先获取目标代币信息（放在第一位）
+            target_token_data = None
+            
+            # 使用多线程获取所有钱包资产
+            wallet_assets = self.get_wallet_assets_threaded(wallet_addresses, max_workers=5)
+            
+            # 分析每个钱包的持仓
+            for wallet_address, wallet_data in wallet_assets.items():
+                try:
+                    if not wallet_data:
+                        logger.warning(f"钱包 {wallet_address} 无数据")
+                        continue
+                        
+                    all_addresses.add(wallet_address)
+                    
+                    # 直接复用 extract_top_tokens 的逻辑
+                    top_tokens = self.extract_top_tokens(wallet_data)
+                    
+                    logger.info(f"钱包 {wallet_address[:8]}...{wallet_address[-6:]} 有 {len(top_tokens)} 个有价值代币")
+                    
+                    for token in top_tokens:
+                        token_address = token.get("address", "")
+                        if not token_address:
+                            continue
+                            
+                        token_value = token.get("value_usd", 0)
+                        token_symbol = token.get("symbol", "Unknown")
+                        token_name = token.get("name", token_symbol)  # 获取代币名称
+                        token_balance = token.get("balance", 0)
+                        
+                        logger.info(f"  代币: {token_symbol} ({token_address[:8]}...) 价值: ${token_value:.2f}")
+                        
+                        # 查找是否已存在该代币
+                        existing_token = None
+                        for existing in all_tokens:
+                            if existing["address"] == token_address:
+                                existing_token = existing
+                                break
+                        
+                        if existing_token:
+                            # 获取流通量百分比（如果是目标代币）
+                            percentage = 0
+                            if token_address == target_token_address and wallet_address in target_holders_map:
+                                percentage = target_holders_map[wallet_address]["holdAmountPercentage"]
+                            
+                            # 更新现有代币的持有者信息
+                            existing_token["holders_details"].append({
+                                "holder_address": wallet_address,
+                                "value_usd": token_value,
+                                "balance": token_balance,
+                                "percentage": percentage,  # 使用真实的流通量百分比（如果是目标代币）
+                                "holder_rank": len(existing_token["holders_details"]) + 1  # 设置持有者排名
+                            })
+                            existing_token["total_value"] += token_value
+                            existing_token["holder_count"] += 1
+                        else:
+                            # 获取流通量百分比（如果是目标代币）
+                            percentage = 0
+                            if token_address == target_token_address and wallet_address in target_holders_map:
+                                percentage = target_holders_map[wallet_address]["holdAmountPercentage"]
+                            
+                            # 新代币
+                            new_token = {
+                                "address": token_address,
+                                "symbol": token_symbol,
+                                "name": token_name,  # 添加代币名称
+                                "total_value": token_value,
+                                "holder_count": 1,
+                                "holders_details": [{
+                                    "holder_address": wallet_address,
+                                    "value_usd": token_value,
+                                    "balance": token_balance,
+                                    "percentage": percentage,  # 使用真实的流通量百分比（如果是目标代币）
+                                    "holder_rank": 1  # 设置持有者排名
+                                }]
+                            }
+                            
+                            # 如果是目标代币，保存引用并放在首位
+                            if token_address == target_token_address:
+                                target_token_data = new_token
+                                all_tokens.insert(0, new_token)
+                            else:
+                                all_tokens.append(new_token)
+                
+                except Exception as e:
+                    logger.error(f"分析钱包 {wallet_address} 失败: {e}")
+                    continue
+            
+            # 确保目标代币在第一位
+            if target_token_data and all_tokens[0]["address"] != target_token_address:
+                # 移除目标代币并插入到首位
+                all_tokens = [token for token in all_tokens if token["address"] != target_token_address]
+                all_tokens.insert(0, target_token_data)
+            
+            # 过滤和排序代币
+            filtered_tokens = []
+            for token in all_tokens:
+                if token["holder_count"] >= 1 and token["total_value"] >= 1:  # 降低门槛
+                    filtered_tokens.append(token)
+            
+            # 目标代币保持在第一位，其他按价值排序
+            if filtered_tokens and filtered_tokens[0]["address"] == target_token_address:
+                target_token = filtered_tokens[0]
+                other_tokens = sorted(filtered_tokens[1:], key=lambda x: x["total_value"], reverse=True)
+                sorted_tokens = [target_token] + other_tokens
+            else:
+                sorted_tokens = sorted(filtered_tokens, key=lambda x: x["total_value"], reverse=True)
+            
+            analysis_duration = time.time() - start_time
+            
+            # 构建原始持有者数据（用于目标代币排名分析）
+            original_holders_data = []
+            if target_token_data:
+                for i, holder_detail in enumerate(target_token_data.get("holders_details", [])):
+                    holder_address = holder_detail["holder_address"]
+                    # 从目标代币持有者信息中获取真实的流通量百分比
+                    target_holder_info = target_holders_map.get(holder_address, {})
+                    hold_amount_percentage = target_holder_info.get("holdAmountPercentage", 0)
+                    hold_volume = target_holder_info.get("holdVolume", holder_detail["value_usd"])
+                    hold_amount = target_holder_info.get("holdAmount", str(holder_detail["balance"]))
+                    
+                    holder_info = {
+                        "holderWalletAddress": holder_address,
+                        "holdVolume": hold_volume,
+                        "holdAmount": hold_amount,
+                        "holdAmountPercentage": hold_amount_percentage,  # 使用真实的流通量百分比
+                        "rank": i + 1
+                    }
+                    original_holders_data.append(holder_info)
+                    logger.info(f"钱包 {holder_address[:8]}...{holder_address[-6:]} 流通量占比: {hold_amount_percentage:.3f}%")
+            
+            # 构建分析结果，与普通分析结果格式保持一致
+            analysis_result = {
+                "token_address": target_token_address,
+                "analysis_time": datetime.now().isoformat(),
+                "filtering_stats": {
+                    "original_holders_count": len(wallet_addresses),
+                    "excluded_holders_count": 0,
+                    "filtered_holders_count": len(all_addresses),
+                    "analyzed_holders_count": len(all_addresses)
+                },
+                "total_holders_analyzed": len(all_addresses),
+                "target_token_actual_holders": len([t for t in sorted_tokens if t["address"] == target_token_address]),
+                "original_holders_data": original_holders_data,  # 添加目标代币持有者数据
+                "is_wallet_group_analysis": True,  # 标记为钱包组分析
+                "wallet_group_size": len(wallet_addresses),
+                "successful_wallets": len(all_addresses),
+                "token_statistics": {
+                    "total_unique_tokens": len(filtered_tokens),
+                    "total_portfolio_value": sum(token["total_value"] for token in sorted_tokens),
+                    "top_tokens_by_value": sorted_tokens,
+                }
+            }
+            
+            logger.info(f"钱包组分析完成: 耗时{analysis_duration:.2f}s, 成功分析{len(all_addresses)}个钱包, 发现{len(sorted_tokens)}种代币")
+            
+            return analysis_result
+            
+        except Exception as e:
+            logger.error(f"钱包组分析失败: {e}")
+            import traceback
+            traceback.print_exc()
+            return None
+
 
 def analyze_target_token_rankings(analysis_result: Dict, original_holders: List[Dict] = None) -> Dict:
     """
@@ -929,17 +1141,63 @@ def analyze_target_token_rankings(analysis_result: Dict, original_holders: List[
         if target_rank > 15 and target_value > 0:
             portfolio_total_value += target_value
         
-        target_percentage = 0
-        is_conspiracy_wallet = False
+        # 计算排除SOL和稳定币后的资产总价值（用于阴谋β计算）
+        portfolio_value_without_sol_stable = 0
+        target_value_for_beta = target_value  # 目标代币价值（用于阴谋β）
         
+        for token in holder_tokens:
+            token_addr = token.get("address", "")
+            token_value = token.get("value_usd", 0)
+            
+            # 如果不是SOL和稳定币，加入阴谋β计算
+            if token_addr not in SOL_AND_STABLECOINS:
+                portfolio_value_without_sol_stable += token_value
+        
+        # 如果目标代币不在前15名且不是SOL/稳定币，需要加上目标代币价值
+        target_token_address_current = target_token_address  # 目标代币地址
+        if (target_rank > 15 and target_value > 0 and 
+            target_token_address_current not in SOL_AND_STABLECOINS):
+            portfolio_value_without_sol_stable += target_value
+        
+        # 如果目标代币是SOL或稳定币，阴谋β中目标代币价值为0
+        if target_token_address_current in SOL_AND_STABLECOINS:
+            target_value_for_beta = 0
+        
+        # 计算阴谋α（所有资产）
+        target_percentage_alpha = 0
+        is_conspiracy_alpha = False
         if portfolio_total_value > 0 and target_value > 0:
-            target_percentage = (target_value / portfolio_total_value) * 100
-            is_conspiracy_wallet = target_percentage > 50  # 阴谋钱包：目标代币占比>50%
+            target_percentage_alpha = (target_value / portfolio_total_value) * 100
+            is_conspiracy_alpha = target_percentage_alpha > 50
+        
+        # 计算阴谋β（排除SOL和稳定币）
+        target_percentage_beta = 0
+        is_conspiracy_beta = False
+        if portfolio_value_without_sol_stable > 0 and target_value_for_beta > 0:
+            target_percentage_beta = (target_value_for_beta / portfolio_value_without_sol_stable) * 100
+            is_conspiracy_beta = target_percentage_beta > 50
+        
+        # 综合判断：任一条件满足即为阴谋钱包
+        is_conspiracy_wallet = is_conspiracy_alpha or is_conspiracy_beta
+        
+        # 保持向后兼容性，target_percentage使用阴谋α的值
+        target_percentage = target_percentage_alpha
         
         # 获取目标代币的持有百分比（占总供应量）
         target_supply_percentage = 0
         if holder_address in original_target_holders:
             target_supply_percentage = original_target_holders[holder_address]["holdAmountPercentage"]
+        else:
+            # 如果该地址不在原始目标持有者中，但持有目标代币，
+            # 尝试从目标代币的详细信息中获取百分比
+            if target_rank <= 15 and target_value > 0:
+                # 从target_token的holders_details中查找该地址的百分比
+                for holder_detail in target_token.get("holders_details", []):
+                    if holder_detail.get("holder_address") == holder_address:
+                        # 使用目标代币价值和总持有价值来估算百分比
+                        # 这里我们根据价值占比来估算流通量百分比
+                        # 这是一个近似值，因为我们没有代币的具体数量信息
+                        break
         
         address_rankings.append({
             "holder_address": holder_address,
@@ -949,8 +1207,13 @@ def analyze_target_token_rankings(analysis_result: Dict, original_holders: List[
             "target_supply_percentage": target_supply_percentage,  # 占总供应量百分比
             "total_tokens": len(holder_tokens),
             "portfolio_value": portfolio_total_value,
-            "target_percentage": target_percentage,
-            "is_conspiracy_wallet": is_conspiracy_wallet
+            "portfolio_value_without_sol_stable": portfolio_value_without_sol_stable,  # 排除SOL和稳定币的资产价值
+            "target_percentage": target_percentage,  # 阴谋α占比（所有资产）
+            "target_percentage_alpha": target_percentage_alpha,  # 阴谋α占比（所有资产）
+            "target_percentage_beta": target_percentage_beta,  # 阴谋β占比（排除SOL和稳定币）
+            "is_conspiracy_wallet": is_conspiracy_wallet,  # 综合阴谋钱包判断
+            "is_conspiracy_alpha": is_conspiracy_alpha,  # 阴谋α
+            "is_conspiracy_beta": is_conspiracy_beta  # 阴谋β
         })
     
     print(f"最终统计了 {len(address_rankings)} 个地址的排名")
@@ -982,8 +1245,21 @@ def analyze_target_token_rankings(analysis_result: Dict, original_holders: List[
         
         # 阴谋钱包统计
         conspiracy_wallets = [addr for addr in address_rankings if addr["is_conspiracy_wallet"]]
+        conspiracy_alpha_wallets = [addr for addr in address_rankings if addr["is_conspiracy_alpha"]]
+        conspiracy_beta_wallets = [addr for addr in address_rankings if addr["is_conspiracy_beta"]]
+        
         conspiracy_count = len(conspiracy_wallets)
+        conspiracy_alpha_count = len(conspiracy_alpha_wallets)
+        conspiracy_beta_count = len(conspiracy_beta_wallets)
+        
         conspiracy_total_value = sum(wallet["target_token_value"] for wallet in conspiracy_wallets)
+        conspiracy_alpha_total_value = sum(wallet["target_token_value"] for wallet in conspiracy_alpha_wallets)
+        conspiracy_beta_total_value = sum(wallet["target_token_value"] for wallet in conspiracy_beta_wallets)
+        
+        # 流通量占比统计
+        conspiracy_supply_percentage = sum(wallet.get("target_supply_percentage", 0) for wallet in conspiracy_wallets)
+        conspiracy_alpha_supply_percentage = sum(wallet.get("target_supply_percentage", 0) for wallet in conspiracy_alpha_wallets)
+        conspiracy_beta_supply_percentage = sum(wallet.get("target_supply_percentage", 0) for wallet in conspiracy_beta_wallets)
         
         # 智能分析
         analysis_text = _generate_ranking_analysis(address_rankings, avg_rank, rank_distribution)
@@ -993,9 +1269,16 @@ def analyze_target_token_rankings(analysis_result: Dict, original_holders: List[
         
         statistics = {
             "total_addresses": original_target_holders_count,  # 原始目标代币持有者数量
-            "actual_holders": len(actual_holders_all),  # 目标代币在钱包中排名≤10的地址数
-            "conspiracy_wallets": conspiracy_count,  # 阴谋钱包数量
-            "conspiracy_total_value": conspiracy_total_value,  # 阴谋钱包总价值
+            "actual_holders": len(actual_holders_all),  # 目标代币在钱包中排名≤15的地址数
+            "conspiracy_wallets": conspiracy_count,  # 综合阴谋钱包数量
+            "conspiracy_alpha_wallets": conspiracy_alpha_count,  # 阴谋α钱包数量
+            "conspiracy_beta_wallets": conspiracy_beta_count,  # 阴谋β钱包数量
+            "conspiracy_total_value": conspiracy_total_value,  # 综合阴谋钱包总价值
+            "conspiracy_alpha_total_value": conspiracy_alpha_total_value,  # 阴谋α钱包总价值
+            "conspiracy_beta_total_value": conspiracy_beta_total_value,  # 阴谋β钱包总价值
+            "conspiracy_supply_percentage": conspiracy_supply_percentage,  # 综合阴谋钱包流通量占比
+            "conspiracy_alpha_supply_percentage": conspiracy_alpha_supply_percentage,  # 阴谋α钱包流通量占比
+            "conspiracy_beta_supply_percentage": conspiracy_beta_supply_percentage,  # 阴谋β钱包流通量占比
             "average_rank": avg_rank,
             "median_rank": median_rank,
             "rank_distribution": rank_distribution,
@@ -1059,8 +1342,16 @@ def _calculate_analysis_metrics(rankings: List[Dict]) -> Dict:
     
     # 阴谋钱包相关
     conspiracy_wallets = [r for r in rankings if r.get("is_conspiracy_wallet", False)]
+    conspiracy_alpha_wallets = [r for r in rankings if r.get("is_conspiracy_alpha", False)]
+    conspiracy_beta_wallets = [r for r in rankings if r.get("is_conspiracy_beta", False)]
+    
     conspiracy_count = len(conspiracy_wallets)
+    conspiracy_alpha_count = len(conspiracy_alpha_wallets)
+    conspiracy_beta_count = len(conspiracy_beta_wallets)
+    
     conspiracy_supply = sum(r.get("target_supply_percentage", 0) for r in conspiracy_wallets)
+    conspiracy_alpha_supply = sum(r.get("target_supply_percentage", 0) for r in conspiracy_alpha_wallets)
+    conspiracy_beta_supply = sum(r.get("target_supply_percentage", 0) for r in conspiracy_beta_wallets)
     
     # 排名分布统计
     top3_count = len([r for r in rankings if r["target_token_rank"] <= 3])
@@ -1075,12 +1366,20 @@ def _calculate_analysis_metrics(rankings: List[Dict]) -> Dict:
     # 总流通量
     total_supply = sum(r.get("target_supply_percentage", 0) for r in rankings)
     conspiracy_risk_ratio = conspiracy_supply / total_supply if total_supply > 0 else 0
+    conspiracy_alpha_risk_ratio = conspiracy_alpha_supply / total_supply if total_supply > 0 else 0
+    conspiracy_beta_risk_ratio = conspiracy_beta_supply / total_supply if total_supply > 0 else 0
     
     return {
         "total_addresses": total_addresses,
         "conspiracy_count": conspiracy_count,
+        "conspiracy_alpha_count": conspiracy_alpha_count,
+        "conspiracy_beta_count": conspiracy_beta_count,
         "conspiracy_supply": conspiracy_supply,
+        "conspiracy_alpha_supply": conspiracy_alpha_supply,
+        "conspiracy_beta_supply": conspiracy_beta_supply,
         "conspiracy_risk_ratio": conspiracy_risk_ratio,
+        "conspiracy_alpha_risk_ratio": conspiracy_alpha_risk_ratio,
+        "conspiracy_beta_risk_ratio": conspiracy_beta_risk_ratio,
         "top3_count": top3_count,
         "top5_count": top5_count,
         "top15_count": top15_count,
@@ -1094,18 +1393,40 @@ def _calculate_analysis_metrics(rankings: List[Dict]) -> Dict:
 def _analyze_conspiracy_risk(metrics: Dict) -> str:
     """分析阴谋钱包风险"""
     conspiracy_count = metrics["conspiracy_count"]
+    conspiracy_alpha_count = metrics["conspiracy_alpha_count"]
+    conspiracy_beta_count = metrics["conspiracy_beta_count"]
     conspiracy_supply = metrics["conspiracy_supply"]
+    conspiracy_alpha_supply = metrics["conspiracy_alpha_supply"]
+    conspiracy_beta_supply = metrics["conspiracy_beta_supply"]
     conspiracy_risk_ratio = metrics["conspiracy_risk_ratio"]
+    conspiracy_alpha_risk_ratio = metrics["conspiracy_alpha_risk_ratio"]
+    conspiracy_beta_risk_ratio = metrics["conspiracy_beta_risk_ratio"]
     
     if conspiracy_count == 0:
         return "✅ 无阴谋风险：未发现过度集中持仓钱包"
     
+    # 构建详细的阴谋钱包分析
+    analysis_parts = []
+    
+    # 总体风险评估
     if conspiracy_risk_ratio >= 0.6:
-        return f"🔴 阴谋风险极高：{conspiracy_count}个钱包过度集中({conspiracy_supply:.1f}%)，砸盘风险大"
+        analysis_parts.append(f"🔴 阴谋风险极高：{conspiracy_count}个钱包过度集中({conspiracy_supply:.1f}%)，砸盘风险大")
     elif conspiracy_risk_ratio >= 0.3:
-        return f"🟡 阴谋风险中等：{conspiracy_count}个钱包集中持仓({conspiracy_supply:.1f}%)，需谨慎"
+        analysis_parts.append(f"🟡 阴谋风险中等：{conspiracy_count}个钱包集中持仓({conspiracy_supply:.1f}%)，需谨慎")
     else:
-        return f"🟢 阴谋风险较低：{conspiracy_count}个集中钱包占比{conspiracy_supply:.1f}%，可控"
+        analysis_parts.append(f"🟢 阴谋风险较低：{conspiracy_count}个集中钱包占比{conspiracy_supply:.1f}%，可控")
+    
+    # 详细分析阴谋α和阴谋β
+    detail_parts = []
+    if conspiracy_alpha_count > 0:
+        detail_parts.append(f"α型{conspiracy_alpha_count}个({conspiracy_alpha_supply:.1f}%)")
+    if conspiracy_beta_count > 0:
+        detail_parts.append(f"β型{conspiracy_beta_count}个({conspiracy_beta_supply:.1f}%)")
+    
+    if detail_parts:
+        analysis_parts.append(f"其中{', '.join(detail_parts)}")
+    
+    return " ".join(analysis_parts)
 
 
 def _analyze_holder_confidence(avg_rank: float, metrics: Dict) -> str:
@@ -1763,6 +2084,12 @@ def format_target_token_rankings(ranking_result: Dict) -> str:
     
     # 计算阴谋钱包流通量占比
     conspiracy_supply_percentage = sum(r.get("target_supply_percentage", 0) for r in rankings if r.get("is_conspiracy_wallet", False))
+    conspiracy_alpha_supply_percentage = sum(r.get("target_supply_percentage", 0) for r in rankings if r.get("is_conspiracy_alpha", False))
+    conspiracy_beta_supply_percentage = sum(r.get("target_supply_percentage", 0) for r in rankings if r.get("is_conspiracy_beta", False))
+    
+    # 获取阴谋钱包统计
+    conspiracy_alpha_count = statistics.get("conspiracy_alpha_wallets", 0)
+    conspiracy_beta_count = statistics.get("conspiracy_beta_wallets", 0)
     
     # 计算分析地址流通量占比（只计算原始目标代币持有者，即有target_supply_percentage的地址）
     all_analysis_percentage = sum(r.get("target_supply_percentage", 0) for r in rankings if r.get("target_supply_percentage", 0) > 0)
@@ -1774,9 +2101,17 @@ def format_target_token_rankings(ranking_result: Dict) -> str:
     msg += f"🎯 分析地址: <b>{total_addresses}</b> 个大户（{all_analysis_percentage:.1f}%）\n"
     msg += f"💎 实际持有: <b>{actual_holders}</b> 个 ({actual_holders_supply_percentage:.1f}%)\n"
     
-    # 阴谋钱包信息
+    # 阴谋钱包信息 - 显示详细的α和β分类
     if conspiracy_count > 0:
         msg += f"🔴 阴谋钱包: <b>{conspiracy_count}</b> 个 ({conspiracy_supply_percentage:.1f}%)\n"
+        detail_parts = []
+        if conspiracy_alpha_count > 0:
+            detail_parts.append(f"α型{conspiracy_alpha_count}个({conspiracy_alpha_supply_percentage:.1f}%)")
+        if conspiracy_beta_count > 0:
+            detail_parts.append(f"β型{conspiracy_beta_count}个({conspiracy_beta_supply_percentage:.1f}%)")
+        if detail_parts:
+            msg += f"   ├ {', '.join(detail_parts)}\n"
+            msg += f"   └ α型：所有资产>50% | β型：除SOL/稳定币>50%\n"
     
     msg += "───────────────────────────────────\n\n"
     

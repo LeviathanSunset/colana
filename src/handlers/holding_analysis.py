@@ -145,6 +145,252 @@ class HoldingAnalysisHandler(BaseCommandHandler):
             
         except Exception as e:
             self.logger.error_with_solution(e, f"ca命令处理失败 - 用户: {message.from_user.username}")
+
+    def handle_caw(self, message: Message) -> None:
+        """处理 /caw 命令 - 钱包组分析"""
+        try:
+            if not OKXCrawlerForBot:
+                error_msg = (
+                    "❌ OKX分析功能暂时不可用\n\n"
+                    "🔧 可能的解决方案:\n"
+                    "• 检查网络连接和代理设置\n"
+                    "• 确认OKX API服务正常\n"
+                    "• 重启Bot服务\n"
+                    "• 联系管理员检查依赖模块"
+                )
+                self.reply_with_topic(message, error_msg)
+                self.logger.error("OKX分析模块未加载，功能不可用")
+                return
+
+            # 检查群组权限
+            chat_id = message.chat.id
+            allowed_groups = self.config.ca_allowed_groups
+            
+            if allowed_groups and chat_id not in allowed_groups:
+                self.reply_with_topic(
+                    message, 
+                    "❌ 此功能仅在特定群组中可用\n如需使用，请联系管理员"
+                )
+                self.logger.warning(f"未授权群组 {chat_id} 尝试使用caw功能")
+                return
+
+            # 提取钱包地址数组参数
+            parts = message.text.split(maxsplit=1)
+            if len(parts) < 2:
+                help_msg = (
+                    "❌ 请提供钱包地址列表\n\n"
+                    "📋 使用方法:\n"
+                    "<code>/caw [代币地址\n钱包地址1\n钱包地址2\n...]</code>\n\n"
+                    "📝 示例:\n"
+                    "<code>/caw [EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v\n"
+                    "4vbZLVibs7pXH3B9SAu92TF6n23PgqaakDS34Wbh5gNs\n"
+                    "66T4v43X9yt6TRjBkLwhptt3SPxvdEUqJjiCkFWAqL2f]</code>\n\n"
+                    "💡 提示: 第一行是目标代币地址，后面是要分析的钱包地址"
+                )
+                self.reply_with_topic(message, help_msg, parse_mode="HTML")
+                return
+
+            # 解析钱包地址数组
+            input_text = parts[1].strip()
+            if not (input_text.startswith('[') and input_text.endswith(']')):
+                self.reply_with_topic(message, "❌ 格式错误：请使用 [地址1\n地址2\n...] 格式")
+                return
+
+            # 移除方括号并按行分割
+            addresses_text = input_text[1:-1].strip()
+            address_lines = [line.strip() for line in addresses_text.split('\n') if line.strip()]
+            
+            if len(address_lines) < 2:
+                self.reply_with_topic(message, "❌ 至少需要提供目标代币地址和一个钱包地址")
+                return
+
+            target_token_address = address_lines[0]  # 第一行是目标代币地址
+            wallet_addresses = address_lines[1:]     # 其余是钱包地址
+
+            # 验证地址格式
+            if len(target_token_address) < 32:
+                self.reply_with_topic(message, f"❌ 目标代币地址格式错误: {target_token_address}")
+                return
+
+            for addr in wallet_addresses:
+                if len(addr) < 32:
+                    self.reply_with_topic(message, f"❌ 钱包地址格式错误: {addr}")
+                    return
+
+            # 发送处理消息
+            processing_msg = self.reply_with_topic(
+                message,
+                f"🔍 正在分析钱包组持仓...\n"
+                f"目标代币: <code>{target_token_address}</code>\n"
+                f"钱包数量: {len(wallet_addresses)} 个\n"
+                f"⏳ 预计耗时: 30-60秒",
+                parse_mode="HTML"
+            )
+
+            # 在后台线程中运行分析
+            analysis_thread = threading.Thread(
+                target=self._run_wallet_group_analysis,
+                args=(processing_msg, target_token_address, wallet_addresses)
+            )
+            analysis_thread.daemon = True
+            analysis_thread.start()
+
+        except Exception as e:
+            self.logger.error_with_solution(e, f"caw命令处理失败 - 用户: {message.from_user.username}")
+
+    def _run_wallet_group_analysis(self, processing_msg, target_token_address: str, wallet_addresses: list):
+        """在后台运行钱包组分析"""
+        start_time = time.time()
+        
+        try:
+            # 创建OKX爬虫实例
+            crawler = OKXCrawlerForBot()
+            
+            # 直接分析指定的钱包地址组
+            result = crawler.analyze_wallet_group_holdings(target_token_address, wallet_addresses)
+            
+            analysis_duration = time.time() - start_time
+            
+            if result and result.get("token_statistics"):
+                # 生成缓存键
+                # 生成简短的缓存键（避免Telegram callback_data长度限制）
+                import hashlib
+                token_hash = hashlib.md5(target_token_address.encode()).hexdigest()[:8]
+                cache_key = f"wg_{token_hash}_{len(wallet_addresses)}_{int(time.time())}"
+                
+                # 缓存分析结果（按照/ca命令的格式）
+                analysis_cache[cache_key] = {
+                    "result": result,
+                    "token_address": target_token_address,  # 添加目标代币地址
+                    "timestamp": time.time(),
+                    "is_wallet_group": True  # 标记为钱包组分析
+                }
+                
+                # 记录性能日志
+                self.logger.log_performance(
+                    "钱包组分析",
+                    analysis_duration,
+                    {
+                        "target_token": target_token_address,
+                        "wallet_count": len(wallet_addresses),
+                        "tokens_found": len(result["token_statistics"].get("top_tokens_by_value", []))
+                    }
+                )
+                
+                # 获取目标代币符号
+                target_symbol = "Unknown"
+                target_tokens = [t for t in result["token_statistics"]["top_tokens_by_value"] if t["address"] == target_token_address]
+                if target_tokens:
+                    target_symbol = target_tokens[0]["symbol"]
+                
+                # 格式化代币表格
+                table_msg, table_markup = format_tokens_table(
+                    result["token_statistics"],
+                    max_tokens=self.config.analysis.ranking_size,
+                    sort_by="value",
+                    cache_key=cache_key,
+                    target_token_symbol=target_symbol,
+                )
+                
+                # 添加分析信息
+                analysis_info = f"\n📊 <b>{target_symbol} 钱包组分析统计</b>\n"
+                analysis_info += f"🕒 分析时间: {result.get('analysis_time', '').split('T')[0]}\n"
+                analysis_info += f"👥 分析地址: {result.get('total_holders_analyzed', 0)} 个钱包\n"
+                target_holders = len([t for t in result["token_statistics"]["top_tokens_by_value"] if t["address"] == target_token_address])
+                if target_holders > 0:
+                    analysis_info += f"🎯 持有 {target_symbol} 的钱包: {target_holders} 个\n"
+                analysis_info += f"📈 统计范围: 每个钱包的所有有价值代币\n"
+
+                final_msg = table_msg + analysis_info
+
+                # 创建完整的按钮布局 
+                if table_markup:
+                    # 添加排序切换按钮
+                    table_markup.add(
+                        InlineKeyboardButton(
+                            "💰 按价值排序 ✅", callback_data=f"ca_sort_value_{cache_key}"
+                        ),
+                        InlineKeyboardButton(
+                            "👥 按人数排序", callback_data=f"ca_sort_count_{cache_key}"
+                        ),
+                    )
+                    
+                    # 添加集群分析和目标代币排名按钮
+                    table_markup.add(
+                        InlineKeyboardButton(
+                            "🎯 共同持仓分析", callback_data=f"ca_cluster_{cache_key}"
+                        ),
+                        InlineKeyboardButton(
+                            "📊 目标代币排名", callback_data=f"ca_ranking_{cache_key}"
+                        )
+                    )
+                else:
+                    # 如果没有代币详情按钮，创建新的按钮布局
+                    table_markup = InlineKeyboardMarkup(row_width=2)
+                    table_markup.add(
+                        InlineKeyboardButton(
+                            "💰 按价值排序 ✅", callback_data=f"ca_sort_value_{cache_key}"
+                        ),
+                        InlineKeyboardButton(
+                            "👥 按人数排序", callback_data=f"ca_sort_count_{cache_key}"
+                        ),
+                    )
+                    table_markup.add(
+                        InlineKeyboardButton(
+                            "🎯 共同持仓分析", callback_data=f"ca_cluster_{cache_key}"
+                        ),
+                        InlineKeyboardButton(
+                            "📊 目标代币排名", callback_data=f"ca_ranking_{cache_key}"
+                        )
+                    )
+
+                # 编辑消息显示结果
+                self.bot.edit_message_text(
+                    final_msg,
+                    processing_msg.chat.id,
+                    processing_msg.message_id,
+                    parse_mode="HTML",
+                    reply_markup=table_markup,
+                    disable_web_page_preview=True,
+                )
+                
+            else:
+                error_msg = (
+                    f"❌ 分析失败\n"
+                    f"目标代币: `{target_token_address}`\n"
+                    f"钱包数量: {len(wallet_addresses)}\n\n"
+                    f"🔧 可能原因:\n"
+                    f"• 代币地址无效\n"
+                    f"• 钱包地址格式错误\n"
+                    f"• 网络连接问题\n\n"
+                    f"🕒 分析耗时: {analysis_duration:.1f}秒"
+                )
+                
+                self.bot.edit_message_text(
+                    error_msg,
+                    processing_msg.chat.id,
+                    processing_msg.message_id,
+                    parse_mode="Markdown",
+                )
+
+        except Exception as e:
+            analysis_duration = time.time() - start_time
+            
+            error_info = self.logger.error_with_solution(e, f"钱包组分析失败 - {target_token_address}")
+            
+            user_error_msg = (
+                f"❌ 钱包组分析失败\n"
+                f"目标代币: {target_token_address}\n"
+                f"错误: {str(e)}\n\n"
+                f"🕒 已分析: {analysis_duration:.1f}秒"
+            )
+            
+            self.bot.edit_message_text(
+                user_error_msg,
+                processing_msg.chat.id,
+                processing_msg.message_id,
+                parse_mode=None,
+            )
             error_msg = (
                 "❌ 命令处理失败\n\n"
                 "🔧 请尝试:\n"
@@ -855,9 +1101,11 @@ class HoldingAnalysisHandler(BaseCommandHandler):
             # 解析回调数据: ca_ranking_{cache_key}
             cache_key = call.data[len("ca_ranking_"):]
             print(f"目标代币排名回调: cache_key={cache_key}")
+            print(f"当前缓存中的键: {list(analysis_cache.keys())}")
             
             # 从缓存中获取分析结果
             if cache_key not in analysis_cache:
+                print(f"❌ 缓存键 {cache_key} 不存在")
                 self.bot.answer_callback_query(call.id, "❌ 数据缓存已失效，请重新运行 /ca 命令")
                 return
 
@@ -867,6 +1115,7 @@ class HoldingAnalysisHandler(BaseCommandHandler):
 
             # 检查缓存是否过期
             if time.time() - cached_data["timestamp"] > 24 * 3600:
+                print(f"❌ 缓存已过期: {time.time() - cached_data['timestamp']} 秒")
                 self._show_expired_data_option(call, token_address)
                 return
 
@@ -878,6 +1127,7 @@ class HoldingAnalysisHandler(BaseCommandHandler):
                     break
             
             target_symbol = target_token_info.get("symbol", "Unknown") if target_token_info else "Unknown"
+            print(f"目标代币: {target_symbol} ({token_address})")
 
             # 显示正在分析的消息
             self.bot.edit_message_text(
@@ -899,6 +1149,8 @@ class HoldingAnalysisHandler(BaseCommandHandler):
 
         except Exception as e:
             print(f"排名分析回调错误: error={str(e)}")
+            import traceback
+            traceback.print_exc()
             self.bot.answer_callback_query(call.id, f"❌ 启动排名分析失败: {str(e)}")
 
     def _run_ranking_analysis(
@@ -946,7 +1198,7 @@ class HoldingAnalysisHandler(BaseCommandHandler):
                 if rank_buttons_2:
                     markup.row(*rank_buttons_2)
                 
-                # 第三行：>10名 + 阴谋钱包
+                # 第三行：>10名 + 阴谋钱包总按钮
                 third_row_buttons = []
                 over_10_count = sum(1 for r in ranking_result["rankings"] if r["target_token_rank"] > 10)
                 if over_10_count > 0:
@@ -954,7 +1206,7 @@ class HoldingAnalysisHandler(BaseCommandHandler):
                         InlineKeyboardButton(f">10名({over_10_count})", callback_data=f"ca_rank_{cache_key}_over10")
                     )
                 
-                # 添加阴谋钱包按钮
+                # 添加综合阴谋钱包按钮
                 conspiracy_count = sum(1 for r in ranking_result["rankings"] if r.get("is_conspiracy_wallet", False))
                 if conspiracy_count > 0:
                     third_row_buttons.append(
@@ -963,6 +1215,23 @@ class HoldingAnalysisHandler(BaseCommandHandler):
                 
                 if third_row_buttons:
                     markup.row(*third_row_buttons)
+                
+                # 第四行：阴谋α和阴谋β的详细按钮
+                fourth_row_buttons = []
+                conspiracy_alpha_count = sum(1 for r in ranking_result["rankings"] if r.get("is_conspiracy_alpha", False))
+                conspiracy_beta_count = sum(1 for r in ranking_result["rankings"] if r.get("is_conspiracy_beta", False))
+                
+                if conspiracy_alpha_count > 0:
+                    fourth_row_buttons.append(
+                        InlineKeyboardButton(f"🔴α型({conspiracy_alpha_count})", callback_data=f"ca_rank_{cache_key}_conspiracy_alpha")
+                    )
+                if conspiracy_beta_count > 0:
+                    fourth_row_buttons.append(
+                        InlineKeyboardButton(f"🔴β型({conspiracy_beta_count})", callback_data=f"ca_rank_{cache_key}_conspiracy_beta")
+                    )
+                
+                if fourth_row_buttons:
+                    markup.row(*fourth_row_buttons)
                 
                 # 功能按钮
                 markup.add(
@@ -1060,6 +1329,12 @@ class HoldingAnalysisHandler(BaseCommandHandler):
             elif rank_part == "conspiracy":
                 filtered_rankings = [r for r in rankings if r.get("is_conspiracy_wallet", False)]
                 rank_title = "阴谋钱包"
+            elif rank_part == "conspiracy_alpha":
+                filtered_rankings = [r for r in rankings if r.get("is_conspiracy_alpha", False)]
+                rank_title = "阴谋α钱包"
+            elif rank_part == "conspiracy_beta":
+                filtered_rankings = [r for r in rankings if r.get("is_conspiracy_beta", False)]
+                rank_title = "阴谋β钱包"
             else:
                 try:
                     target_rank = int(rank_part)
@@ -1083,6 +1358,10 @@ class HoldingAnalysisHandler(BaseCommandHandler):
             # 为阴谋钱包添加特殊说明
             if rank_part == "conspiracy":
                 msg += f"🔴 <i>阴谋钱包：{symbol}代币价值占总资产>50%的地址</i>\n"
+            elif rank_part == "conspiracy_alpha":
+                msg += f"🔴 <i>阴谋α钱包：{symbol}代币价值占全部资产>50%的地址</i>\n"
+            elif rank_part == "conspiracy_beta":
+                msg += f"🟠 <i>阴谋β钱包：{symbol}代币价值占资产(去除SOL及稳定币)>50%的地址</i>\n"
             
             msg += "─" * 35 + "\n\n"
             
@@ -1144,13 +1423,16 @@ class HoldingAnalysisHandler(BaseCommandHandler):
                 
                 msg += f"<b>{i:2d}.</b> 大户#{holder_rank} {addr_with_link}\n"
                 if rank_part == "over10":
+                    # 修正百分比显示格式
                     percentage_str = f"({target_supply_percentage:.3f}%)" if target_supply_percentage > 0 else ""
                     msg += f"    {rank_emoji} 排名: <b>第{target_rank}名</b>/{total_tokens} | 价值: {value_str} {percentage_str}\n"
                 elif rank_part == "conspiracy":
                     target_percentage = ranking.get("target_percentage", 0)
+                    # 修正百分比显示格式
                     percentage_str = f"({target_supply_percentage:.3f}%)" if target_supply_percentage > 0 else ""
                     msg += f"    🔴 排名: <b>第{target_rank}名</b>/{total_tokens} | 占比: <b>{target_percentage:.1f}%</b> | 价值: {value_str} {percentage_str}\n"
                 else:
+                    # 修正百分比显示格式
                     percentage_str = f"({target_supply_percentage:.3f}%)" if target_supply_percentage > 0 else ""
                     msg += f"    {rank_emoji} 排名: <b>{rank_title}</b>/{total_tokens} | 价值: {value_str} {percentage_str}\n"
                 msg += f"    💼 总资产: {portfolio_str}\n\n"
@@ -1208,6 +1490,10 @@ class HoldingAnalysisHandler(BaseCommandHandler):
         @self.bot.message_handler(commands=["ca"])
         def ca_handler(message):
             self.handle_ca(message)
+
+        @self.bot.message_handler(commands=["caw"])
+        def caw_handler(message):
+            self.handle_caw(message)
 
         @self.bot.callback_query_handler(func=lambda call: call.data.startswith("ca_sort_"))
         def ca_sort_handler(call):
