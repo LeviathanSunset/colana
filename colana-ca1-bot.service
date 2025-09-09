@@ -7,11 +7,11 @@ Wants=network-online.target
 Type=simple
 User=root
 Group=root
-WorkingDirectory=/home/root/telegram-bot/cocolanababanana
+WorkingDirectory=/root/projects/colana
 Environment=PATH=/usr/bin:/usr/local/bin
-Environment=PYTHONPATH=/home/root/telegram-bot/cocolanababanana
-EnvironmentFile=/home/root/telegram-bot/cocolanababanana/config/.env
-ExecStart=/usr/bin/python3 /home/root/telegram-bot/cocolanababanana/main.py
+Environment=PYTHONPATH=/root/projects/colana
+EnvironmentFile=/root/projects/colana/config/.env
+ExecStart=/usr/bin/python3 /root/projects/colana/main.py
 Restart=always
 RestartSec=10
 StandardOutput=journal
@@ -22,7 +22,7 @@ SyslogIdentifier=colana-bot
 NoNewPrivileges=yes
 PrivateTmp=yes
 ProtectSystem=strict
-ReadWritePaths=/home/root/telegram-bot/cocolanababanana/storage
+ReadWritePaths=/root/projects/colana/storage
 
 [Install]
 WantedBy=multi-user.target

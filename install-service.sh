@@ -12,7 +12,7 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 # 项目路径
-PROJECT_DIR="/home/root/telegram-bot/cocolanababanana"
+PROJECT_DIR="$(cd "$(dirname "$0")" && pwd)"
 SERVICE_NAME="colana-ca1-bot"
 SERVICE_FILE="$PROJECT_DIR/$SERVICE_NAME.service"
 
@@ -46,21 +46,48 @@ if [ ! -f "$PROJECT_DIR/config/.env" ]; then
     exit 1
 fi
 
+if [ ! -f "$PROJECT_DIR/config/config.yaml" ]; then
+    echo -e "${RED}❌ 配置文件不存在: $PROJECT_DIR/config/config.yaml${NC}"
+    exit 1
+fi
+
 # 检查配置是否有效
 cd "$PROJECT_DIR"
-export $(cat config/.env | grep -v '^#' | xargs)
+# 安全地加载环境变量，处理带引号和空格的值
+while IFS= read -r line; do
+    # 跳过注释和空行
+    if [[ $line =~ ^[[:space:]]*# ]] || [[ -z "${line// }" ]]; then
+        continue
+    fi
+    # 处理变量赋值，移除空格和引号
+    if [[ $line =~ ^[[:space:]]*([A-Za-z_][A-Za-z0-9_]*)[[:space:]]*=[[:space:]]*(.*)$ ]]; then
+        var_name="${BASH_REMATCH[1]}"
+        var_value="${BASH_REMATCH[2]}"
+        # 移除首尾引号
+        var_value="${var_value%\"}"
+        var_value="${var_value#\"}"
+        var_value="${var_value%\'}"
+        var_value="${var_value#\'}"
+        export "$var_name=$var_value"
+    fi
+done < config/.env
 python3 -c "
 import sys
 sys.path.insert(0, 'src')
-from src.core.config import ConfigManager
-config = ConfigManager()
-if config.bot.telegram_token == 'YOUR_BOT_TOKEN_HERE':
-    print('❌ 请在config/.env文件中设置正确的TELEGRAM_TOKEN')
+try:
+    from src.core.config import ConfigManager
+    config = ConfigManager()
+    # 检查基本配置是否存在
+    if not hasattr(config, 'bot') or not config.bot.telegram_token or config.bot.telegram_token == 'YOUR_BOT_TOKEN_HERE':
+        print('❌ 请在config/.env文件中设置正确的TELEGRAM_TOKEN')
+        exit(1)
+    if not config.bot.telegram_chat_id or config.bot.telegram_chat_id == 'YOUR_CHAT_ID_HERE':
+        print('❌ 请在config/.env文件中设置正确的TELEGRAM_CHAT_ID')
+        exit(1)
+    print('✅ 配置检查通过')
+except Exception as e:
+    print(f'❌ 配置检查失败: {e}')
     exit(1)
-if config.bot.telegram_chat_id == 'YOUR_CHAT_ID_HERE':
-    print('❌ 请在config/.env文件中设置正确的TELEGRAM_CHAT_ID')
-    exit(1)
-print('✅ 配置检查通过')
 " || exit 1
 
 # 安装依赖
