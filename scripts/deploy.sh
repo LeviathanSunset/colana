@@ -17,7 +17,7 @@ fi
 
 # 2. 激活虚拟环境并安装依赖
 echo "📦 安装依赖..."
-source venv/bin/activate
+. venv/bin/activate
 pip install --upgrade pip
 pip install -r requirements.txt
 
@@ -52,11 +52,11 @@ if [ $? -ne 0 ]; then
 fi
 
 # 5. 设置systemd服务（可选）
-read -p "是否设置为系统服务？(y/n): " -n 1 -r
-echo
-if [[ $REPLY =~ ^[Yy]$ ]]; then
+echo "是否设置为系统服务？(y/n): "
+read -r REPLY
+if [ "$REPLY" = "y" ] || [ "$REPLY" = "Y" ]; then
     echo "🔧 设置systemd服务..."
-    sudo cp colana-bot.service /etc/systemd/system/
+    sudo cp deployment/colana-bot.service /etc/systemd/system/
     sudo systemctl daemon-reload
     sudo systemctl enable colana-bot
     echo "✅ 服务已设置，使用以下命令管理："

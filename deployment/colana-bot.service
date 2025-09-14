@@ -6,12 +6,12 @@ Wants=network.target
 [Service]
 Type=simple
 User=root
-WorkingDirectory=/home/root/telegram-bot/colana
-ExecStart=/home/root/telegram-bot/colana/scripts/start.sh
+WorkingDirectory=/root/projects/colana
+ExecStart=/root/projects/colana/scripts/start.sh
 Restart=always
 RestartSec=10
-Environment=PATH=/home/root/telegram-bot/colana/venv/bin:/usr/local/bin:/usr/bin:/bin
-EnvironmentFile=/home/root/telegram-bot/colana/config/.env
+Environment=PATH=/root/projects/colana/venv/bin:/usr/local/bin:/usr/bin:/bin
+EnvironmentFile=/root/projects/colana/config/.env
 StandardOutput=journal
 StandardError=journal
 

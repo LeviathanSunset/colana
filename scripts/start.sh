@@ -4,7 +4,7 @@
 echo "🚀 启动代币大户分析Bot..."
 
 # 进入项目目录
-cd /home/root/telegram-bot/colana
+cd /root/projects/colana
 
 # 加载环境变量
 if [ -f config/.env ]; then
@@ -17,7 +17,7 @@ fi
 
 # 激活虚拟环境
 echo "🔄 激活虚拟环境..."
-source venv/bin/activate
+. venv/bin/activate
 
 # 检查依赖
 echo "📦 检查依赖..."
