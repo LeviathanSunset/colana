@@ -7,11 +7,11 @@ Wants=network-online.target
 Type=simple
 User=root
 Group=root
-WorkingDirectory=/root/projects/colana
+WorkingDirectory=/root/projects/colana1
 Environment=PATH=/usr/bin:/usr/local/bin
-Environment=PYTHONPATH=/root/projects/colana
-EnvironmentFile=/root/projects/colana/config/.env
-ExecStart=/usr/bin/python3 /root/projects/colana/main.py
+Environment=PYTHONPATH=/root/projects/colana1
+EnvironmentFile=/root/projects/colana1/config/.env
+ExecStart=/usr/bin/python3 /root/projects/colana1/main.py
 Restart=always
 RestartSec=10
 StandardOutput=journal
@@ -22,7 +22,7 @@ SyslogIdentifier=colana-bot
 NoNewPrivileges=yes
 PrivateTmp=yes
 ProtectSystem=strict
-ReadWritePaths=/root/projects/colana/storage
+ReadWritePaths=/root/projects/colana1/storage
 
 [Install]
 WantedBy=multi-user.target
