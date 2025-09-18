@@ -68,7 +68,7 @@ class ConfigManager:
         """
         # 设置配置文件路径
         self.yaml_config_file = yaml_config_file or "config/config.yaml"
-        self.env_file = env_file or ".env"
+        self.env_file = env_file or "config/.env"
         
         # 初始化配置对象
         self._bot_config = None
